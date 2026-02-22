@@ -231,18 +231,13 @@ source ~/.bashrc
 nvm install 22
 npm install -g clawdbot --registry=https://registry.npmmirror.com
 
-脚本会自动完成：
-✅ 系统更新
-✅ 防火墙配置（开放 22/80/443/8080/8081 端口）
-✅ 清理 Oracle 默认 iptables 规则
-✅ 配置 4GB Swap
-✅ 安装 Node.js
-✅ 安装 Clawdbot
-✅ 安装 Claude Code
-✅ 初始化工作目录
+安装完成后验证：
+clawdbot --version
 
 ⏱️ 耗时：3-5 分钟（看网速）
-📍 成功标志：看到"🎉 安装完成！"和版本信息就对了！✅
+📍 成功标志：能看到版本号就对了！✅
+
+💡 防火墙、Swap 等服务器优化见进阶篇。
 
 📍 配图 12：安装完成截图，圈出版本信息
 
@@ -382,7 +377,7 @@ nano ~/.clawdbot/clawdbot.json
         "id": "bingbu",
         "name": "兵部尚书",
         "model": "anthropic/claude-opus-4-6",
-        "identity": {"theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。",
+        "identity": {"theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。"},
         "sandbox": {
           "mode": "all",
           "scope": "agent"
@@ -392,7 +387,7 @@ nano ~/.clawdbot/clawdbot.json
         "id": "hubu",
         "name": "户部尚书",
         "model": "anthropic/claude-opus-4-6",
-        "identity": {"theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。",
+        "identity": {"theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。"},
         "sandbox": {
           "mode": "all",
           "scope": "agent"
@@ -402,7 +397,7 @@ nano ~/.clawdbot/clawdbot.json
         "id": "libu",
         "name": "礼部尚书",
         "model": "qwen/qwen-plus-latest",
-        "identity": {"theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。",
+        "identity": {"theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。"},
         "sandbox": {
           "mode": "all",
           "scope": "agent"
