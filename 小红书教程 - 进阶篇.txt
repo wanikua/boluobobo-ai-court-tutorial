@@ -779,45 +779,48 @@ MAILTO=your-email@example.com
 
 ⚔️ 实战场景：朝廷自动化任务
 
+💡 Clawdbot 有内置 cron 功能，直接在 clawdbot.json 里配置，
+用自然语言写指令，不需要写 bash 脚本！
+
 场景 1：每日自动日报
 
-# 编辑 crontab
-crontab -e
+{
+  "id": "daily-report",
+  "schedule": "0 14 * * *",
+  "text": "生成今日日报，写入 Notion 日报数据库",
+  "agent": "司礼监"
+}
 
-# 添加：每天下午 6 点生成日报
-0 18 * * * cd ~/clawd && ./daily-report.sh >> ~/clawd/reports/daily.log 2>&1
+💡 schedule 用标准 cron 表达式，"0 14 * * *" = UTC 14:00 = 北京 22:00
 
-💡 效果：每天下午 6 点，朝廷自动生成日报并记录日志！
+场景 2：每周自动备份代码
 
-场景 2：每周自动备份
+{
+  "id": "weekly-backup",
+  "schedule": "0 9 * * 5",
+  "text": "把 ~/clawd 目录的改动提交并 push 到 GitHub，commit message 写'周备份'",
+  "agent": "兵部"
+}
 
-# 每周五下午 5 点备份代码
-0 17 * * 5 cd ~/clawd && git add . && git commit -m "周备份 $(date +'%Y-%m-%d')" && git push origin main >> ~/clawd/git-backup.log 2>&1
+场景 3：服务器健康检查
 
-# 每周日凌晨 2 点备份数据库
-0 2 * * 0 mysqldump -u root -p'password' database > ~/backups/db-$(date +'%Y%m%d').sql
-
-场景 3：每小时健康检查
-
-# 每小时检查服务器状态
-0 * * * * cd ~/clawd && ./health-check.sh >> ~/clawd/health.log 2>&1
-
-# health-check.sh 示例
-#!/bin/bash
-echo "=== 健康检查 $(date) ==="
-echo "CPU: $(top -bn1 | grep 'Cpu(s)' | awk '{print $2}')%"
-echo "内存：$(free -h | grep Mem | awk '{print $3 "/" $2}')"
-echo "磁盘：$(df -h / | tail -1 | awk '{print $5}')"
-echo "========================"
+{
+  "id": "health-check",
+  "schedule": "0 */6 * * *",
+  "text": "检查服务器 CPU、内存、磁盘使用率，如果有异常立即通知",
+  "agent": "司礼监"
+}
 
 场景 4：每月财务汇总
 
-# 每月 1 号上午 10 点生成财务报告
-0 10 1 * * cd ~/clawd && ./monthly-finance.sh >> ~/clawd/reports/finance.log 2>&1
+{
+  "id": "monthly-finance",
+  "schedule": "0 12 1 * *",
+  "text": "汇总本月所有 API 花费和服务器成本，按类别统计，写入 Notion 财务数据库",
+  "agent": "户部"
+}
 
-场景 5：Discord 定时通知
-
-用 Clawdbot 内置 cron（不是 Linux crontab）：
+场景 5：每天早上发工作计划
 
 {
   "id": "morning-plan",
@@ -825,6 +828,9 @@ echo "========================"
   "text": "在 Discord 日报频道发送今日工作计划提醒",
   "agent": "司礼监"
 }
+
+⚠️ 注意：这是 Clawdbot 内置 cron，不是 Linux crontab！
+所有配置写在 clawdbot.json 的 "cron" 数组里。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
