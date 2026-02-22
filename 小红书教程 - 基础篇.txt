@@ -1,0 +1,597 @@
+🏛️ 保姆级教程：30 分钟搭建你的 AI 朝廷
+
+完整版 | 评论区领取 | 3000 字 | 每步都有截图指引
+适用人群：完全零基础小白
+预计耗时：30-45 分钟
+最终效果：拥有一台永久免费的云服务器，运行你的 AI 朝廷团队
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+📖 目录
+
+1. 领免费服务器（10 分钟）
+2. 连接服务器（5 分钟）
+3. 一键安装 Clawdbot（5 分钟）
+4. 配置 API Key（5 分钟）
+5. 搭建朝廷架构（15 分钟）
+6. 启动并测试（5 分钟）
+7. 常见问题 Q&A
+8. 15 张配图清单
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+一、领免费服务器（10 分钟）
+
+1.1 打开 Oracle Cloud 官网
+网址：https://signup.cloud.oracle.com
+
+📍 配图 1：Oracle Cloud 注册首页，红框圈出"Sign Up"按钮
+
+1.2 填写基本信息
+- Country/Territory：选择 China
+- Name：你的真实姓名（拼音）
+- Email：推荐 Gmail/Outlook（QQ 邮箱可能收不到验证码）
+- 点击 "Verify my email"
+
+⏱️ 耗时：1 分钟
+❗ 易错点：邮箱一定要能正常收海外邮件！
+
+📍 配图 2：注册表单页面，红框圈出邮箱输入框和验证按钮
+
+1.3 验证邮箱
+1. 打开邮箱，找到 Oracle 发的验证邮件
+2. 复制 6 位验证码
+3. 粘贴回注册页面，点击 "Verify Code"
+
+📍 配图 3：验证邮件截图 + 验证码输入框
+
+1.4 设置密码
+密码要求：
+- 至少 8 个字符
+- 至少 1 个大写字母 + 1 个小写字母 + 1 个数字 + 1 个特殊字符
+
+💡 建议格式：MyOracle2025! 这种
+
+📍 配图 4：密码设置页面，标注密码要求
+
+1.5 选择主区域（⚠️ 最重要！）
+选定后无法更改！推荐：
+
+🇯🇵 日本东京 ⭐⭐⭐⭐⭐ 延迟低，容量足
+🇯🇵 日本大阪 ⭐⭐⭐⭐ 备选
+🇺🇸 美西凤凰城 ⭐⭐⭐⭐ 容量大
+
+⏱️ 耗时：2 分钟
+❗ 易错点：不要选新加坡/首尔！经常缺货抢不到！
+
+📍 配图 5：区域选择页面，红框圈出"ap-tokyo-1"
+
+1.6 填写地址和手机
+- Address：随便填个英文地址（合理即可）
+- Phone：+86 你的手机号
+- 选择 "Text me a code" 收短信验证
+
+❗ 易错点：+86 有时收不到短信，多试几次或换个时间段
+
+1.7 添加信用卡
+🔒 不会扣费！只是身份验证，Oracle 会预授权$1（之后退回）
+
+支持的卡：
+✅ Visa 信用卡/借记卡
+✅ MasterCard 信用卡/借记卡
+❌ 银联卡（不支持）
+❌ 预付费卡（大概率失败）
+
+⏱️ 耗时：3 分钟
+❗ 易错点：必须是 Visa 或 MasterCard！确保卡上有$1 余额！
+
+📍 配图 6：信用卡信息填写页面，圈出卡类型标识
+
+1.8 完成注册
+1. 勾选同意条款
+2. 点击 "Start my free trial"
+3. 等待激活（通常几分钟到几小时）
+
+📍 成功标志：收到邮件"Your Oracle Cloud account is activated" ✅
+
+1.9 登录控制台
+1. 访问：https://cloud.oracle.com
+2. 输入 Cloud Account Name（注册时填的）
+3. 选择 "Oracle Cloud Infrastructure Direct Sign-In"
+4. 输入邮箱和密码登录
+
+📍 配图 7：Oracle Cloud 登录页面
+
+1.10 创建服务器实例
+1. 点击左上角 ☰ 汉堡菜单
+2. 选择 Compute → Instances
+3. 点击 "Create Instance"
+
+📍 配图 8：Instances 页面，圈出"Create Instance"按钮
+
+配置实例（按顺序）：
+
+Name：clawdbot-server（随便起）
+Image：Ubuntu 24.04（一定要改！默认是 Oracle Linux）
+Shape：VM.Standard.A1.Flex（ARM 架构）
+OCPUs：4（免费最大 4 核）
+Memory：24（免费最大 24GB）
+Public IP：Assign（必须分配公网 IP）
+SSH 密钥：Generate（下载私钥保存好！）
+Boot Volume：200GB（免费最大）
+
+⏱️ 耗时：3 分钟
+❗ 超级易错点：
+- 必须选 ARM（Ampere），AMD 的免费实例只有 1GB 内存几乎不能用！
+- SSH 密钥只能下载一次！关掉页面就没了！
+
+📍 配图 9：实例配置页面，圈出 ARM 架构选择和 SSH 密钥下载按钮
+
+1.11 等待实例创建
+点击 "Create" 后，等待状态变为 "RUNNING"（约 2-5 分钟）
+记 Public IP Address（如 144.24.xxx.xxx）
+
+📍 配图 10：实例详情页，圈出公网 IP 地址
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+⚠️ 中国大陆用户特别说明（重要！）
+
+可能遇到的问题：
+🚫 中国大陆 IP 可能被限制注册（部分地区）
+🚫 免费额度抢手，可能显示"Out of capacity"
+🚫 需要国际信用卡（Visa/MasterCard）
+
+别担心！有 3 个解决方案：
+
+🟢 方案 1：挂梯子注册（推荐⭐）
+- 用香港/日本/新加坡节点
+- 邮箱用 Gmail/Outlook
+- 成功率 90%+
+
+🟡 方案 2：用其他云服务商免费额度
+- AWS 12 个月免费（需信用卡）
+- Google Cloud $300 额度（需信用卡）
+- 腾讯云/阿里云学生机（¥9.9/月）
+
+🟢 方案 3：本地运行（最简单⭐⭐⭐）
+- Mac/Windows 直接装 Clawdbot
+- 不用服务器，24 小时开机
+- 成本：0 元（只付 API 费）
+
+💡 建议：方案 3 最适合新手！不用折腾服务器，5 分钟搞定！
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+二、连接服务器（5 分钟）
+
+2.1 Windows 用户
+
+方法一：PowerShell（推荐）
+
+# 1. 打开 PowerShell（Win+X → 终端）
+
+# 2. 设置密钥权限（替换为你的密钥路径）
+icacls "C:\Users\你的用户名\Downloads\ssh-key-2025-xx-xx.key" /inheritance:r /grant:r "%USERNAME%:R"
+
+# 3. 连接服务器（替换 IP 和密钥路径）
+ssh -i "C:\Users\你的用户名\Downloads\ssh-key-2025-xx-xx.key" ubuntu@你的服务器 IP
+
+方法二：MobaXterm（图形界面）
+1. 下载：https://mobaxterm.mobatek.net/download.html
+2. 打开 → Session → SSH
+3. 填写：
+   - Remote host：你的服务器 IP
+   - Specify username：ubuntu
+   - Use private key：选择下载的 .key 文件
+4. 点击 OK 连接
+
+📍 配图 11：MobaXterm 配置界面
+
+2.2 Mac / Linux 用户
+
+# 1. 设置密钥权限（必须！）
+chmod 400 ~/Downloads/ssh-key-2025-xx-xx.key
+
+# 2. 连接服务器
+ssh -i ~/Downloads/ssh-key-2025-xx-xx.key ubuntu@你的服务器 IP
+
+2.3 首次连接确认
+首次会提示：
+Are you sure you want to continue connecting (yes/no)?
+输入 yes 回车。
+
+📍 成功标志：看到 ubuntu@clawdbot-server:~$ 提示符就对了！✅
+
+❗ 易错点：
+- 用户名是 ubuntu，不是 root！
+- 如果提示 Permission denied：检查密钥路径和权限
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+三、一键安装 Clawdbot（5 分钟）
+
+SSH 连上服务器后，直接复制粘贴这段代码：
+
+# ==========================================
+# 🚀 一键安装脚本（复制整段执行）
+# ==========================================
+
+# 方法 1：npm 安装（推荐）
+# 先安装 Node.js
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+source ~/.bashrc
+nvm install 22
+npm install -g clawdbot
+
+# 方法 2：如果 npm 太慢，用国内镜像
+# 先安装 Node.js
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+source ~/.bashrc
+nvm install 22
+npm install -g clawdbot --registry=https://registry.npmmirror.com
+
+脚本会自动完成：
+✅ 系统更新
+✅ 防火墙配置（开放 22/80/443/8080/8081 端口）
+✅ 清理 Oracle 默认 iptables 规则
+✅ 配置 4GB Swap
+✅ 安装 Node.js
+✅ 安装 Clawdbot
+✅ 安装 Claude Code
+✅ 初始化工作目录
+
+⏱️ 耗时：3-5 分钟（看网速）
+📍 成功标志：看到"🎉 安装完成！"和版本信息就对了！✅
+
+📍 配图 12：安装完成截图，圈出版本信息
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+四、配置 API Key（5 分钟）
+
+4.1 获取 Anthropic API Key
+1. 访问：https://console.anthropic.com
+2. 注册/登录账号
+3. 左侧点击 "API Keys"
+4. 点击 "Create Key"
+5. 起个名字（如 oracle-server）
+6. 复制 Key（格式：sk-ant-api03-xxxxx）
+
+⏱️ 耗时：2 分钟
+🔴 超级重要：API Key 只显示一次！复制后妥善保存！
+
+📍 配图 13：Anthropic API Keys 页面，圈出"Create Key"按钮
+
+💡 费用说明：
+- 新账号通常有$5 免费额度
+- Claude Sonnet：约$3/百万 token
+- 正常用每月$10-30 够了
+
+4.2 配置环境变量
+
+# 复制下面这行，替换为你的真实 API Key
+echo 'export ANTHROPIC_API_KEY="sk-ant-api03-你的密钥"' >> ~/.bashrc
+
+# 立即生效
+source ~/.bashrc
+
+# 验证
+echo $ANTHROPIC_API_KEY
+# 应显示你的 API Key
+
+📍 成功标志：输出你的 API Key 就对了！✅
+
+❗ 易错点：
+- API Key 两边的引号不要丢！
+- 是 >> 不是 >（> 会覆盖整个文件！）
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+五、搭建朝廷架构（15 分钟）
+
+5.1 创建核心文件
+
+# 进入工作目录
+cd ~/clawd
+
+创建 SOUL.md（AI 人格）
+
+cat > SOUL.md << 'EOF'
+# SOUL.md - 朝廷行为准则
+
+## 沟通风格
+- 中文为主
+- 直接说结论，废话少说
+- 坏消息先说
+
+## 铁律
+1. 废话不要多
+2. 汇报要及时
+3. 记录要完整
+4. 做事要靠谱
+5. 隐私要守住
+EOF
+
+创建 IDENTITY.md（架构定义）
+
+cat > IDENTITY.md << 'EOF'
+# IDENTITY.md - 朝廷架构
+
+## 模型分层
+| 层级 | 模型 | 用途 |
+|---|---|---|
+| 调度层 | Claude Sonnet 4.5 | 快速路由 |
+| 执行层（重） | Claude Opus 4.5 | 代码/财务/法律 |
+| 执行层（轻） | Qwen 3.5 Plus | 生活/品牌 |
+
+## 朝廷架构
+👑 你 — 天子
+⚡ 大内总管 [Sonnet] — 司礼监
+├─ ⚔️ 兵部 [Opus] — 软件工程
+├─ 💰 户部 [Opus] — 财务管理
+└─ 🎭 礼部 [Qwen] — 品牌营销
+
+## 政令流转
+1. 你降旨 → 大内总管接旨
+2. 小事 → 总管直接处理
+3. 大事 → 派相应部门执行
+4. 完成 → 总管汇报
+EOF
+
+创建 USER.md（关于你）
+
+cat > USER.md << 'EOF'
+# USER.md
+
+- **Name:** 你的名字
+- **Language:** 中文
+- **Timezone:** Asia/Shanghai
+EOF
+
+⏱️ 耗时：5 分钟
+📍 配图 14：~/clawd 目录文件列表截图
+
+5.2 配置 Clawdbot
+
+编辑配置文件：
+nano ~/.clawdbot/clawdbot.json
+
+或直接用 nano 编辑：
+nano ~/.clawdbot/clawdbot.json
+
+粘贴以下配置（记得替换 API Key）：
+
+{
+  "agents": {
+    "defaults": {
+      "workspace": "/home/ubuntu/clawd",
+      "model": "anthropic/claude-sonnet-4-5",
+      "sandbox": {
+        "mode": "non-main"
+      }
+    },
+    "list": [
+      {
+        "id": "main",
+        "name": "大内总管",
+        "model": "anthropic/claude-sonnet-4-5",
+        "sandbox": { "mode": "off" }
+      },
+      {
+        "id": "bingbu",
+        "name": "兵部尚书",
+        "model": "anthropic/claude-opus-4-6",
+        "identity": {"theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent"
+        }
+      },
+      {
+        "id": "hubu",
+        "name": "户部尚书",
+        "model": "anthropic/claude-opus-4-6",
+        "identity": {"theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent"
+        }
+      },
+      {
+        "id": "libu",
+        "name": "礼部尚书",
+        "model": "qwen/qwen-plus-latest",
+        "identity": {"theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。",
+        "sandbox": {
+          "mode": "all",
+          "scope": "agent"
+        }
+      }
+    ]
+  },
+  "providers": {
+    "anthropic": {
+      "apiKey": "sk-ant-api03-你的密钥"
+    },
+    "qwen": {
+      "apiKey": "sk-your-qwen-key"
+    }
+  },
+  "channels": {
+    "discord": {
+      "enabled": false
+    }
+  }
+}
+
+保存退出：
+- nano：Ctrl+O → 回车保存 → Ctrl+X 退出
+
+⏱️ 耗时：8 分钟
+❗ 易错点：
+- JSON 格式要正确，逗号、括号不能少
+- API Key 两边的引号不要丢
+- 如果不用 Qwen，可以删掉 qwen 配置块
+
+📍 配图 15：clawdbot.json 配置文件截图
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+六、启动并测试（5 分钟）
+
+6.1 启动 Gateway
+
+# 启动服务
+clawdbot gateway start
+
+# 查看状态
+clawdbot gateway status
+
+📍 成功标志：看到"active (running)"就对了！✅
+
+6.2 测试对话
+
+# 测试大内总管
+在 Discord 里 @司礼监 说"你好，自我介绍一下"
+
+# 测试兵部
+在 Discord 里 @对应部门 说"用 Python 写个 Hello World"
+
+# 测试户部
+在 Discord 里 @对应部门 说"如何控制 AI API 成本"
+
+# 测试礼部
+在 Discord 里 @对应部门 说"写条小红书文案，主题是 AI 工具推荐"
+
+📍 成功标志：每个部门都能正常回复就对了！✅
+
+6.3 常用命令
+
+# 查看状态
+clawdbot gateway status
+
+# 重启
+clawdbot gateway restart
+
+# 查看日志
+cat /tmp/clawdbot/clawdbot-$(date +%Y-%m-%d).log
+
+# 停止
+clawdbot gateway stop
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+七、常见问题 Q&A
+
+🆕 Q0: Oracle 注册一直失败怎么办？
+
+解决：
+- 检查是否用了国内 IP（换梯子节点）
+- 检查信用卡类型（必须 Visa/MasterCard）
+- 换个邮箱试试（Gmail 最稳）
+- 实在不行用方案 2/3（见上文"中国大陆用户特别说明"）
+
+🆕 Q00: 显示"Out of capacity"怎么办？
+
+解决：
+- 换其他区域（ap-tokyo-1 / ap-seoul-1）
+- 换时间段（凌晨美国时间成功率高）
+- 等几天再试
+- 用其他云服务商（AWS/Google Cloud/腾讯云学生机）
+
+Q1: 注册时信用卡验证失败？
+
+解决：
+- 确认是 Visa 或 MasterCard（银联不行）
+- 确认卡上余额 > $1
+- 换个浏览器（推荐 Chrome）
+- 清除缓存重试
+
+Q2: 创建实例提示"Out of capacity"？
+
+解决：
+- 换个时间重试（凌晨成功率高）
+- 考虑换区域（日本大阪/美西凤凰城）
+- 先试 2 OCPU / 12GB，之后再升级
+
+Q3: SSH 连接被拒绝？
+
+解决：
+- 确认实例状态是"RUNNING"
+- 确认用户名是 ubuntu（不是 root）
+- 确认使用了正确的私钥文件
+- 检查 Oracle 安全组是否开放 22 端口
+
+Q4: clawdbot 命令找不到？
+
+解决：
+# 重新加载 NVM
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+
+# 重新安装
+npm install -g clawdbot
+
+Q5: Gateway 启动失败？
+
+解决：
+# 查看详细日志
+cat /tmp/clawdbot/clawdbot-$(date +%Y-%m-%d).log
+
+# 常见原因：
+# 1. API Key 未配置 → echo $ANTHROPIC_API_KEY 检查
+# 2. 配置文件语法错误 → 检查 JSON 格式
+# 3. 端口被占用 → ss -tlnp | grep 18789
+
+Q6: 如何降低成本？
+
+建议：
+1. 日常对话用 Sonnet（便宜 10 倍）
+2. 简单任务用 Qwen（便宜 50 倍）
+3. 复杂任务才上 Opus
+4. 每月$10-30 够用
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+八、15 张配图清单
+
+编号 | 内容 | 截图位置 | 标注重点
+1 | Oracle 注册首页 | https://signup.cloud.oracle.com | 圈出"Sign Up"按钮
+2 | 注册表单 | 邮箱输入区域 | 圈出邮箱框和验证按钮
+3 | 验证邮件 | 邮箱收件箱 | 圈出 6 位验证码
+4 | 密码设置 | 密码输入页面 | 标注密码要求
+5 | 区域选择 | Home Region 下拉框 | 圈出"ap-tokyo-1"
+6 | 信用卡填写 | 卡号输入页面 | 圈出 Visa/MasterCard 标识
+7 | Oracle 登录页 | https://cloud.oracle.com | 圈出登录入口
+8 | Instances 页面 | Compute → Instances | 圈出"Create Instance"
+9 | 实例配置页 | Shape 和 SSH 密钥区域 | 圈出 ARM 选择和下载按钮
+10 | 实例详情页 | 实例运行状态 | 圈出公网 IP 地址
+11 | MobaXterm 配置 | Session 设置窗口 | 圈出 IP、用户名、密钥选择
+12 | 安装完成截图 | 终端输出 | 圈出"🎉 安装完成！"
+13 | Anthropic API 页 | https://console.anthropic.com | 圈出"Create Key"
+14 | ~/clawd 目录 | ls -la 输出 | 圈出 SOUL.md、IDENTITY.md 等
+15 | 配置文件 | clawdbot.json 内容 | 圈出 agents.list 配置
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+🎉 恭喜完成！
+
+现在你拥有：
+✅ 一台永久免费的云服务器（4 核 24GB）
+✅ 一个 AI 朝廷团队（总管 + 兵部 + 户部 + 礼部）
+✅ 月成本仅¥30-50（比 ChatGPT 省 80%）
+
+下一步：
+1. 根据需求调整部门配置
+2. 接入 Discord/Telegram
+3. 配置自动汇报和提醒
+4. 探索更多 Clawdbot 功能
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+版本：完整版 v1.1
+字数：约 3500 字
+适用：评论区领取/私域分发
+更新日期：2026-02-22
+作者：菠萝王朝·礼部
