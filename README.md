@@ -80,6 +80,28 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-
 
 ---
 
+## 核心能力
+
+### 多 Agent 协作
+不同频道绑定不同 AI 专家，一个 Bot 自动路由，不需要手动切换。
+
+### 自动 Prompt 优化
+不用手动调 Prompt。每个 Agent 有独立的身份文件，系统自动注入上下文：
+
+```json
+"identity": {"theme": "你是兵部尚书，专精软件工程。回答用中文，直接给方案。"}
+```
+
+Clawdbot 自动结合行为准则（SOUL.md）、组织架构（IDENTITY.md）和工作区文件，生成完整的系统提示。Agent 越用越懂你——它能读取记忆文件（memory/），自动积累项目知识。
+
+### 工具集成
+AI 不只是聊天——能写代码（Claude Code）、管仓库（GitHub）、写文档（Notion）、搜信息（浏览器）、定时执行任务（Cron）。
+
+### 自动汇报
+配置 Cron，AI 每天自动写日报、每周写周报，发到 Discord + 存到 Notion，你不用管。
+
+---
+
 ## 详细教程
 
 如果你想了解每一步的细节，看这些：
