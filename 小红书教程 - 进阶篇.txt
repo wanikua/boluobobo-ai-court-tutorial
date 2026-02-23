@@ -547,70 +547,64 @@ Token 通过环境变量配置，不写在 clawdbot.json 里。
 ⚔️ 实战案例：朝廷自动写奏折
 
 Clawdbot 内置 cron 定时任务功能，不需要写 bash 脚本。
-直接在 clawdbot.json 里配置，朝廷会自动执行。
+用 clawdbot cron add 命令添加，朝廷会自动执行。
+
+⚠️ 添加 cron 之前，先获取 Gateway Token：
+clawdbot gateway token
+# 复制输出的 token，下面的命令需要用到
 
 案例 1：每日自动日报
 
-在 clawdbot.json 的 cron 字段中添加：
-
-"cron": [
-  {
-    "id": "daily-report",
-    "schedule": "0 14 * * *",
-    "text": "生成今日日报：汇总今天完成的任务、遇到的问题、明天的计划。用简洁中文分点列出，同步写入 Notion 日报数据库。",
-    "agent": "main"
-  }
-]
+clawdbot cron add \
+  --name "每日日报" \
+  --agent main \
+  --cron "0 22 * * *" \
+  --tz "Asia/Shanghai" \
+  --message "生成今日日报：汇总今天完成的任务、遇到的问题、明天的计划。用简洁中文分点列出，同步写入 Notion 日报数据库。" \
+  --session isolated \
+  --token 你的gateway-token
 
 说明：
-- schedule 是标准 cron 表达式，"0 14 * * *" = 每天 UTC 14:00（北京时间 22:00）
-- text 是你要朝廷执行的指令，用自然语言写
-- agent 指定哪个 agent 来执行
+- --cron 是标准 cron 表达式，"0 22 * * *" = 每天 22:00
+- --tz 指定时区，"Asia/Shanghai" = 北京时间
+- --message 是你要朝廷执行的指令，用自然语言写
+- --agent 指定哪个 agent 来执行
+- --session isolated 表示每次独立会话（推荐）
 
 案例 2：每周自动周报
 
-{
-  "id": "weekly-report",
-  "schedule": "0 12 * * 0",
-  "text": "生成本周周报：汇总本周各项目进展、关键数据、遇到的挑战和解决方案、下周计划。同步写入 Notion 周报数据库。",
-  "agent": "main"
-}
+clawdbot cron add \
+  --name "每周周报" \
+  --agent main \
+  --cron "0 20 * * 0" \
+  --tz "Asia/Shanghai" \
+  --message "生成本周周报：汇总本周各项目进展、关键数据、遇到的挑战和解决方案、下周计划。同步写入 Notion 周报数据库。" \
+  --session isolated \
+  --token 你的gateway-token
 
 案例 3：项目进展自动同步
 
-{
-  "id": "project-sync",
-  "schedule": "0 10 * * 1,4",
-  "text": "检查所有 GitHub 仓库的最近提交和未关闭 Issue，更新 Notion 项目数据库的状态和进度。",
-  "agent": "bingbu"
-}
+clawdbot cron add \
+  --name "项目同步" \
+  --agent bingbu \
+  --cron "0 18 * * 1,4" \
+  --tz "Asia/Shanghai" \
+  --message "检查所有 GitHub 仓库的最近提交和未关闭 Issue，更新 Notion 项目数据库的状态和进度。" \
+  --session isolated \
+  --token 你的gateway-token
 
-完整 cron 配置示例（放在 clawdbot.json 里）：
+管理 cron 任务：
 
-"cron": [
-  {
-    "id": "daily-report",
-    "schedule": "0 14 * * *",
-    "text": "生成今日日报，写入 Notion",
-    "agent": "main"
-  },
-  {
-    "id": "weekly-report",
-    "schedule": "0 12 * * 0",
-    "text": "生成本周周报，写入 Notion",
-    "agent": "main"
-  },
-  {
-    "id": "project-sync",
-    "schedule": "0 10 * * 1,4",
-    "text": "同步项目进展到 Notion",
-    "agent": "bingbu"
-  }
-]
+# 查看所有 cron 任务
+clawdbot cron list --token 你的gateway-token
+
+# 删除某个 cron 任务
+clawdbot cron remove --name "每日日报" --token 你的gateway-token
 
 💡 关键区别：Clawdbot 的 cron 不是 Linux crontab！
 不需要写 bash 脚本，直接用自然语言告诉朝廷要做什么。
 Clawdbot 会启动一个 agent session 来执行你的指令。
+⚠️ 注意：cron 配置不能直接写在 clawdbot.json 里！必须用命令行添加。
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -780,55 +774,51 @@ MAILTO=your-email@example.com
 
 以下是 Clawdbot cron 的实战场景：
 
+⚠️ 先获取 Gateway Token（只需做一次）：
+clawdbot gateway token
+
 场景 1：每日自动日报
 
-{
-  "id": "daily-report",
-  "schedule": "0 14 * * *",
-  "text": "生成今日日报，写入 Notion 日报数据库",
-  "agent": "main"
-}
-
-💡 schedule 用标准 cron 表达式，"0 14 * * *" = UTC 14:00 = 北京 22:00
+clawdbot cron add \
+  --name "每日日报" --agent main \
+  --cron "0 22 * * *" --tz "Asia/Shanghai" \
+  --message "生成今日日报，写入 Notion 日报数据库" \
+  --session isolated --token 你的token
 
 场景 2：每周自动备份代码
 
-{
-  "id": "weekly-backup",
-  "schedule": "0 9 * * 5",
-  "text": "把 ~/clawd 目录的改动提交并 push 到 GitHub，commit message 写'周备份'",
-  "agent": "bingbu"
-}
+clawdbot cron add \
+  --name "每周备份" --agent bingbu \
+  --cron "0 17 * * 5" --tz "Asia/Shanghai" \
+  --message "把 ~/clawd 目录的改动提交并 push 到 GitHub，commit message 写'周备份'" \
+  --session isolated --token 你的token
 
 场景 3：服务器健康检查
 
-{
-  "id": "health-check",
-  "schedule": "0 */6 * * *",
-  "text": "检查服务器 CPU、内存、磁盘使用率，如果有异常立即通知",
-  "agent": "main"
-}
+clawdbot cron add \
+  --name "健康检查" --agent main \
+  --cron "0 */6 * * *" --tz "Asia/Shanghai" \
+  --message "检查服务器 CPU、内存、磁盘使用率，如果有异常立即通知" \
+  --session isolated --token 你的token
 
 场景 4：每月财务汇总
 
-{
-  "id": "monthly-finance",
-  "schedule": "0 12 1 * *",
-  "text": "汇总本月所有 API 花费和服务器成本，按类别统计，写入 Notion 财务数据库",
-  "agent": "hubu"
-}
+clawdbot cron add \
+  --name "月度财务" --agent hubu \
+  --cron "0 20 1 * *" --tz "Asia/Shanghai" \
+  --message "汇总本月所有 API 花费和服务器成本，按类别统计，写入 Notion 财务数据库" \
+  --session isolated --token 你的token
 
 场景 5：每天早上发工作计划
 
-{
-  "id": "morning-plan",
-  "schedule": "0 1 * * *",
-  "text": "在 Discord 日报频道发送今日工作计划提醒",
-  "agent": "main"
-}
+clawdbot cron add \
+  --name "早间计划" --agent main \
+  --cron "0 9 * * *" --tz "Asia/Shanghai" \
+  --message "在 Discord 发送今日工作计划提醒" \
+  --session isolated --token 你的token
 
-⚠️ 注意：这是 Clawdbot 内置 cron，不是 Linux crontab！
-所有配置写在 clawdbot.json 的 "cron" 数组里。
+⚠️ 注意：Clawdbot cron 必须用命令行添加，不能写在 clawdbot.json 里！
+（写进去会导致 Gateway 崩溃）
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -946,28 +936,29 @@ Discord 就是来拯救你的！
 
 🔧 Clawdbot 接入 Discord
 
-1️⃣ 创建 Discord Bot
+1️⃣ 创建 Discord Bot（每个部门一个）
 
 # 1. 访问 Discord Developer Portal
 #    https://discord.com/developers/applications
 
-# 2. 点击 "New Application"
-# 3. 填写名字：Clawdbot 朝廷
-# 4. 点击 Create
+# 2. 为每个部门创建一个 Application：
+#    - 点击 "New Application"
+#    - 名字填部门名（如"司礼监"、"兵部"、"户部"...）
+#    - 重复创建，需要几个部门就创建几个
 
-# 5. 进入应用页面，左侧菜单选 "Bot"
+# 3. 对每个 Application，左侧菜单选 "Bot"
 
-# 6. 获取 Token（重要！）：
+# 4. 获取 Token（每个 Bot 都要！）：
 #    - 点击 "Reset Token"
 #    - 复制 Token（格式类似：MTIzNDU2Nzg5MDEyMzQ1Njc4OQ.xxxxxx.xxxxx）
 #    - 🔴 妥善保存！只显示一次！
 
 
-2️⃣ 配置 Bot 权限
+2️⃣ 配置 Bot 权限（每个 Bot 都要做！）
 
-# 在 Bot 页面，找到 "Privileged Gateway Intents"
+# 在每个 Bot 页面，找到 "Privileged Gateway Intents"
 # 勾选：
-# ✅ MESSAGE CONTENT INTENT（读取消息内容）
+# ✅ MESSAGE CONTENT INTENT（读取消息内容）—— 必须！
 # ✅ SERVER MEMBERS INTENT（读取成员信息）
 # ✅ PRESENCE INTENT（读取在线状态）
 
@@ -980,31 +971,46 @@ Discord 就是来拯救你的！
 nano ~/.clawdbot/clawdbot.json
 
 # Discord 配置在 channels.discord 字段中（基础篇已配好）：
-# 如果你按基础篇配置过，这里只需要确认 token 和 guilds 已填好
+# 如果你按基础篇配置过，这里只需要确认 accounts 里的 token 都填好了
 
-# 如果还没配过，格式如下：
+# 多 Bot 架构：每个部门一个独立的 Discord Bot
+# 格式如下（不需要 guildId 和 channelId）：
 {
   "channels": {
     "discord": {
       "enabled": true,
-      "token": "你的 Bot Token",
-      "guilds": {
-        "你的服务器ID": {
-          "channels": { "*": { "allow": true } }
+      "groupPolicy": "open",
+      "accounts": {
+        "main": {
+          "name": "司礼监",
+          "token": "司礼监的Bot Token",
+          "groupPolicy": "open"
+        },
+        "bingbu": {
+          "name": "兵部",
+          "token": "兵部的Bot Token",
+          "groupPolicy": "open"
         }
       }
     }
-  }
+  },
+  "bindings": [
+    { "agentId": "main", "match": { "channel": "discord", "accountId": "main" } },
+    { "agentId": "bingbu", "match": { "channel": "discord", "accountId": "bingbu" } }
+  ]
 }
 
 # 保存退出（Ctrl+X → Y → Enter）
 
-💡 获取服务器/频道 ID 方法：
-1. Discord 设置 → 高级 → 开启开发者模式
-2. 右键服务器/频道 → 复制 ID
+💡 多 Bot 的好处：
+- @哪个 Bot 就找哪个专家，不需要特定频道
+- 每个 Bot 有独立的头像和名字，一眼能分清
+- 不需要配置 guildId 和 channelId，bindings 按 accountId 绑定
 
 
-4️⃣ 邀请 Bot 进服务器（关键步骤！）
+4️⃣ 邀请所有 Bot 进服务器（每个 Bot 都要做！）
+
+# 对每个 Application 重复以下步骤：
 
 # 1. 在 Developer Portal，左侧选 "OAuth2" → "URL Generator"
 
@@ -1014,24 +1020,20 @@ nano ~/.clawdbot/clawdbot.json
 
 # 3. 勾选 Bot Permissions（建议权限）：
 #    ✅ Send Messages          - 发送消息
-#    ✅ Manage Channels         - 管理频道
-#    ✅ Manage Roles            - 管理角色
 #    ✅ Read Message History    - 读取历史消息
 #    ✅ Embed Links             - 发送富文本
 #    ✅ Attach Files            - 发送文件
 
 # 4. 复制生成的 URL（在页面底部）
-#    格式类似：https://discord.com/api/oauth2/authorize?client_id=xxx&...
 
 # 5. 在浏览器打开这个 URL
 #    - 选择你要安装的服务器（你需要是管理员）
 #    - 点击"授权"
-#    - 完成人机验证（如果有）
 
-# 6. 验证 Bot 已加入
-#    - 打开你的服务器
-#    - 左侧服务器列表底部应该能看到 Bot 头像
-#    - 或在服务器设置 → 成员 中看到 Bot
+# 6. 重复步骤 1-5，直到所有 Bot 都加入服务器
+
+# 7. 验证所有 Bot 已加入
+#    - 在服务器设置 → 成员 中，应该能看到所有 Bot
 
 
 ⚠️ 常见问题：
@@ -1042,7 +1044,8 @@ Q: 授权失败？
 A: 检查服务器是否已达到成员上限，或联系 Discord 支持
 
 Q: Bot 加入了但不说话？
-A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
+A: 检查 clawdbot.json 的 accounts 配置是否正确、Token 是否有效、Gateway 是否启动
+   用 systemctl --user status clawdbot-gateway 查看状态
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -1117,30 +1120,30 @@ A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
       3. ⏳ 进行中：API 性能优化（80%）
 
 
-案例 2：自动汇报到指定频道
+案例 2：自动汇报到 Discord
 
-用 Clawdbot 内置 cron 实现自动汇报：
+用 Clawdbot 内置 cron 实现自动汇报（用命令行添加）：
 
-在 clawdbot.json 中添加 cron 配置：
+# 先获取 token
+clawdbot gateway token
 
-"cron": [
-  {
-    "id": "daily-report",
-    "schedule": "0 10 * * *",
-    "text": "生成今日日报，发送到 Discord 日报频道",
-    "agent": "main"
-  },
-  {
-    "id": "weekly-report",
-    "schedule": "0 9 * * 5",
-    "text": "生成本周周报，发送到 Discord 周报频道",
-    "agent": "main"
-  }
-]
+# 每日日报
+clawdbot cron add \
+  --name "每日日报" --agent main \
+  --cron "0 18 * * *" --tz "Asia/Shanghai" \
+  --message "生成今日日报，发送到 Discord" \
+  --session isolated --token 你的token
+
+# 每周周报
+clawdbot cron add \
+  --name "每周周报" --agent main \
+  --cron "0 17 * * 5" --tz "Asia/Shanghai" \
+  --message "生成本周周报，发送到 Discord" \
+  --session isolated --token 你的token
 
 效果：
-- 每天 UTC 10:00（北京 18:00）自动生成日报
-- 每周五 UTC 9:00（北京 17:00）自动生成周报
+- 每天 18:00（北京时间）自动生成日报
+- 每周五 17:00（北京时间）自动生成周报
 
 
 案例 3：多人协作管理

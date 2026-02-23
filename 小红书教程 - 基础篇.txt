@@ -285,184 +285,190 @@ nano IDENTITY.md
 编辑配置文件：
 nano ~/.clawdbot/clawdbot.json
 
-粘贴以下配置（记得替换 API Key）：
+把一键脚本生成的模板内容替换成以下配置（记得替换 API Key 和 Bot Token）：
 
 {
+  "models": {
+    "providers": {
+      "anthropic": {
+        "baseUrl": "https://api.anthropic.com",
+        "apiKey": "sk-ant-api03-你的密钥",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "claude-sonnet-4-5",
+            "name": "Claude Sonnet 4.5",
+            "input": ["text", "image"],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "claude-opus-4-6",
+            "name": "Claude Opus 4.6",
+            "input": ["text", "image"],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
   "agents": {
     "defaults": {
       "workspace": "/home/ubuntu/clawd",
-      "model": "anthropic/claude-sonnet-4-5",
-      "groupPolicy": "open",
-      "sandbox": {
-        "mode": "non-main"
-      }
+      "model": { "primary": "anthropic/claude-sonnet-4-5" },
+      "sandbox": { "mode": "non-main" }
     },
     "list": [
       {
         "id": "main",
-        "name": "大内总管",
-        "model": "anthropic/claude-sonnet-4-5",
-        "groupPolicy": "open",
+        "name": "司礼监",
+        "model": { "primary": "anthropic/claude-sonnet-4-5" },
         "sandbox": { "mode": "off" }
       },
       {
         "id": "bingbu",
-        "name": "兵部尚书",
-        "model": "anthropic/claude-opus-4-6",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。"},
-        "sandbox": {
-          "mode": "all",
-          "scope": "agent"
-        }
+        "name": "兵部",
+        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "identity": { "theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。" },
+        "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "hubu",
-        "name": "户部尚书",
-        "model": "anthropic/claude-opus-4-6",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。"},
-        "sandbox": {
-          "mode": "all",
-          "scope": "agent"
-        }
+        "name": "户部",
+        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "identity": { "theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。" },
+        "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "libu",
-        "name": "礼部尚书",
-        "model": "anthropic/claude-sonnet-4-5",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。"},
-        "sandbox": {
-          "mode": "all",
-          "scope": "agent"
-        }
+        "name": "礼部",
+        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "identity": { "theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。" },
+        "sandbox": { "mode": "all", "scope": "agent" }
       }
     ]
-  },
-  "providers": {
-    "anthropic": {
-      "apiKey": "sk-ant-api03-你的密钥"
-    }
   },
   "channels": {
     "discord": {
       "enabled": true,
-      "token": "你的Discord Bot Token",
-      "guilds": {
-        "你的服务器ID": {
-          "channels": { "*": { "allow": true } }
+      "groupPolicy": "open",
+      "accounts": {
+        "main": {
+          "name": "司礼监",
+          "token": "司礼监的Bot Token",
+          "groupPolicy": "open"
+        },
+        "bingbu": {
+          "name": "兵部",
+          "token": "兵部的Bot Token",
+          "groupPolicy": "open"
+        },
+        "hubu": {
+          "name": "户部",
+          "token": "户部的Bot Token",
+          "groupPolicy": "open"
+        },
+        "libu": {
+          "name": "礼部",
+          "token": "礼部的Bot Token",
+          "groupPolicy": "open"
         }
       }
     }
   },
   "bindings": [
-    {
-      "agentId": "bingbu",
-      "match": {
-        "channel": "discord",
-        "guildId": "你的服务器ID",
-        "peer": { "kind": "channel", "id": "兵部频道ID" }
-      }
-    },
-    {
-      "agentId": "hubu",
-      "match": {
-        "channel": "discord",
-        "guildId": "你的服务器ID",
-        "peer": { "kind": "channel", "id": "户部频道ID" }
-      }
-    },
-    {
-      "agentId": "libu",
-      "match": {
-        "channel": "discord",
-        "guildId": "你的服务器ID",
-        "peer": { "kind": "channel", "id": "礼部频道ID" }
-      }
-    }
+    { "agentId": "main", "match": { "channel": "discord", "accountId": "main" } },
+    { "agentId": "bingbu", "match": { "channel": "discord", "accountId": "bingbu" } },
+    { "agentId": "hubu", "match": { "channel": "discord", "accountId": "hubu" } },
+    { "agentId": "libu", "match": { "channel": "discord", "accountId": "libu" } }
   ]
 }
 
 💡 想省钱？礼部等轻量任务可以换成 Qwen 模型：
-   1. 把礼部的 model 改为 "dashscope/qwen3.5-plus"
-   2. 在 providers 中添加 Qwen：
-      "dashscope": { "apiKey": "sk-你的通义千问密钥" }
-      获取地址：https://dashscope.console.aliyun.com
-   3. Qwen 比 Claude 便宜 50 倍，适合内容创作、日常对话等轻量任务
+   1. 在 models.providers 中添加 dashscope provider：
+      "dashscope": {
+        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode",
+        "apiKey": "sk-你的通义千问密钥",
+        "api": "openai-chat",
+        "models": [{ "id": "qwen-plus", "name": "Qwen Plus", "input": ["text"], "contextWindow": 131072, "maxTokens": 8192 }]
+      }
+   2. 把礼部的 model 改为 { "primary": "dashscope/qwen-plus" }
+   3. 获取地址：https://dashscope.console.aliyun.com
+   4. Qwen 比 Claude 便宜 50 倍，适合内容创作、日常对话等轻量任务
 
 ⚠️ 重要！替换以下内容（获取方法见下面的详细步骤）：
 - "sk-ant-api03-你的密钥" → 你的 Anthropic API Key
-- "你的Discord Bot Token" → 你的 Discord Bot Token
-- "你的服务器ID" → 你的 Discord 服务器 ID
-- "兵部频道ID" 等 → 对应频道的 ID
+- "司礼监的Bot Token" 等 → 每个部门的 Discord Bot Token（下一步创建）
 
 💡 注意 groupPolicy: "open" 这个配置很重要！
 不加的话默认是 "allowlist"，Bot 会静默丢弃所有群聊消息。
+channels 和每个 account 里都要加。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
-5.3 创建 Discord Bot（只需要一个）
+5.3 创建 Discord Bot（每个部门一个）
 
-💡 整个朝廷只需要一个 Bot！
-不同部门不需要不同的 Bot。Clawdbot 会根据频道自动切换 Agent。
+💡 多 Bot 架构：每个部门 = 一个独立的 Discord Bot！
+@兵部 就找兵部，@户部 就找户部，各司其职，互不干扰。
+基础篇需要 4 个 Bot：司礼监、兵部、户部、礼部。
 
-第一步：创建 Application
+第一步：创建 Application（重复 4 次）
 
 1. 打开 https://discord.com/developers/applications
 2. 点击 "New Application"
-3. 名字填你喜欢的（比如"朝廷管家"）
+3. 名字填部门名（如"司礼监"、"兵部"、"户部"、"礼部"）
 4. 点击 "Create"
 
-第二步：创建 Bot 并获取 Token
+💡 建议一口气创建 4 个 Application，一个部门一个。
 
+第二步：创建 Bot 并获取 Token（每个都要做）
+
+对每个 Application：
 1. 左边菜单点 "Bot"
 2. 点击 "Reset Token" → 复制 Token（只显示一次！）
-3. 这个 Token 就是配置里的 "你的Discord Bot Token"
+3. 把 Token 填到 clawdbot.json 的 accounts 对应位置
 
-⚠️ Bot 设置（同一页面往下滚）：
+⚠️ Bot 设置（同一页面往下滚，每个 Bot 都要做）：
 - Message Content Intent → 打开 ✅（必须！否则收不到消息）
 - Presence Intent → 可选
 - Server Members Intent → 可选
 
-第三步：邀请 Bot 到你的服务器
+💡 建议用记事本先记下每个 Bot 的 Token，格式：
+   司礼监: MTIzNDU2...
+   兵部:   MjM0NTY3...
+   户部:   MzQ1Njc4...
+   礼部:   NDU2Nzg5...
 
+第三步：邀请所有 Bot 到你的服务器
+
+对每个 Application：
 1. 左边菜单点 "OAuth2"
 2. 勾选 "bot"
 3. Bot Permissions 勾选：
    - Send Messages ✅
    - Read Message History ✅
    - Read Messages/View Channels ✅
-   - Use Slash Commands ✅（可选）
 4. 复制生成的邀请链接，在浏览器打开
 5. 选择你的服务器，点击 "Authorize"
-
-第四步：获取服务器 ID 和频道 ID
-
-开启开发者模式（只需做一次）：
-1. Discord 设置 → 高级 → 开发者模式 → 打开 ✅
-
-获取 ID：
-- 服务器 ID：右键服务器图标 → 复制服务器 ID
-- 频道 ID：右键频道名 → 复制频道 ID
-
-把这些 ID 填到 clawdbot.json 对应位置就行。
-
+6. 重复 4 次，直到 4 个 Bot 都加入服务器
 
 💡 bindings 的作用：
-不同 Discord 频道绑定不同 AI Agent。
-在兵部频道发消息 → 兵部 Agent 回复（编程专家）
-在户部频道发消息 → 户部 Agent 回复（财务专家）
-没有绑定的频道 → 默认由大内总管回复
+每个 Bot 账号绑定一个 AI Agent。
+@司礼监 → 司礼监 Agent 回复（总管）
+@兵部 → 兵部 Agent 回复（编程专家）
+@户部 → 户部 Agent 回复（财务专家）
+@礼部 → 礼部 Agent 回复（营销专家）
 
 保存退出：
 - nano：Ctrl+O → 回车保存 → Ctrl+X 退出
 
-⏱️ 耗时：8 分钟
+⏱️ 耗时：10 分钟（4 个 Bot）
 ❗ 易错点：
 - JSON 格式要正确，逗号、括号不能少
 - API Key 两边的引号不要丢
-- groupPolicy: "open" 不能漏！否则 Bot 收不到群消息
+- groupPolicy: "open" 不能漏！channels 和每个 account 里都要加
+- 每个 Bot 都要开 Message Content Intent！漏了就收不到消息
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -471,49 +477,52 @@ nano ~/.clawdbot/clawdbot.json
 
 6.1 启动 Gateway
 
-# 启动服务（一键脚本已配好 systemd，开机自动启动）
-sudo systemctl start clawdbot
+# 安装 Gateway 服务（如果一键脚本没装上，手动装一次）
+clawdbot gateway install
+
+# 启动服务
+systemctl --user start clawdbot-gateway
 
 # 查看状态
-sudo systemctl status clawdbot
+systemctl --user status clawdbot-gateway
 
 📍 成功标志：看到"active (running)"就对了！✅
 
-💡 也可以用 clawdbot gateway start 手动启动（适合调试）
+💡 也可以用 clawdbot gateway start 手动启动（适合调试，Ctrl+C 停止）
 
 6.2 测试对话
 
-# 测试大内总管（在命令中心频道）
-@Bot名字 你好，自我介绍一下
+# 测试司礼监（在任意频道 @司礼监）
+@司礼监 你好，自我介绍一下
 
-# 测试兵部（切到兵部频道发消息）
-@Bot名字 用 Python 写个 Hello World
+# 测试兵部（@兵部）
+@兵部 用 Python 写个 Hello World
 
-# 测试户部（切到户部频道发消息）
-@Bot名字 如何控制 AI API 成本
+# 测试户部（@户部）
+@户部 如何控制 AI API 成本
 
-# 测试礼部（切到礼部频道发消息）
-@Bot名字 写条小红书文案，主题是 AI 工具推荐
+# 测试礼部（@礼部）
+@礼部 写条小红书文案，主题是 AI 工具推荐
 
-💡 关键：不同频道会自动路由到不同 Agent！
-你不需要指定部门，只要在对应频道发消息就行。
+💡 关键：不同 Bot = 不同专家！
+@哪个部门就找哪个专家，在任何频道都行。
 
-📍 成功标志：每个频道的回复风格不一样就对了！✅
+📍 成功标志：每个 Bot 的回复风格不一样就对了！✅
 比如兵部会直接给代码，户部会给数据分析。
 
 6.3 常用命令
 
 # 查看状态
-sudo systemctl status clawdbot
+systemctl --user status clawdbot-gateway
 
 # 重启
-sudo systemctl restart clawdbot
+systemctl --user restart clawdbot-gateway
 
 # 查看日志
-journalctl -u clawdbot --since today
+journalctl --user -u clawdbot-gateway --since today
 
 # 停止
-sudo systemctl stop clawdbot
+systemctl --user stop clawdbot-gateway
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -571,12 +580,13 @@ Q5: Gateway 启动失败？
 
 解决：
 # 查看详细日志
-journalctl -u clawdbot --since today --no-pager
+journalctl --user -u clawdbot-gateway --since today --no-pager
 
 # 常见原因：
 # 1. API Key 未配置 → 检查 ~/.clawdbot/clawdbot.json 中的 apiKey
-# 2. 配置文件语法错误 → 检查 JSON 格式
-# 3. 端口被占用 → ss -tlnp | grep 18789
+# 2. 配置文件语法错误 → 用 clawdbot doctor 检查配置
+# 3. Bot Token 无效 → 确认 Token 没过期、没被 Reset
+# 4. 端口被占用 → ss -tlnp | grep 18789
 
 Q6: 如何降低成本？
 
@@ -613,12 +623,12 @@ Q6: 如何降低成本？
 
 现在你拥有：
 ✅ 一台永久免费的云服务器（4 核 24GB）
-✅ 一个 AI 朝廷团队（总管 + 兵部 + 户部 + 礼部）
+✅ 一个 AI 朝廷团队（司礼监 + 兵部 + 户部 + 礼部，各自独立 Bot）
 
 下一步：
-1. 根据需求调整部门配置
-2. 接入 Discord/Telegram
-3. 配置自动汇报和提醒
+1. 根据需求添加更多部门（工部、吏部、刑部）
+2. 配置定时任务（cron）自动汇报
+3. 接入 Notion 自动写日报
 4. 探索更多 Clawdbot 功能
 
 ━━━━━━━━━━━━━━━━━━━━━━━━

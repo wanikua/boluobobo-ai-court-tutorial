@@ -17,11 +17,11 @@ echo "================================"
 echo ""
 
 # ---- 1. 系统更新 ----
-echo -e "${YELLOW}[1/7] 系统更新...${NC}"
+echo -e "${YELLOW}[1/8] 系统更新...${NC}"
 sudo apt-get update -qq
 
 # ---- 2. 防火墙 ----
-echo -e "${YELLOW}[2/7] 配置防火墙...${NC}"
+echo -e "${YELLOW}[2/8] 配置防火墙...${NC}"
 # Oracle Cloud 默认 iptables 有一条 REJECT 规则会阻断非 SSH 流量，只删这条
 # 注意：不能 flush 整个链，否则在 DROP 策略下会丢失 SSH 连接
 sudo iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited 2>/dev/null || true
@@ -30,7 +30,7 @@ sudo netfilter-persistent save 2>/dev/null || true
 echo -e "  ${GREEN}✓ 防火墙已配置${NC}"
 
 # ---- 3. Swap（小内存机器需要）----
-echo -e "${YELLOW}[3/7] 配置 Swap...${NC}"
+echo -e "${YELLOW}[3/8] 配置 Swap...${NC}"
 if [ ! -f /swapfile ]; then
     sudo fallocate -l 4G /swapfile
     sudo chmod 600 /swapfile
@@ -43,7 +43,7 @@ else
 fi
 
 # ---- 4. Node.js ----
-echo -e "${YELLOW}[4/7] 安装 Node.js 22...${NC}"
+echo -e "${YELLOW}[4/8] 安装 Node.js 22...${NC}"
 if command -v node &>/dev/null && [[ "$(node -v)" == v22* ]]; then
     echo -e "  ${GREEN}✓ Node.js $(node -v) 已安装${NC}"
 else
@@ -53,7 +53,7 @@ else
 fi
 
 # ---- 5. gh CLI（GitHub 自动化）----
-echo -e "${YELLOW}[5/7] 安装 GitHub CLI...${NC}"
+echo -e "${YELLOW}[5/8] 安装 GitHub CLI...${NC}"
 if command -v gh &>/dev/null; then
     echo -e "  ${GREEN}✓ gh $(gh --version | head -1 | awk '{print $3}') 已安装${NC}"
 else
@@ -63,8 +63,22 @@ else
     echo -e "  ${GREEN}✓ gh CLI 安装完成${NC}"
 fi
 
-# ---- 6. Clawdbot ----
-echo -e "${YELLOW}[6/7] 安装 Clawdbot...${NC}"
+# ---- 6. Chromium（浏览器，Agent 搜索/截图用）----
+echo -e "${YELLOW}[6/8] 安装 Chromium 浏览器...${NC}"
+if command -v chromium-browser &>/dev/null || snap list chromium &>/dev/null 2>&1; then
+    echo -e "  ${GREEN}✓ Chromium 已安装，跳过${NC}"
+else
+    sudo snap install chromium 2>/dev/null || sudo apt-get install -y chromium-browser -qq
+    echo -e "  ${GREEN}✓ Chromium 安装完成${NC}"
+fi
+# 设置 Puppeteer 浏览器路径（Clawdbot 的浏览器 skill 需要）
+if ! grep -q PUPPETEER_EXECUTABLE_PATH ~/.bashrc 2>/dev/null; then
+    echo 'export PUPPETEER_EXECUTABLE_PATH="/snap/chromium/current/usr/lib/chromium-browser/chrome"' >> ~/.bashrc
+    echo -e "  ${GREEN}✓ 浏览器路径已配置${NC}"
+fi
+
+# ---- 7. Clawdbot ----
+echo -e "${YELLOW}[7/8] 安装 Clawdbot...${NC}"
 if command -v clawdbot &>/dev/null; then
     CURRENT_VER=$(clawdbot --version 2>/dev/null || echo "unknown")
     echo -e "  ${GREEN}✓ Clawdbot 已安装 ($CURRENT_VER)，更新中...${NC}"
@@ -72,8 +86,8 @@ fi
 sudo npm install -g clawdbot --loglevel=error
 echo -e "  ${GREEN}✓ Clawdbot $(clawdbot --version 2>/dev/null) 安装完成${NC}"
 
-# ---- 7. 初始化工作区 ----
-echo -e "${YELLOW}[7/7] 初始化朝廷工作区...${NC}"
+# ---- 8. 初始化工作区 ----
+echo -e "${YELLOW}[8/8] 初始化朝廷工作区...${NC}"
 WORKSPACE="$HOME/clawd"
 CONFIG_DIR="$HOME/.clawdbot"
 mkdir -p "$WORKSPACE"
@@ -136,112 +150,139 @@ fi
 if [ ! -f "$CONFIG_DIR/clawdbot.json" ]; then
 cat > "$CONFIG_DIR/clawdbot.json" << CONFIG_EOF
 {
+  "models": {
+    "providers": {
+      "anthropic": {
+        "baseUrl": "https://api.anthropic.com",
+        "apiKey": "YOUR_ANTHROPIC_API_KEY",
+        "api": "anthropic-messages",
+        "models": [
+          {
+            "id": "claude-sonnet-4-5",
+            "name": "Claude Sonnet 4.5",
+            "input": ["text", "image"],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          },
+          {
+            "id": "claude-opus-4-6",
+            "name": "Claude Opus 4.6",
+            "input": ["text", "image"],
+            "contextWindow": 200000,
+            "maxTokens": 8192
+          }
+        ]
+      }
+    }
+  },
   "agents": {
     "defaults": {
       "workspace": "$HOME/clawd",
-      "model": "anthropic/claude-sonnet-4-5",
-      "groupPolicy": "open",
+      "model": { "primary": "anthropic/claude-sonnet-4-5" },
       "sandbox": { "mode": "non-main" }
     },
     "list": [
       {
         "id": "main",
         "name": "司礼监",
-        "model": "anthropic/claude-sonnet-4-5",
-        "groupPolicy": "open",
+        "model": { "primary": "anthropic/claude-sonnet-4-5" },
         "sandbox": { "mode": "off" }
       },
       {
         "id": "bingbu",
         "name": "兵部",
-        "model": "anthropic/claude-opus-4-6",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。"},
+        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "identity": { "theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "hubu",
         "name": "户部",
-        "model": "anthropic/claude-opus-4-6",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。"},
+        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "identity": { "theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "libu",
         "name": "礼部",
-        "model": "anthropic/claude-sonnet-4-5",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。"},
+        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "identity": { "theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "gongbu",
         "name": "工部",
-        "model": "anthropic/claude-sonnet-4-5",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是工部尚书，专精 DevOps、服务器运维、CI/CD、基础设施。回答用中文，注重实操。"},
+        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "identity": { "theme": "你是工部尚书，专精 DevOps、服务器运维、CI/CD、基础设施。回答用中文，注重实操。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "libu2",
         "name": "吏部",
-        "model": "anthropic/claude-sonnet-4-5",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是吏部尚书，专精项目管理、创业孵化、团队协调。回答用中文，条理清晰。"},
+        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "identity": { "theme": "你是吏部尚书，专精项目管理、创业孵化、团队协调。回答用中文，条理清晰。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "xingbu",
         "name": "刑部",
-        "model": "anthropic/claude-sonnet-4-5",
-        "groupPolicy": "open",
-        "identity": {"theme": "你是刑部尚书，专精法务合规、知识产权、合同审查。回答用中文，严谨专业。"},
+        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "identity": { "theme": "你是刑部尚书，专精法务合规、知识产权、合同审查。回答用中文，严谨专业。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       }
     ]
   },
-  "providers": {
-    "anthropic": {
-      "apiKey": "YOUR_ANTHROPIC_API_KEY"
-    }
-  },
   "channels": {
     "discord": {
       "enabled": true,
-      "token": "YOUR_DISCORD_BOT_TOKEN",
-      "guilds": {
-        "YOUR_GUILD_ID": {
-          "channels": { "*": { "allow": true } }
+      "groupPolicy": "open",
+      "accounts": {
+        "main": {
+          "name": "司礼监",
+          "token": "YOUR_MAIN_BOT_TOKEN",
+          "groupPolicy": "open"
+        },
+        "bingbu": {
+          "name": "兵部",
+          "token": "YOUR_BINGBU_BOT_TOKEN",
+          "groupPolicy": "open"
+        },
+        "hubu": {
+          "name": "户部",
+          "token": "YOUR_HUBU_BOT_TOKEN",
+          "groupPolicy": "open"
+        },
+        "libu": {
+          "name": "礼部",
+          "token": "YOUR_LIBU_BOT_TOKEN",
+          "groupPolicy": "open"
+        },
+        "gongbu": {
+          "name": "工部",
+          "token": "YOUR_GONGBU_BOT_TOKEN",
+          "groupPolicy": "open"
+        },
+        "libu2": {
+          "name": "吏部",
+          "token": "YOUR_LIBU2_BOT_TOKEN",
+          "groupPolicy": "open"
+        },
+        "xingbu": {
+          "name": "刑部",
+          "token": "YOUR_XINGBU_BOT_TOKEN",
+          "groupPolicy": "open"
         }
       }
     }
   },
   "bindings": [
-    {
-      "agentId": "bingbu",
-      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_BINGBU_CHANNEL_ID" } }
-    },
-    {
-      "agentId": "hubu",
-      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_HUBU_CHANNEL_ID" } }
-    },
-    {
-      "agentId": "libu",
-      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_LIBU_CHANNEL_ID" } }
-    },
-    {
-      "agentId": "gongbu",
-      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_GONGBU_CHANNEL_ID" } }
-    },
-    {
-      "agentId": "libu2",
-      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_LIBU2_CHANNEL_ID" } }
-    },
-    {
-      "agentId": "xingbu",
-      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_XINGBU_CHANNEL_ID" } }
-    }
+    { "agentId": "main", "match": { "channel": "discord", "accountId": "main" } },
+    { "agentId": "bingbu", "match": { "channel": "discord", "accountId": "bingbu" } },
+    { "agentId": "hubu", "match": { "channel": "discord", "accountId": "hubu" } },
+    { "agentId": "libu", "match": { "channel": "discord", "accountId": "libu" } },
+    { "agentId": "gongbu", "match": { "channel": "discord", "accountId": "gongbu" } },
+    { "agentId": "libu2", "match": { "channel": "discord", "accountId": "libu2" } },
+    { "agentId": "xingbu", "match": { "channel": "discord", "accountId": "xingbu" } }
   ]
 }
 CONFIG_EOF
@@ -251,32 +292,11 @@ fi
 # 创建 memory 目录
 mkdir -p memory
 
-# ---- 创建 systemd 服务（开机自启）----
-SERVICE_FILE="/etc/systemd/system/clawdbot.service"
-if [ ! -f "$SERVICE_FILE" ]; then
-    sudo tee "$SERVICE_FILE" > /dev/null << SYSTEMD_EOF
-[Unit]
-Description=Clawdbot Gateway
-After=network-online.target
-Wants=network-online.target
-
-[Service]
-Type=simple
-User=$USER
-WorkingDirectory=$HOME/clawd
-ExecStart=$(which clawdbot) gateway start --foreground
-Restart=on-failure
-RestartSec=10
-
-[Install]
-WantedBy=multi-user.target
-SYSTEMD_EOF
-    sudo systemctl daemon-reload
-    sudo systemctl enable clawdbot
-    echo -e "  ${GREEN}✓ systemd 服务已创建并设为开机自启${NC}"
-else
-    echo -e "  ${GREEN}✓ systemd 服务已存在，跳过${NC}"
-fi
+# ---- 安装 Gateway 服务（开机自启）----
+echo -e "${YELLOW}安装 Gateway 服务...${NC}"
+clawdbot gateway install 2>/dev/null \
+    && echo -e "  ${GREEN}✓ Gateway 服务已安装（开机自启）${NC}" \
+    || echo -e "  ${YELLOW}⚠ Gateway 服务安装跳过（配置填好后运行 clawdbot gateway install）${NC}"
 
 echo ""
 echo "================================"
@@ -290,20 +310,26 @@ echo "     编辑 ~/.clawdbot/clawdbot.json"
 echo "     把 YOUR_ANTHROPIC_API_KEY 替换成你的 Anthropic API Key"
 echo "     获取地址：https://console.anthropic.com"
 echo ""
-echo -e "  ${YELLOW}2. 设置 Discord Bot${NC}"
+echo -e "  ${YELLOW}2. 创建 Discord Bot（每个部门一个）${NC}"
 echo "     a) 访问 https://discord.com/developers/applications"
 echo "     b) 创建 Application → Bot → 复制 Token"
-echo "     c) 把 YOUR_DISCORD_BOT_TOKEN 替换成你的 Token"
-echo "     d) 把 YOUR_GUILD_ID 替换成你的服务器 ID"
-echo "     e) 把 YOUR_*_CHANNEL_ID 替换成对应频道 ID"
-echo "     f) 邀请 Bot 到你的服务器（需要 Send Messages + Read Messages 权限）"
+echo "     c) 重复创建多个 Bot（司礼监、兵部、户部...按需）"
+echo "     d) 把每个 Token 填到 clawdbot.json 的 accounts 对应位置"
+echo "     e) 每个 Bot 都要开启 Message Content Intent"
+echo "     f) 邀请所有 Bot 到你的 Discord 服务器"
 echo ""
 echo -e "  ${YELLOW}3. 启动朝廷${NC}"
-echo "     sudo systemctl start clawdbot"
+echo "     systemctl --user start clawdbot-gateway"
 echo ""
 echo -e "  ${YELLOW}4. 验证${NC}"
-echo "     sudo systemctl status clawdbot"
-echo "     然后在 Discord 频道 @你的Bot 说话试试"
+echo "     systemctl --user status clawdbot-gateway"
+echo "     然后在 Discord @你的Bot 说话试试"
+echo ""
+echo -e "  ${YELLOW}5. 添加定时任务（可选）${NC}"
+echo "     获取 Token：clawdbot gateway token"
+echo "     添加 cron： clawdbot cron add --name '每日简报' \\"
+echo "       --agent main --cron '0 22 * * *' --tz Asia/Shanghai \\"
+echo "       --message '生成今日简报' --session isolated --token <你的token>"
 echo ""
 echo -e "完整教程：${BLUE}https://github.com/wanikua/boluobobo-ai-court-tutorial${NC}"
 echo ""

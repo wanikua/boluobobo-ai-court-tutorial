@@ -28,7 +28,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 1. **Anthropic API Key** → [console.anthropic.com](https://console.anthropic.com)
 2. **Discord Bot Token** → [discord.com/developers](https://discord.com/developers/applications)
 
-然后 `sudo systemctl start clawdbot`，朝廷就上线了（开机自动启动）。
+然后 `systemctl --user start clawdbot-gateway`，朝廷就上线了（开机自动启动）。
 
 ---
 
@@ -48,20 +48,20 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 - **吏部** — 项目管理
 - **刑部** — 法务合规
 
-每个"部门"是一个独立的 AI Agent，绑定到 Discord 不同频道：
+每个"部门"是一个独立的 AI Agent，绑定到独立的 Discord Bot：
 
 ```
-你在 #兵部 频道：帮我写个用户登录的 API
+@兵部：帮我写个用户登录的 API
 → 兵部（Opus）：直接给你完整代码 + 架构建议
 
-你在 #户部 频道：这个月 API 花了多少钱
+@户部：这个月 API 花了多少钱
 → 户部（Opus）：按类别列出费用明细 + 优化建议
 
-你在 #礼部 频道：写一条小红书推广文案
+@礼部：写一条小红书推广文案
 → 礼部（Sonnet）：给你三版文案 + 配图建议
 ```
 
-一个 Bot，不同频道自动切换专家。你不需要指定找谁，系统自动路由。
+每个部门一个独立 Bot，@谁就找谁。在任何频道都能用。
 
 ![朝廷架构](./images/discord-architecture.png)
 
@@ -70,13 +70,13 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 ## 核心能力
 
 ### 多 Agent 协作
-不同频道绑定不同 AI 专家，一个 Bot 自动路由，不需要手动切换。
+每个部门一个独立 Discord Bot，@谁就找谁，不需要手动切换。
 
 ### 自动 Prompt 优化
 不用手动调 Prompt。每个 Agent 有独立的身份文件，系统自动注入上下文：
 
 ```json
-"identity": {"theme": "你是兵部尚书，专精软件工程。回答用中文，直接给方案。"}
+"identity": { "theme": "你是兵部尚书，专精软件工程。回答用中文，直接给方案。" }
 ```
 
 Clawdbot 自动结合行为准则（SOUL.md）、组织架构（IDENTITY.md）和工作区文件，生成完整的系统提示。Agent 越用越懂你——它能读取记忆文件（memory/），自动积累项目知识。
