@@ -345,13 +345,6 @@ nano ~/.clawdbot/clawdbot.json
       "apiKey": "sk-ant-api03-你的密钥"
     }
   },
-
-💡 想省钱？礼部等轻量任务可以换成 Qwen 模型：
-   1. 把礼部的 model 改为 "dashscope/qwen3.5-plus"
-   2. 在 providers 中添加 Qwen：
-      "dashscope": { "apiKey": "sk-你的通义千问密钥" }
-      获取地址：https://dashscope.console.aliyun.com
-   3. Qwen 比 Claude 便宜 50 倍，适合内容创作、日常对话等轻量任务
   "channels": {
     "discord": {
       "enabled": true,
@@ -390,6 +383,13 @@ nano ~/.clawdbot/clawdbot.json
     }
   ]
 }
+
+💡 想省钱？礼部等轻量任务可以换成 Qwen 模型：
+   1. 把礼部的 model 改为 "dashscope/qwen3.5-plus"
+   2. 在 providers 中添加 Qwen：
+      "dashscope": { "apiKey": "sk-你的通义千问密钥" }
+      获取地址：https://dashscope.console.aliyun.com
+   3. Qwen 比 Claude 便宜 50 倍，适合内容创作、日常对话等轻量任务
 
 ⚠️ 重要！替换以下内容（获取方法见下面的详细步骤）：
 - "sk-ant-api03-你的密钥" → 你的 Anthropic API Key

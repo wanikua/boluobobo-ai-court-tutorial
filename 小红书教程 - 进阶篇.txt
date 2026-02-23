@@ -373,12 +373,16 @@ deploy-backup
 # 创建监控脚本
 cat > ~/clawd/watch-config.sh << 'EOF'
 #!/bin/bash
+cd ~/clawd
 
-# 监控配置文件变化
-FILES=("$HOME/.clawdbot/clawdbot.json" "SOUL.md" "IDENTITY.md" "USER.md")
+# 同步 clawdbot.json 到工作区（原件在 ~/.clawdbot/，不在 git 仓库内）
+cp "$HOME/.clawdbot/clawdbot.json" ~/clawd/clawdbot.json.bak
+
+# 监控工作区内的配置文件
+FILES=("clawdbot.json.bak" "SOUL.md" "IDENTITY.md" "USER.md")
 
 for file in "${FILES[@]}"; do
-    if git diff --quiet -- "$file"; then
+    if git diff --quiet -- "$file" 2>/dev/null; then
         echo "$file 无变化"
     else
         echo "⚠️ $file 有变化！"
