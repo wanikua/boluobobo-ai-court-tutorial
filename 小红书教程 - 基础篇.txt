@@ -457,10 +457,61 @@ nano ~/.clawdbot/clawdbot.json
   ]
 }
 
-⚠️ 重要！替换以下内容：
-- "你的Discord Bot Token" → Discord Developer Portal 获取
-- "你的服务器ID" → 右键服务器 → 复制服务器 ID
-- "兵部频道ID" 等 → 右键频道 → 复制频道 ID
+⚠️ 重要！替换以下内容（获取方法见下面的详细步骤）：
+- "YOUR_ANTHROPIC_API_KEY" → 你的 Anthropic API Key
+- "你的Discord Bot Token" → 你的 Discord Bot Token
+- "你的服务器ID" → 你的 Discord 服务器 ID
+- "兵部频道ID" 等 → 对应频道的 ID
+
+━━━━━━━━━━━━━━━━━━━━━━━━
+
+5.2 创建 Discord Bot（只需要一个）
+
+💡 整个朝廷只需要一个 Bot！
+不同部门不需要不同的 Bot。Clawdbot 会根据频道自动切换 Agent。
+
+第一步：创建 Application
+
+1. 打开 https://discord.com/developers/applications
+2. 点击 "New Application"
+3. 名字填你喜欢的（比如"朝廷管家"）
+4. 点击 "Create"
+
+第二步：创建 Bot 并获取 Token
+
+1. 左边菜单点 "Bot"
+2. 点击 "Reset Token" → 复制 Token（只显示一次！）
+3. 这个 Token 就是配置里的 "你的Discord Bot Token"
+
+⚠️ Bot 设置（同一页面往下滚）：
+- Message Content Intent → 打开 ✅（必须！否则收不到消息）
+- Presence Intent → 可选
+- Server Members Intent → 可选
+
+第三步：邀请 Bot 到你的服务器
+
+1. 左边菜单点 "OAuth2"
+2. 勾选 "bot"
+3. Bot Permissions 勾选：
+   - Send Messages ✅
+   - Read Message History ✅
+   - Read Messages/View Channels ✅
+   - Use Slash Commands ✅（可选）
+4. 复制生成的邀请链接，在浏览器打开
+5. 选择你的服务器，点击 "Authorize"
+
+第四步：获取服务器 ID 和频道 ID
+
+开启开发者模式（只需做一次）：
+1. Discord 设置 → 高级 → 开发者模式 → 打开 ✅
+
+获取 ID：
+- 服务器 ID：右键服务器图标 → 复制服务器 ID
+- 频道 ID：右键频道名 → 复制频道 ID
+
+把这些 ID 填到 clawdbot.json 对应位置就行。
+
+📍 配图：Discord Developer Portal 创建 Bot 的截图
 
 💡 bindings 的作用：
 不同 Discord 频道绑定不同 AI Agent。
