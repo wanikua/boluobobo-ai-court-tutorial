@@ -492,20 +492,30 @@ Notion skill 让朝廷自动写奏折！
 # 3. 选择刚创建的 Clawdbot 朝廷
 # 4. 确认授权
 
-3️⃣ 配置环境变量
+3️⃣ 配置 Notion Token
 
-# 添加 Notion Token
-mkdir -p ~/.config/notion && echo ""secret_你的 Token"" > ~/.config/notion/api_key
+方法 1：写在 clawdbot.json 的 providers 里（推荐）
 
-# 配置数据库 ID（⚠️ 必须替换为你自己的数据库 ID！）
-# 如何获取：打开 Notion 数据库页面，看 URL 最后一串字符
-# 例如：notion.so/30f90cde52d481daa6a0f9a03c21046d
-#                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 这就是 ID
-echo 'export NOTION_DAILY_DB="你的日报数据库 ID"' >> ~/.bashrc
-echo 'export NOTION_WEEKLY_DB="你的周报数据库 ID"' >> ~/.bashrc
+打开 ~/clawd/clawdbot.json，在 providers 里添加：
 
-# 生效
+"providers": {
+  "anthropic": {
+    "apiKey": "sk-ant-api03-你的密钥"
+  },
+  "notion": {
+    "apiKey": "secret_你的NotionToken"
+  }
+}
+
+方法 2：用环境变量
+
+echo 'export NOTION_TOKEN="secret_你的NotionToken"' >> ~/.bashrc
 source ~/.bashrc
+
+⚠️ 数据库 ID 需要替换为你自己的！
+获取方法：打开 Notion 数据库页面，看 URL 最后一串字符
+例如：notion.so/30f90cde52d481daa6a0f9a03c21046d
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^ 这就是 ID
 
 📍 配图 12：Notion 数据库 ID 获取方法（页面 URL 中的 ID）
 
@@ -779,8 +789,17 @@ MAILTO=your-email@example.com
 
 ⚔️ 实战场景：朝廷自动化任务
 
-💡 Clawdbot 有内置 cron 功能，直接在 clawdbot.json 里配置，
-用自然语言写指令，不需要写 bash 脚本！
+⚠️ 两种定时任务，别搞混！
+
+| 类型 | 用途 | 配置位置 |
+|------|------|----------|
+| Linux crontab | 跑 bash 脚本（备份、清理日志等） | 终端 `crontab -e` |
+| Clawdbot cron | 让 AI 执行任务（写日报、查数据等） | clawdbot.json |
+
+简单规则：不需要 AI 思考的 → 用 Linux crontab
+         需要 AI 动脑的 → 用 Clawdbot cron
+
+以下是 Clawdbot cron 的实战场景：
 
 场景 1：每日自动日报
 
@@ -1508,7 +1527,7 @@ A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
-版本：进阶篇 v1.1（新增 cron + Discord）
+版本：进阶篇 v3.0
 字数：约 5500 字
 适用：老手进阶/私域分发
 更新日期：2026-02-22
