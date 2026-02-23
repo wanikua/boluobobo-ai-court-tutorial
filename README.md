@@ -26,7 +26,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 
 跑完后你只需要填两样东西：
 1. **Anthropic API Key** → [console.anthropic.com](https://console.anthropic.com)
-2. **Discord Bot Token** → [discord.com/developers](https://discord.com/developers/applications)
+2. **Discord Bot Token**（每个部门一个） → [discord.com/developers](https://discord.com/developers/applications)
 
 然后 `systemctl --user start clawdbot-gateway`，朝廷就上线了（开机自动启动）。
 

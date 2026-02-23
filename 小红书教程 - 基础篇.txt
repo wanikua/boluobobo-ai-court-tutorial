@@ -46,7 +46,7 @@
 - 至少 8 个字符
 - 至少 1 个大写字母 + 1 个小写字母 + 1 个数字 + 1 个特殊字符
 
-💡 建议格式：MyOracle2025! 这种
+💡 建议格式：MyOracle2026! 这种
 
 
 1.5 选择主区域（⚠️ 最重要！）
@@ -285,7 +285,8 @@ nano IDENTITY.md
 编辑配置文件：
 nano ~/.clawdbot/clawdbot.json
 
-把一键脚本生成的模板内容替换成以下配置（记得替换 API Key 和 Bot Token）：
+一键脚本已生成包含 7 个部门的完整模板。基础篇只用 4 个（司礼监+兵部+户部+礼部），
+你可以直接在模板上修改，或者替换成以下精简配置（记得替换 API Key 和 Bot Token）：
 
 {
   "models": {
@@ -612,7 +613,7 @@ Q6: 如何降低成本？
 9 | 实例配置页 | Shape 和 SSH 密钥区域 | 圈出 ARM 选择和下载按钮
 10 | 实例详情页 | 实例运行状态 | 圈出公网 IP 地址
 11 | MobaXterm 配置 | Session 设置窗口 | 圈出 IP、用户名、密钥选择
-12 | 安装完成截图 | 终端输出 | 圈出"🎉 安装完成！"
+12 | 安装完成截图 | 终端输出 | 圈出"部署完成！"
 13 | Anthropic API 页 | https://console.anthropic.com | 圈出"Create Key"
 14 | ~/clawd 目录 | ls -la 输出 | 圈出 SOUL.md、IDENTITY.md 等
 15 | 配置文件 | clawdbot.json 内容 | 圈出 agents.list 配置
