@@ -8,60 +8,63 @@
 
 ---
 
+## 一键部署
+
+领好 [Oracle Cloud 免费服务器](https://www.oracle.com/cloud/free/) 后，SSH 连上，跑这一行：
+
+```bash
+bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-tutorial/main/install.sh)
+```
+
+脚本会自动完成：
+- ✅ 系统更新 + 防火墙配置
+- ✅ 4GB Swap
+- ✅ Node.js 22 安装
+- ✅ Clawdbot 安装
+- ✅ 朝廷工作区初始化（SOUL.md / IDENTITY.md / clawdbot.json）
+
+跑完后你只需要填两样东西：
+1. **Anthropic API Key** → [console.anthropic.com](https://console.anthropic.com)
+2. **Discord Bot Token** → [discord.com/developers](https://discord.com/developers/applications)
+
+然后 `clawdbot gateway start`，朝廷就上线了。
+
+---
+
 ## 这是什么？
 
 一个 **多 AI 协作系统**，灵感来自明朝六部制度：
 
-- **兵部** — 写代码、搞架构
-- **户部** — 算账、管预算
-- **礼部** — 写文案、搞营销
+- **兵部** — 写代码、搞架构（Claude Opus）
+- **户部** — 算账、管预算（Claude Opus）
+- **礼部** — 写文案、搞营销（Claude Sonnet）
 - **工部** — 运维、部署
-- ...还有更多
+- **吏部** — 项目管理
+- **刑部** — 法务合规
 
-每个"部门"是一个独立的 AI Agent，各司其职，互不干扰。
+每个"部门"是一个独立的 AI Agent，绑定到 Discord 不同频道。
+在兵部频道问代码问题 → 编程专家回答。
+在户部频道聊财务 → 财务专家回答。
 
 ![朝廷架构](./images/discord-architecture.png)
 
 ---
 
-## 需要什么？
+## 费用
 
 | 项目 | 费用 |
 |---|---|
-| Oracle Cloud 服务器 | **免费**（永久，4核 24GB） |
+| Oracle Cloud 服务器 | **免费**（永久，ARM 4核 24GB） |
 | Anthropic API | 约 **¥30-50/月** |
 | Discord | 免费 |
 
-对比 ChatGPT Plus ¥149/月，这套方案更便宜，还能同时跑多个专家模型。
+对比 ChatGPT Plus ¥149/月，更便宜，还能同时跑多个专家。
 
 ---
 
-## 快速开始
+## 详细教程
 
-```bash
-# 1. 申请 Oracle Cloud 免费服务器，SSH 连上
-
-# 2. 安装 Node.js
-curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-sudo apt-get install -y nodejs
-
-# 3. 安装 Clawdbot
-sudo npm install -g clawdbot
-
-# 4. 配置 API Key
-echo 'export ANTHROPIC_API_KEY="你的密钥"' >> ~/.bashrc
-source ~/.bashrc
-
-# 5. 启动
-mkdir -p ~/clawd && cd ~/clawd
-clawdbot gateway start
-```
-
-详细步骤看下面的教程文件。
-
----
-
-## 📚 教程
+如果你想了解每一步的细节，看这些：
 
 | 文件 | 内容 |
 |---|---|
@@ -69,41 +72,21 @@ clawdbot gateway start
 | [进阶篇](./小红书教程%20-%20进阶篇.txt) | tmux、GitHub、Notion、定时任务、Discord 集成 |
 | [配图指引](./小红书教程%20-%20配图指引.md) | 每一步该截什么图 |
 
-## 📝 配套文案
-
-| 文件 | 用途 |
-|---|---|
-| [文案 - 基础篇](./小红书文案%20-%20基础篇.txt) | 小红书发帖用 |
-| [文案 - 进阶篇](./小红书文案%20-%20进阶篇.txt) | 小红书发帖用 |
-
----
-
-## 核心功能
-
-### 多 Agent 协作
-不同频道绑定不同 AI 专家。在兵部频道问代码问题，AI 自动用编程专家回答；在户部频道聊财务，AI 自动切换成财务专家。
-
-### 自动汇报
-配置定时任务，AI 每天自动写日报、每周写周报，发到 Discord + 存到 Notion。
-
-### 工具集成
-AI 不只是聊天——能写代码（Claude Code）、管仓库（GitHub）、写文档（Notion）、搜信息（浏览器）。
-
 ---
 
 ## 常见问题
 
 **Q: 需要会写代码吗？**
-A: 不需要。教程是复制粘贴级别的，跟着做就行。
+不需要。一键脚本搞定安装，配置文件填几个 Key 就行。
 
 **Q: 服务器真的免费吗？**
-A: Oracle Cloud 的 Always Free 套餐，ARM 4核 24GB，永久免费。需要信用卡注册但不会扣费。
+Oracle Cloud Always Free 套餐，ARM 4核 24GB，永久免费。需要信用卡注册但不扣费。
 
 **Q: 和直接用 ChatGPT 有什么区别？**
-A: ChatGPT 是一个通才。这套系统是多个专家——每个 Agent 有自己的专业领域、记忆和工具权限。而且能自动执行任务，不用你手动操作。
+ChatGPT 是一个通才。这套系统是多个专家——每个 Agent 有自己的专业领域、记忆和工具权限。能自动写代码、管 GitHub、写 Notion 文档。
 
-**Q: API 费用大概多少？**
-A: 日常使用约 ¥30-50/月。轻量任务用便宜模型（Sonnet/Qwen），重要任务才用贵的（Opus）。
+**Q: 能用其他模型吗？**
+能。Clawdbot 支持 Anthropic、OpenAI、Google、Qwen 等。在 `clawdbot.json` 里改 model 就行。
 
 ---
 
@@ -116,12 +99,4 @@ A: 日常使用约 ¥30-50/月。轻量任务用便宜模型（Sonnet/Qwen），
 
 ---
 
-## 配套小红书
-
-这套教程配套小红书系列笔记，从概念到实操全覆盖：
-
-[🏛️ 被 5 万+ 人围观的 AI 朝廷，教程来了！](https://www.xiaohongshu.com/explore/699afe4e0000000028008ef0)
-
----
-
-v3.0 | MIT License
+v3.1 | MIT License
