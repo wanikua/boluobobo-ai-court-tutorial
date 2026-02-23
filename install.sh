@@ -1,6 +1,6 @@
 #!/bin/bash
 # ============================================
-# 🏛️ AI 朝廷一键部署脚本
+# AI 朝廷一键部署脚本
 # 适用于 Oracle Cloud ARM / Ubuntu 22.04+
 # ============================================
 set -e
@@ -12,24 +12,25 @@ BLUE='\033[0;34m'
 NC='\033[0m'
 
 echo ""
-echo -e "${BLUE}🏛️  AI 朝廷一键部署${NC}"
+echo -e "${BLUE}AI 朝廷一键部署${NC}"
 echo "================================"
 echo ""
 
 # ---- 1. 系统更新 ----
-echo -e "${YELLOW}[1/6] 系统更新...${NC}"
+echo -e "${YELLOW}[1/7] 系统更新...${NC}"
 sudo apt-get update -qq
-sudo apt-get upgrade -y -qq
 
 # ---- 2. 防火墙 ----
-echo -e "${YELLOW}[2/6] 配置防火墙...${NC}"
-# Oracle Cloud 默认 iptables 规则会阻断流量，清掉
-sudo iptables -F INPUT 2>/dev/null || true
-sudo iptables -F FORWARD 2>/dev/null || true
+echo -e "${YELLOW}[2/7] 配置防火墙...${NC}"
+# Oracle Cloud 默认 iptables 有一条 REJECT 规则会阻断非 SSH 流量，只删这条
+# 注意：不能 flush 整个链，否则在 DROP 策略下会丢失 SSH 连接
+sudo iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited 2>/dev/null || true
+sudo iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited 2>/dev/null || true
 sudo netfilter-persistent save 2>/dev/null || true
+echo -e "  ${GREEN}✓ 防火墙已配置${NC}"
 
 # ---- 3. Swap（小内存机器需要）----
-echo -e "${YELLOW}[3/6] 配置 Swap...${NC}"
+echo -e "${YELLOW}[3/7] 配置 Swap...${NC}"
 if [ ! -f /swapfile ]; then
     sudo fallocate -l 4G /swapfile
     sudo chmod 600 /swapfile
@@ -42,7 +43,7 @@ else
 fi
 
 # ---- 4. Node.js ----
-echo -e "${YELLOW}[4/6] 安装 Node.js 22...${NC}"
+echo -e "${YELLOW}[4/7] 安装 Node.js 22...${NC}"
 if command -v node &>/dev/null && [[ "$(node -v)" == v22* ]]; then
     echo -e "  ${GREEN}✓ Node.js $(node -v) 已安装${NC}"
 else
@@ -74,7 +75,9 @@ echo -e "  ${GREEN}✓ Clawdbot $(clawdbot --version 2>/dev/null) 安装完成${
 # ---- 7. 初始化工作区 ----
 echo -e "${YELLOW}[7/7] 初始化朝廷工作区...${NC}"
 WORKSPACE="$HOME/clawd"
+CONFIG_DIR="$HOME/.clawdbot"
 mkdir -p "$WORKSPACE"
+mkdir -p "$CONFIG_DIR"
 cd "$WORKSPACE"
 
 # SOUL.md
@@ -129,14 +132,15 @@ USER_EOF
 echo -e "  ${GREEN}✓ USER.md 已创建${NC}"
 fi
 
-# clawdbot.json 模板
-if [ ! -f clawdbot.json ]; then
-cat > clawdbot.json << CONFIG_EOF
+# clawdbot.json 模板 → 写到 ~/.clawdbot/
+if [ ! -f "$CONFIG_DIR/clawdbot.json" ]; then
+cat > "$CONFIG_DIR/clawdbot.json" << CONFIG_EOF
 {
   "agents": {
     "defaults": {
       "workspace": "$HOME/clawd",
       "model": "anthropic/claude-sonnet-4-5",
+      "groupPolicy": "open",
       "sandbox": { "mode": "non-main" }
     },
     "list": [
@@ -144,12 +148,14 @@ cat > clawdbot.json << CONFIG_EOF
         "id": "main",
         "name": "司礼监",
         "model": "anthropic/claude-sonnet-4-5",
+        "groupPolicy": "open",
         "sandbox": { "mode": "off" }
       },
       {
         "id": "bingbu",
         "name": "兵部",
         "model": "anthropic/claude-opus-4-6",
+        "groupPolicy": "open",
         "identity": {"theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。"},
         "sandbox": { "mode": "all", "scope": "agent" }
       },
@@ -157,6 +163,7 @@ cat > clawdbot.json << CONFIG_EOF
         "id": "hubu",
         "name": "户部",
         "model": "anthropic/claude-opus-4-6",
+        "groupPolicy": "open",
         "identity": {"theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。"},
         "sandbox": { "mode": "all", "scope": "agent" }
       },
@@ -164,7 +171,32 @@ cat > clawdbot.json << CONFIG_EOF
         "id": "libu",
         "name": "礼部",
         "model": "anthropic/claude-sonnet-4-5",
+        "groupPolicy": "open",
         "identity": {"theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。"},
+        "sandbox": { "mode": "all", "scope": "agent" }
+      },
+      {
+        "id": "gongbu",
+        "name": "工部",
+        "model": "anthropic/claude-sonnet-4-5",
+        "groupPolicy": "open",
+        "identity": {"theme": "你是工部尚书，专精 DevOps、服务器运维、CI/CD、基础设施。回答用中文，注重实操。"},
+        "sandbox": { "mode": "all", "scope": "agent" }
+      },
+      {
+        "id": "libu2",
+        "name": "吏部",
+        "model": "anthropic/claude-sonnet-4-5",
+        "groupPolicy": "open",
+        "identity": {"theme": "你是吏部尚书，专精项目管理、创业孵化、团队协调。回答用中文，条理清晰。"},
+        "sandbox": { "mode": "all", "scope": "agent" }
+      },
+      {
+        "id": "xingbu",
+        "name": "刑部",
+        "model": "anthropic/claude-sonnet-4-5",
+        "groupPolicy": "open",
+        "identity": {"theme": "你是刑部尚书，专精法务合规、知识产权、合同审查。回答用中文，严谨专业。"},
         "sandbox": { "mode": "all", "scope": "agent" }
       }
     ]
@@ -197,25 +229,64 @@ cat > clawdbot.json << CONFIG_EOF
     {
       "agentId": "libu",
       "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_LIBU_CHANNEL_ID" } }
+    },
+    {
+      "agentId": "gongbu",
+      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_GONGBU_CHANNEL_ID" } }
+    },
+    {
+      "agentId": "libu2",
+      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_LIBU2_CHANNEL_ID" } }
+    },
+    {
+      "agentId": "xingbu",
+      "match": { "channel": "discord", "guildId": "YOUR_GUILD_ID", "peer": { "kind": "channel", "id": "YOUR_XINGBU_CHANNEL_ID" } }
     }
   ]
 }
 CONFIG_EOF
-echo -e "  ${GREEN}✓ clawdbot.json 模板已创建${NC}"
+echo -e "  ${GREEN}✓ clawdbot.json 模板已创建 ($CONFIG_DIR/clawdbot.json)${NC}"
 fi
 
 # 创建 memory 目录
 mkdir -p memory
 
+# ---- 创建 systemd 服务（开机自启）----
+SERVICE_FILE="/etc/systemd/system/clawdbot.service"
+if [ ! -f "$SERVICE_FILE" ]; then
+    sudo tee "$SERVICE_FILE" > /dev/null << SYSTEMD_EOF
+[Unit]
+Description=Clawdbot Gateway
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=$USER
+WorkingDirectory=$HOME/clawd
+ExecStart=$(which clawdbot) gateway start --foreground
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
+SYSTEMD_EOF
+    sudo systemctl daemon-reload
+    sudo systemctl enable clawdbot
+    echo -e "  ${GREEN}✓ systemd 服务已创建并设为开机自启${NC}"
+else
+    echo -e "  ${GREEN}✓ systemd 服务已存在，跳过${NC}"
+fi
+
 echo ""
 echo "================================"
-echo -e "${GREEN}🎉 部署完成！${NC}"
+echo -e "${GREEN}部署完成！${NC}"
 echo "================================"
 echo ""
 echo "接下来你需要完成以下配置："
 echo ""
 echo -e "  ${YELLOW}1. 设置 API Key${NC}"
-echo "     编辑 ~/clawd/clawdbot.json"
+echo "     编辑 ~/.clawdbot/clawdbot.json"
 echo "     把 YOUR_ANTHROPIC_API_KEY 替换成你的 Anthropic API Key"
 echo "     获取地址：https://console.anthropic.com"
 echo ""
@@ -228,11 +299,10 @@ echo "     e) 把 YOUR_*_CHANNEL_ID 替换成对应频道 ID"
 echo "     f) 邀请 Bot 到你的服务器（需要 Send Messages + Read Messages 权限）"
 echo ""
 echo -e "  ${YELLOW}3. 启动朝廷${NC}"
-echo "     cd ~/clawd"
-echo "     clawdbot gateway start"
+echo "     sudo systemctl start clawdbot"
 echo ""
 echo -e "  ${YELLOW}4. 验证${NC}"
-echo "     clawdbot gateway status"
+echo "     sudo systemctl status clawdbot"
 echo "     然后在 Discord 频道 @你的Bot 说话试试"
 echo ""
 echo -e "完整教程：${BLUE}https://github.com/wanikua/buoluobobo-ai-court-tutorial${NC}"
