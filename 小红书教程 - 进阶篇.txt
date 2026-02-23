@@ -1217,28 +1217,27 @@ A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
 
 2️⃣ 常用命令速查
 
-# 在 Discord 中可以用的命令（需要配置）：
+# 在 Discord 中直接用自然语言和朝廷对话：
 
-# 日报相关
-!daily              # 生成今日日报
-!daily yesterday    # 生成昨日报
+# 日报相关（在命令中心频道 @Bot）
+@Bot 生成今天的日报
+@Bot 生成昨天的日报
 
 # 周报相关
-!weekly             # 生成本周周报
-!weekly last        # 生成上周周报
+@Bot 生成本周周报
+@Bot 生成上周周报
 
 # 任务管理
-!tasks              # 查看当前任务
-!tasks add xxx      # 添加任务
-!tasks complete 1   # 完成任务 1
+@Bot 列出当前所有任务
+@Bot 添加任务：优化登录页面
+@Bot 把第一个任务标记为完成
 
 # 项目管理
-!projects           # 查看项目列表
-!project pindoudou  # 查看特定项目状态
+@Bot 查看所有项目状态
+@Bot pindoudou 项目进展如何
 
-# 系统命令
-!status             # 查看朝廷状态
-!help               # 查看帮助
+# 注意：Clawdbot 不需要特殊命令前缀（如 !daily）
+# 直接用自然语言说就行，AI 会理解你的意图
 
 3️⃣ 频道分类技巧
 

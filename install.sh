@@ -66,9 +66,6 @@ WORKSPACE="$HOME/clawd"
 mkdir -p "$WORKSPACE"
 cd "$WORKSPACE"
 
-# 下载朝廷模板配置
-TEMPLATE_URL="https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-tutorial/main/templates"
-
 # SOUL.md
 if [ ! -f SOUL.md ]; then
 cat > SOUL.md << 'SOUL_EOF'
@@ -123,11 +120,11 @@ fi
 
 # clawdbot.json 模板
 if [ ! -f clawdbot.json ]; then
-cat > clawdbot.json << 'CONFIG_EOF'
+cat > clawdbot.json << CONFIG_EOF
 {
   "agents": {
     "defaults": {
-      "workspace": "~/clawd",
+      "workspace": "$HOME/clawd",
       "model": "anthropic/claude-sonnet-4-5",
       "sandbox": { "mode": "non-main" }
     },
