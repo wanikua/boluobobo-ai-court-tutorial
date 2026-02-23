@@ -51,8 +51,19 @@ else
     echo -e "  ${GREEN}✓ Node.js $(node -v) 安装完成${NC}"
 fi
 
-# ---- 5. Clawdbot ----
-echo -e "${YELLOW}[5/6] 安装 Clawdbot...${NC}"
+# ---- 5. gh CLI（GitHub 自动化）----
+echo -e "${YELLOW}[5/7] 安装 GitHub CLI...${NC}"
+if command -v gh &>/dev/null; then
+    echo -e "  ${GREEN}✓ gh $(gh --version | head -1 | awk '{print $3}') 已安装${NC}"
+else
+    curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg 2>/dev/null
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null
+    sudo apt-get update -qq && sudo apt-get install gh -y -qq
+    echo -e "  ${GREEN}✓ gh CLI 安装完成${NC}"
+fi
+
+# ---- 6. Clawdbot ----
+echo -e "${YELLOW}[6/7] 安装 Clawdbot...${NC}"
 if command -v clawdbot &>/dev/null; then
     CURRENT_VER=$(clawdbot --version 2>/dev/null || echo "unknown")
     echo -e "  ${GREEN}✓ Clawdbot 已安装 ($CURRENT_VER)，更新中...${NC}"
@@ -60,8 +71,8 @@ fi
 sudo npm install -g clawdbot --loglevel=error
 echo -e "  ${GREEN}✓ Clawdbot $(clawdbot --version 2>/dev/null) 安装完成${NC}"
 
-# ---- 6. 初始化工作区 ----
-echo -e "${YELLOW}[6/6] 初始化朝廷工作区...${NC}"
+# ---- 7. 初始化工作区 ----
+echo -e "${YELLOW}[7/7] 初始化朝廷工作区...${NC}"
 WORKSPACE="$HOME/clawd"
 mkdir -p "$WORKSPACE"
 cd "$WORKSPACE"

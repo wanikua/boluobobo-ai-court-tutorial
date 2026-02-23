@@ -17,11 +17,12 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-
 ```
 
 脚本会自动完成：
-- ✅ 系统更新 + 防火墙配置
+- ✅ 系统更新 + Oracle 防火墙清理
 - ✅ 4GB Swap
-- ✅ Node.js 22 安装
-- ✅ Clawdbot 安装
-- ✅ 朝廷工作区初始化（SOUL.md / IDENTITY.md / clawdbot.json）
+- ✅ Node.js 22
+- ✅ GitHub CLI（gh）
+- ✅ Clawdbot
+- ✅ 朝廷工作区初始化（SOUL.md / IDENTITY.md / clawdbot.json 含多 Agent 模板）
 
 跑完后你只需要填两样东西：
 1. **Anthropic API Key** → [console.anthropic.com](https://console.anthropic.com)
@@ -33,6 +34,11 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-
 
 ## 这是什么？
 
+> 不是框架，不用写代码。是一套开箱即用的私有 AI 团队方案。
+
+跟 AutoGPT / CrewAI / MetaGPT 的区别：它们是开发框架，你得写代码来编排 Agent。
+这个是**成品**——跑个脚本就能用，在 Discord 里发消息就能指挥。
+
 一个 **多 AI 协作系统**，灵感来自明朝六部制度：
 
 - **兵部** — 写代码、搞架构（Claude Opus）
@@ -42,9 +48,20 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-
 - **吏部** — 项目管理
 - **刑部** — 法务合规
 
-每个"部门"是一个独立的 AI Agent，绑定到 Discord 不同频道。
-在兵部频道问代码问题 → 编程专家回答。
-在户部频道聊财务 → 财务专家回答。
+每个"部门"是一个独立的 AI Agent，绑定到 Discord 不同频道：
+
+```
+你在 #兵部 频道：帮我写个用户登录的 API
+→ 兵部（Opus）：直接给你完整代码 + 架构建议
+
+你在 #户部 频道：这个月 API 花了多少钱
+→ 户部（Opus）：按类别列出费用明细 + 优化建议
+
+你在 #礼部 频道：写一条小红书推广文案
+→ 礼部（Sonnet）：给你三版文案 + 配图建议
+```
+
+一个 Bot，不同频道自动切换专家。你不需要指定找谁，系统自动路由。
 
 ![朝廷架构](./images/discord-architecture.png)
 
@@ -58,7 +75,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-
 | Anthropic API | 约 **¥30-50/月** |
 | Discord | 免费 |
 
-对比 ChatGPT Plus ¥149/月，更便宜，还能同时跑多个专家。
+成本计算：日常对话用 Sonnet（$3/M token），每天约 50 次对话 ≈ $1/天 ≈ ¥7/天。
+重度编码用 Opus 会贵一些，但可以混搭：轻活给 Sonnet，重活才用 Opus。
 
 ---
 

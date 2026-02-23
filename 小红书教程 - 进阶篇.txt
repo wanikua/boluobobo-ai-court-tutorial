@@ -494,23 +494,13 @@ Notion skill 让朝廷自动写奏折！
 
 3️⃣ 配置 Notion Token
 
-方法 1：写在 clawdbot.json 的 providers 里（推荐）
-
-打开 ~/clawd/clawdbot.json，在 providers 里添加：
-
-"providers": {
-  "anthropic": {
-    "apiKey": "sk-ant-api03-你的密钥"
-  },
-  "notion": {
-    "apiKey": "secret_你的NotionToken"
-  }
-}
-
-方法 2：用环境变量
+配置 Notion Token（环境变量）
 
 echo 'export NOTION_TOKEN="secret_你的NotionToken"' >> ~/.bashrc
 source ~/.bashrc
+
+💡 Notion 是 Clawdbot 的 skill（工具），不是 provider。
+Token 通过环境变量配置，不写在 clawdbot.json 里。
 
 ⚠️ 数据库 ID 需要替换为你自己的！
 获取方法：打开 Notion 数据库页面，看 URL 最后一串字符
