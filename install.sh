@@ -107,7 +107,7 @@ cat > IDENTITY.md << 'ID_EOF'
 |---|---|---|
 | 调度层 | Claude Sonnet | 日常对话，快速响应 |
 | 执行层（重） | Claude Opus | 编码、深度分析 |
-| 执行层（轻） | Qwen Plus | 轻量任务，省钱 |
+| 执行层（轻） | Qwen Plus（可选） | 轻量任务，省钱 |
 
 ## 六部
 - 兵部：软件工程、系统架构
@@ -305,5 +305,5 @@ echo -e "  ${YELLOW}4. 验证${NC}"
 echo "     sudo systemctl status clawdbot"
 echo "     然后在 Discord 频道 @你的Bot 说话试试"
 echo ""
-echo -e "完整教程：${BLUE}https://github.com/wanikua/buoluobobo-ai-court-tutorial${NC}"
+echo -e "完整教程：${BLUE}https://github.com/wanikua/boluobobo-ai-court-tutorial${NC}"
 echo ""

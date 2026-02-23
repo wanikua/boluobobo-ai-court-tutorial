@@ -276,7 +276,7 @@ source ~/.bashrc
 # 然后在服务器上克隆
 cd ~/clawd
 git init
-git remote add origin git@github.com:你的用户名/clawdbot-backup.git
+git remote add origin https://github.com/你的用户名/clawdbot-backup.git
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -375,7 +375,7 @@ cat > ~/clawd/watch-config.sh << 'EOF'
 #!/bin/bash
 
 # 监控配置文件变化
-FILES=("clawdbot.json" "SOUL.md" "IDENTITY.md" "USER.md")
+FILES=("$HOME/.clawdbot/clawdbot.json" "SOUL.md" "IDENTITY.md" "USER.md")
 
 for file in "${FILES[@]}"; do
     if git diff --quiet -- "$file"; then
@@ -408,7 +408,7 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: 部署到服务器
         run: |
           echo "自动部署中..."
@@ -554,7 +554,7 @@ Clawdbot 内置 cron 定时任务功能，不需要写 bash 脚本。
     "id": "daily-report",
     "schedule": "0 14 * * *",
     "text": "生成今日日报：汇总今天完成的任务、遇到的问题、明天的计划。用简洁中文分点列出，同步写入 Notion 日报数据库。",
-    "agent": "司礼监"
+    "agent": "main"
   }
 ]
 
@@ -569,7 +569,7 @@ Clawdbot 内置 cron 定时任务功能，不需要写 bash 脚本。
   "id": "weekly-report",
   "schedule": "0 12 * * 0",
   "text": "生成本周周报：汇总本周各项目进展、关键数据、遇到的挑战和解决方案、下周计划。同步写入 Notion 周报数据库。",
-  "agent": "司礼监"
+  "agent": "main"
 }
 
 案例 3：项目进展自动同步
@@ -578,7 +578,7 @@ Clawdbot 内置 cron 定时任务功能，不需要写 bash 脚本。
   "id": "project-sync",
   "schedule": "0 10 * * 1,4",
   "text": "检查所有 GitHub 仓库的最近提交和未关闭 Issue，更新 Notion 项目数据库的状态和进度。",
-  "agent": "兵部"
+  "agent": "bingbu"
 }
 
 完整 cron 配置示例（放在 clawdbot.json 里）：
@@ -588,19 +588,19 @@ Clawdbot 内置 cron 定时任务功能，不需要写 bash 脚本。
     "id": "daily-report",
     "schedule": "0 14 * * *",
     "text": "生成今日日报，写入 Notion",
-    "agent": "司礼监"
+    "agent": "main"
   },
   {
     "id": "weekly-report",
     "schedule": "0 12 * * 0",
     "text": "生成本周周报，写入 Notion",
-    "agent": "司礼监"
+    "agent": "main"
   },
   {
     "id": "project-sync",
     "schedule": "0 10 * * 1,4",
     "text": "同步项目进展到 Notion",
-    "agent": "兵部"
+    "agent": "bingbu"
   }
 ]
 
@@ -782,7 +782,7 @@ MAILTO=your-email@example.com
   "id": "daily-report",
   "schedule": "0 14 * * *",
   "text": "生成今日日报，写入 Notion 日报数据库",
-  "agent": "司礼监"
+  "agent": "main"
 }
 
 💡 schedule 用标准 cron 表达式，"0 14 * * *" = UTC 14:00 = 北京 22:00
@@ -793,7 +793,7 @@ MAILTO=your-email@example.com
   "id": "weekly-backup",
   "schedule": "0 9 * * 5",
   "text": "把 ~/clawd 目录的改动提交并 push 到 GitHub，commit message 写'周备份'",
-  "agent": "兵部"
+  "agent": "bingbu"
 }
 
 场景 3：服务器健康检查
@@ -802,7 +802,7 @@ MAILTO=your-email@example.com
   "id": "health-check",
   "schedule": "0 */6 * * *",
   "text": "检查服务器 CPU、内存、磁盘使用率，如果有异常立即通知",
-  "agent": "司礼监"
+  "agent": "main"
 }
 
 场景 4：每月财务汇总
@@ -811,7 +811,7 @@ MAILTO=your-email@example.com
   "id": "monthly-finance",
   "schedule": "0 12 1 * *",
   "text": "汇总本月所有 API 花费和服务器成本，按类别统计，写入 Notion 财务数据库",
-  "agent": "户部"
+  "agent": "hubu"
 }
 
 场景 5：每天早上发工作计划
@@ -820,7 +820,7 @@ MAILTO=your-email@example.com
   "id": "morning-plan",
   "schedule": "0 1 * * *",
   "text": "在 Discord 日报频道发送今日工作计划提醒",
-  "agent": "司礼监"
+  "agent": "main"
 }
 
 ⚠️ 注意：这是 Clawdbot 内置 cron，不是 Linux crontab！
@@ -1258,8 +1258,6 @@ A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
 📈 汇报效率：+300%
 📈 任务自动化：+200%
 📈 团队协作效率：+150%
-
-━━━━━━━━━━━━━━━━━━━━━━━━
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
