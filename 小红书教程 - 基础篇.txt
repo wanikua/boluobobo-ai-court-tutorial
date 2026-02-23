@@ -197,27 +197,13 @@ Are you sure you want to continue connecting (yes/no)?
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
-三、一键安装 Clawdbot（5 分钟）
+三、一键安装（5 分钟）
 
-SSH 连上服务器后，直接复制粘贴这段代码：
+SSH 连上服务器后，复制粘贴这一行：
 
-# ==========================================
-# 🚀 一键安装脚本（复制整段执行）
-# ==========================================
+bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-tutorial/main/install.sh)
 
-# 方法 1：npm 安装（推荐）
-# 先安装 Node.js
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-source ~/.bashrc
-nvm install 22
-npm install -g clawdbot
-
-# 方法 2：如果 npm 太慢，用国内镜像
-# 先安装 Node.js
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
-source ~/.bashrc
-nvm install 22
-npm install -g clawdbot --registry=https://registry.npmmirror.com
+脚本会自动完成：系统更新、防火墙配置、Swap、Node.js 22、GitHub CLI、Clawdbot 安装、工作区初始化。
 
 安装完成后验证：
 clawdbot --version
@@ -225,7 +211,8 @@ clawdbot --version
 ⏱️ 耗时：3-5 分钟（看网速）
 📍 成功标志：能看到版本号就对了！✅
 
-💡 防火墙、Swap 等服务器优化见进阶篇。
+💡 如果 npm 下载慢，可以手动安装：
+npm install -g clawdbot --registry=https://registry.npmmirror.com
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -303,15 +290,15 @@ cat > IDENTITY.md << 'EOF'
 | 层级 | 模型 | 用途 |
 |---|---|---|
 | 调度层 | Claude Sonnet 4.5 | 快速路由 |
-| 执行层（重） | Claude Opus 4.5 | 代码/财务/法律 |
-| 执行层（轻） | Qwen 3.5 Plus | 生活/品牌 |
+| 执行层（重） | Claude Opus 4.6 | 代码/财务/法律 |
+| 执行层（轻） | Claude Sonnet 4.5 | 内容/品牌 |
 
 ## 朝廷架构
 👑 你 — 天子
 ⚡ 大内总管 [Sonnet] — 司礼监
 ├─ ⚔️ 兵部 [Opus] — 软件工程
 ├─ 💰 户部 [Opus] — 财务管理
-└─ 🎭 礼部 [Qwen] — 品牌营销
+└─ 🎭 礼部 [Sonnet] — 品牌营销
 
 ## 政令流转
 1. 你降旨 → 大内总管接旨
@@ -337,9 +324,6 @@ EOF
 编辑配置文件：
 nano ~/.clawdbot/clawdbot.json
 
-或直接用 nano 编辑：
-nano ~/.clawdbot/clawdbot.json
-
 粘贴以下配置（记得替换 API Key）：
 
 {
@@ -347,6 +331,7 @@ nano ~/.clawdbot/clawdbot.json
     "defaults": {
       "workspace": "/home/ubuntu/clawd",
       "model": "anthropic/claude-sonnet-4-5",
+      "groupPolicy": "open",
       "sandbox": {
         "mode": "non-main"
       }
@@ -356,12 +341,14 @@ nano ~/.clawdbot/clawdbot.json
         "id": "main",
         "name": "大内总管",
         "model": "anthropic/claude-sonnet-4-5",
+        "groupPolicy": "open",
         "sandbox": { "mode": "off" }
       },
       {
         "id": "bingbu",
         "name": "兵部尚书",
         "model": "anthropic/claude-opus-4-6",
+        "groupPolicy": "open",
         "identity": {"theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。"},
         "sandbox": {
           "mode": "all",
@@ -372,6 +359,7 @@ nano ~/.clawdbot/clawdbot.json
         "id": "hubu",
         "name": "户部尚书",
         "model": "anthropic/claude-opus-4-6",
+        "groupPolicy": "open",
         "identity": {"theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。"},
         "sandbox": {
           "mode": "all",
@@ -381,7 +369,8 @@ nano ~/.clawdbot/clawdbot.json
       {
         "id": "libu",
         "name": "礼部尚书",
-        "model": "qwen/qwen-plus-latest",
+        "model": "anthropic/claude-sonnet-4-5",
+        "groupPolicy": "open",
         "identity": {"theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。"},
         "sandbox": {
           "mode": "all",
@@ -393,9 +382,6 @@ nano ~/.clawdbot/clawdbot.json
   "providers": {
     "anthropic": {
       "apiKey": "sk-ant-api03-你的密钥"
-    },
-    "qwen": {
-      "apiKey": "sk-your-qwen-key"
     }
   },
   "channels": {
@@ -443,14 +429,17 @@ nano ~/.clawdbot/clawdbot.json
 }
 
 ⚠️ 重要！替换以下内容（获取方法见下面的详细步骤）：
-- "YOUR_ANTHROPIC_API_KEY" → 你的 Anthropic API Key
+- "sk-ant-api03-你的密钥" → 你的 Anthropic API Key
 - "你的Discord Bot Token" → 你的 Discord Bot Token
 - "你的服务器ID" → 你的 Discord 服务器 ID
 - "兵部频道ID" 等 → 对应频道的 ID
 
+💡 注意 groupPolicy: "open" 这个配置很重要！
+不加的话默认是 "allowlist"，Bot 会静默丢弃所有群聊消息。
+
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
-5.2 创建 Discord Bot（只需要一个）
+5.3 创建 Discord Bot（只需要一个）
 
 💡 整个朝廷只需要一个 Bot！
 不同部门不需要不同的 Bot。Clawdbot 会根据频道自动切换 Agent。
@@ -510,7 +499,7 @@ nano ~/.clawdbot/clawdbot.json
 ❗ 易错点：
 - JSON 格式要正确，逗号、括号不能少
 - API Key 两边的引号不要丢
-- 如果不用 Qwen，可以删掉 qwen 配置块
+- groupPolicy: "open" 不能漏！否则 Bot 收不到群消息
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -519,13 +508,15 @@ nano ~/.clawdbot/clawdbot.json
 
 6.1 启动 Gateway
 
-# 启动服务
-clawdbot gateway start
+# 启动服务（一键脚本已配好 systemd，开机自动启动）
+sudo systemctl start clawdbot
 
 # 查看状态
-clawdbot gateway status
+sudo systemctl status clawdbot
 
 📍 成功标志：看到"active (running)"就对了！✅
+
+💡 也可以用 clawdbot gateway start 手动启动（适合调试）
 
 6.2 测试对话
 
@@ -550,16 +541,16 @@ clawdbot gateway status
 6.3 常用命令
 
 # 查看状态
-clawdbot gateway status
+sudo systemctl status clawdbot
 
 # 重启
-clawdbot gateway restart
+sudo systemctl restart clawdbot
 
 # 查看日志
-cat /tmp/clawdbot/clawdbot-$(date +%Y-%m-%d).log
+journalctl -u clawdbot --since today
 
 # 停止
-clawdbot gateway stop
+sudo systemctl stop clawdbot
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -576,7 +567,7 @@ clawdbot gateway stop
 🆕 Q00: 显示"Out of capacity"怎么办？
 
 解决：
-- 换其他区域（ap-tokyo-1 / ap-seoul-1）
+- 换其他区域（ap-tokyo-1 / ap-osaka-1 / us-phoenix-1）
 - 换时间段（凌晨美国时间成功率高）
 - 等几天再试
 - 用其他云服务商（AWS/Google Cloud/腾讯云学生机）
@@ -670,7 +661,7 @@ Q6: 如何降低成本？
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
-版本：基础篇 v3.0
+版本：基础篇 v3.1
 字数：约 3500 字
 适用：评论区领取/私域分发
 更新日期：2026-02-22

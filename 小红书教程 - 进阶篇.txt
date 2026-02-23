@@ -952,9 +952,8 @@ Discord 就是来拯救你的！
 # 4. 点击 Create
 
 # 5. 进入应用页面，左侧菜单选 "Bot"
-# 6. 点击 "Add Bot" → "Yes, do it!"
 
-# 7. 重置 Token（重要！）：
+# 6. 获取 Token（重要！）：
 #    - 点击 "Reset Token"
 #    - 复制 Token（格式类似：MTIzNDU2Nzg5MDEyMzQ1Njc4OQ.xxxxxx.xxxxx）
 #    - 🔴 妥善保存！只显示一次！
@@ -974,19 +973,22 @@ Discord 就是来拯救你的！
 3️⃣ 配置 clawdbot.json
 
 # 编辑朝廷配置文件
-nano ~/clawd/clawdbot.json
+nano ~/.clawdbot/clawdbot.json
 
-# 添加 Discord 配置：
+# Discord 配置在 channels.discord 字段中（基础篇已配好）：
+# 如果你按基础篇配置过，这里只需要确认 token 和 guilds 已填好
+
+# 如果还没配过，格式如下：
 {
-  "discord": {
-    "token": "你的 Bot Token",
-    "serverId": "你的服务器 ID",
-    "channels": {
-      "daily": "日报频道 ID",
-      "weekly": "周报频道 ID",
-      "monthly": "月报频道 ID",
-      "commands": "命令频道 ID",
-      "logs": "日志频道 ID"
+  "channels": {
+    "discord": {
+      "enabled": true,
+      "token": "你的 Bot Token",
+      "guilds": {
+        "你的服务器ID": {
+          "channels": { "*": { "allow": true } }
+        }
+      }
     }
   }
 }
@@ -1027,8 +1029,6 @@ nano ~/clawd/clawdbot.json
 #    - 左侧服务器列表底部应该能看到 Bot 头像
 #    - 或在服务器设置 → 成员 中看到 Bot
 
-# 6. 完成！Bot 已加入服务器！
-
 
 ⚠️ 常见问题：
 Q: 找不到我的服务器？
@@ -1055,11 +1055,11 @@ A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
 │   ├── ⚔️ 兵部（技术/开发）
 │   ├── 💰 户部（财务/运营）
 │   ├── 🎋 礼部（文档/内容）
-│   ├── 👥 吏部（人事/招聘）
-│   ├── ⚖️ 刑部（安全/审计）
-│   └── 📚 学部（学习/研究）
-├── 🔧 工部（工具频道）
-│   ├── 🤖 命令中心
+│   ├── 🔧 工部（运维/部署）
+│   ├── 👥 吏部（项目/管理）
+│   └── ⚖️ 刑部（法务/合规）
+├── 🤖 中枢（工具频道）
+│   ├── 📡 命令中心
 │   ├── 📝 日志记录
 │   └── 🔔 通知提醒
 └── 💬 闲聊（非正式）
@@ -1072,7 +1072,7 @@ A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
 # 创建分类（右键服务器 → 创建分类）
 # 分类 1: 📜 本纪
 # 分类 2: 🏢 六部
-# 分类 3: 🔧 工部
+# 分类 3: 🤖 中枢
 # 分类 4: 💬 闲聊
 
 # 在每个分类下创建频道（右键分类 → 创建频道）

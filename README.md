@@ -13,7 +13,7 @@
 领好 [Oracle Cloud 免费服务器](https://www.oracle.com/cloud/free/) 后，SSH 连上，跑这一行：
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-tutorial/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-tutorial/main/install.sh)
 ```
 
 脚本会自动完成：
@@ -28,7 +28,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-
 1. **Anthropic API Key** → [console.anthropic.com](https://console.anthropic.com)
 2. **Discord Bot Token** → [discord.com/developers](https://discord.com/developers/applications)
 
-然后 `clawdbot gateway start`，朝廷就上线了。
+然后 `sudo systemctl start clawdbot`，朝廷就上线了（开机自动启动）。
 
 ---
 
@@ -120,4 +120,4 @@ ChatGPT 是一个通才。这套系统是多个专家——每个 Agent 有自�
 
 ---
 
-v3.1 | MIT License
+v3.2 | MIT License
