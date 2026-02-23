@@ -67,19 +67,6 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/buoluobobo-ai-court-
 
 ---
 
-## 费用
-
-| 项目 | 费用 |
-|---|---|
-| Oracle Cloud 服务器 | **免费**（永久，ARM 4核 24GB） |
-| Anthropic API | 约 **¥30-50/月** |
-| Discord | 免费 |
-
-成本计算：日常对话用 Sonnet（$3/M token），每天约 50 次对话 ≈ $1/天 ≈ ¥7/天。
-重度编码用 Opus 会贵一些，但可以混搭：轻活给 Sonnet，重活才用 Opus。
-
----
-
 ## 核心能力
 
 ### 多 Agent 协作
