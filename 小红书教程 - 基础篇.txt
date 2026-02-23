@@ -237,23 +237,12 @@ npm install -g clawdbot --registry=https://registry.npmmirror.com
 - Claude Sonnet：约$3/百万 token
 - 正常用每月$10-30 够了
 
-4.2 配置环境变量
+4.2 保存好你的 API Key
 
-# 复制下面这行，替换为你的真实 API Key
-echo 'export ANTHROPIC_API_KEY="sk-ant-api03-你的密钥"' >> ~/.bashrc
+🔴 API Key 只显示一次！先复制到记事本保存好。
+下一步（5.2）会把它填进配置文件 clawdbot.json。
 
-# 立即生效
-source ~/.bashrc
-
-# 验证
-echo $ANTHROPIC_API_KEY
-# 应显示你的 API Key
-
-📍 成功标志：输出你的 API Key 就对了！✅
-
-❗ 易错点：
-- API Key 两边的引号不要丢！
-- 是 >> 不是 >（> 会覆盖整个文件！）
+💡 不需要设环境变量。API Key 直接写在配置文件里就行。
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -529,7 +518,7 @@ systemctl --user stop clawdbot-gateway
 
 七、常见问题 Q&A
 
-🆕 Q0: Oracle 注册一直失败怎么办？
+Q1: Oracle 注册一直失败怎么办？
 
 解决：
 - 检查是否用了国内 IP（换梯子节点）
@@ -537,7 +526,7 @@ systemctl --user stop clawdbot-gateway
 - 换个邮箱试试（Gmail 最稳）
 - 实在不行用方案 2/3（见上文"中国大陆用户特别说明"）
 
-🆕 Q00: 显示"Out of capacity"怎么办？
+Q2: 显示"Out of capacity"怎么办？
 
 解决：
 - 换其他区域（ap-tokyo-1 / ap-osaka-1 / us-phoenix-1）
@@ -545,7 +534,7 @@ systemctl --user stop clawdbot-gateway
 - 等几天再试
 - 用其他云服务商（AWS/Google Cloud/腾讯云学生机）
 
-Q1: 注册时信用卡验证失败？
+Q3: 注册时信用卡验证失败？
 
 解决：
 - 确认是 Visa 或 MasterCard（银联不行）
@@ -553,14 +542,14 @@ Q1: 注册时信用卡验证失败？
 - 换个浏览器（推荐 Chrome）
 - 清除缓存重试
 
-Q2: 创建实例提示"Out of capacity"？
+Q4: 创建实例提示"Out of capacity"？
 
 解决：
 - 换个时间重试（凌晨成功率高）
 - 考虑换区域（日本大阪/美西凤凰城）
 - 先试 2 OCPU / 12GB，之后再升级
 
-Q3: SSH 连接被拒绝？
+Q5: SSH 连接被拒绝？
 
 解决：
 - 确认实例状态是"RUNNING"
@@ -568,7 +557,7 @@ Q3: SSH 连接被拒绝？
 - 确认使用了正确的私钥文件
 - 检查 Oracle 安全组是否开放 22 端口
 
-Q4: clawdbot 命令找不到？
+Q6: clawdbot 命令找不到？
 
 解决：
 # 刷新 PATH
@@ -577,19 +566,22 @@ source ~/.bashrc
 # 如果还不行，重新安装
 sudo npm install -g clawdbot
 
-Q5: Gateway 启动失败？
+Q7: Gateway 启动失败？
 
 解决：
 # 查看详细日志
 journalctl --user -u clawdbot-gateway --since today --no-pager
 
+# 用 clawdbot doctor 检查配置问题
+clawdbot doctor
+
 # 常见原因：
 # 1. API Key 未配置 → 检查 ~/.clawdbot/clawdbot.json 中的 apiKey
-# 2. 配置文件语法错误 → 用 clawdbot doctor 检查配置
+# 2. 配置文件语法错误 → clawdbot doctor 会告诉你哪里不对
 # 3. Bot Token 无效 → 确认 Token 没过期、没被 Reset
 # 4. 端口被占用 → ss -tlnp | grep 18789
 
-Q6: 如何降低成本？
+Q8: 如何降低成本？
 
 建议：
 1. 日常对话用 Sonnet（便宜 10 倍）
@@ -634,7 +626,7 @@ Q6: 如何降低成本？
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
-版本：基础篇 v3.1
+版本：基础篇 v3.2
 字数：约 3500 字
 适用：评论区领取/私域分发
 更新日期：2026-02-22

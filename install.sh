@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================
 # AI 朝廷一键部署脚本
-# 适用于 Oracle Cloud ARM / Ubuntu 22.04+
+# 适用于 Oracle Cloud ARM / Ubuntu 24.04（22.04 也可用）
 # ============================================
 set -e
 
@@ -73,8 +73,12 @@ else
 fi
 # 设置 Puppeteer 浏览器路径（Clawdbot 的浏览器 skill 需要）
 if ! grep -q PUPPETEER_EXECUTABLE_PATH ~/.bashrc 2>/dev/null; then
-    echo 'export PUPPETEER_EXECUTABLE_PATH="/snap/chromium/current/usr/lib/chromium-browser/chrome"' >> ~/.bashrc
-    echo -e "  ${GREEN}✓ 浏览器路径已配置${NC}"
+    CHROME_BIN="/snap/chromium/current/usr/lib/chromium-browser/chrome"
+    if [ ! -f "$CHROME_BIN" ]; then
+        CHROME_BIN=$(which chromium-browser 2>/dev/null || echo "/snap/chromium/current/usr/lib/chromium-browser/chrome")
+    fi
+    echo "export PUPPETEER_EXECUTABLE_PATH=\"$CHROME_BIN\"" >> ~/.bashrc
+    echo -e "  ${GREEN}✓ 浏览器路径已配置 ($CHROME_BIN)${NC}"
 fi
 
 # ---- 7. Clawdbot ----

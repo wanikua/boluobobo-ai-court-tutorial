@@ -1,9 +1,9 @@
 🚀 朝廷进阶玩法：5 个神器让你效率翻倍
 
-进阶篇 | 老手必看 | 5500 字 | 效率提升 500%
+进阶篇 | 老手必看 | 效率提升 500%
 适用人群：已搭建好朝廷，想进一步提升效率
 预计耗时：30-40 分钟
-最终效果：远程编程不断线 + 代码自动备份 + 奏折自动写 + 定时任务 + Discord 协作
+最终效果：远程编程不断线 + 代码自动备份 + 奏折自动写 + 定时任务 + Discord 协作 + Prompt 技巧
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -14,6 +14,7 @@
 3. Notion 数据库 - 朝廷自动写奏折
 4. cron - 定时任务自动执行
 5. Discord - 朝廷总部设置
+6. Prompt 技巧 - 让朝廷更懂你
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -283,28 +284,28 @@ git remote add origin https://github.com/你的用户名/clawdbot-backup.git
 1️⃣ 用 GitHub skill 提交代码
 
 # 让朝廷自动提交代码
-在对应频道 @Bot 说"把当前目录的改动提交到 GitHub，commit message 写'自动备份配置'"
+@对应部门Bot 说"把当前目录的改动提交到 GitHub，commit message 写'自动备份配置'"
 
 2️⃣ 创建 Issue
 
 # 创建新 Issue
-在对应频道 @Bot 说"在 GitHub 仓库创建一个 Issue，标题是'优化日志系统'，描述写'需要改进日志格式和存储方式'"
+@对应部门Bot 说"在 GitHub 仓库创建一个 Issue，标题是'优化日志系统'，描述写'需要改进日志格式和存储方式'"
 
 3️⃣ 查看仓库状态
 
 # 查看最近的提交
-在对应频道 @Bot 说"查看最近 5 次提交记录"
+@对应部门Bot 说"查看最近 5 次提交记录"
 
 # 查看未解决的 Issue
-在对应频道 @Bot 说"列出所有未关闭的 Issue"
+@对应部门Bot 说"列出所有未关闭的 Issue"
 
 4️⃣ 管理 Pull Request
 
 # 创建 PR
-在对应频道 @Bot 说"为 dev 分支创建 PR 到 main 分支，标题是'新增用户模块'"
+@对应部门Bot 说"为 dev 分支创建 PR 到 main 分支，标题是'新增用户模块'"
 
 # 合并 PR
-在对应频道 @Bot 说"合并 PR #42 到 main 分支"
+@对应部门Bot 说"合并 PR #42 到 main 分支"
 
 5️⃣ 自动备份脚本
 
@@ -506,103 +507,54 @@ Token 通过环境变量配置，不写在 clawdbot.json 里。
 1️⃣ 自动记录日报（起居注）
 
 # 让礼部自动写日报
-在对应频道 @Bot 说"生成今天的日报，记录朝廷完成的工作"
+@对应部门Bot 说"生成今天的日报，记录朝廷完成的工作"
 
 # 或者直接调用 Notion skill
-在命令中心频道 @Bot 说"在 Notion 日报数据库创建一条记录，标题是今天的日期，内容包含今天完成的任务"
+@司礼监 说"在 Notion 日报数据库创建一条记录，标题是今天的日期，内容包含今天完成的任务"
 
 2️⃣ 自动生成周报（朔望录）
 
 # 让礼部汇总本周工作
-在对应频道 @Bot 说"生成本周周报，汇总所有完成的任务和进展"
+@对应部门Bot 说"生成本周周报，汇总所有完成的任务和进展"
 
 # 写入 Notion
-在命令中心频道 @Bot 说"在 Notion 周报数据库创建记录，标题是'第 X 周周报'，内容包含本周工作总结"
+@司礼监 说"在 Notion 周报数据库创建记录，标题是'第 X 周周报'，内容包含本周工作总结"
 
 3️⃣ 项目进展追踪（列传）
 
 # 更新项目状态
-在命令中心频道 @Bot 说"更新 Notion 项目数据库，pindoudou 项目状态改为'进行中'，进度 65%"
+@司礼监 说"更新 Notion 项目数据库，pindoudou 项目状态改为'进行中'，进度 65%"
 
 # 添加项目日志
-在命令中心频道 @Bot 说"在 pindoudou 项目页面添加今日进展：完成了用户登录模块"
+@司礼监 说"在 pindoudou 项目页面添加今日进展：完成了用户登录模块"
 
 4️⃣ 财务数据记录（食货表）
 
 # 记录 API 花费
-在命令中心频道 @Bot 说"在 Notion 财务数据库添加记录：日期今天，类别'API 费用'，金额 2.5 美元，备注'Claude 调用'"
+@司礼监 说"在 Notion 财务数据库添加记录：日期今天，类别'API 费用'，金额 2.5 美元，备注'Claude 调用'"
 
 # 月度汇总
-在命令中心频道 @Bot 说"汇总本月所有 API 花费，按服务分类统计"
+@司礼监 说"汇总本月所有 API 花费，按服务分类统计"
 
 5️⃣ 技术文档整理（天工志）
 
 # 创建技术文档
-在对应频道 @Bot 说"在 Notion 技术数据库创建文档，标题是'Clawdbot 部署指南'，内容包含完整的安装步骤"
+@对应部门Bot 说"在 Notion 技术数据库创建文档，标题是'Clawdbot 部署指南'，内容包含完整的安装步骤"
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
 ⚔️ 实战案例：朝廷自动写奏折
 
-Clawdbot 内置 cron 定时任务功能，不需要写 bash 脚本。
-用 clawdbot cron add 命令添加，朝廷会自动执行。
+Clawdbot 内置 cron 定时任务功能，可以定时让 Agent 自动执行任务（写日报、同步数据等）。
 
-⚠️ 添加 cron 之前，先获取 Gateway Token：
-clawdbot gateway token
-# 复制输出的 token，下面的命令需要用到
+💡 完整的 cron 配置方法见第四章。这里只展示 Notion 自动化的效果：
 
-案例 1：每日自动日报
+效果示例：
+- 每天 22:00 自动生成日报，写入 Notion
+- 每周日 20:00 自动生成周报，写入 Notion
+- 每周一/四 自动同步 GitHub 项目进展到 Notion
 
-clawdbot cron add \
-  --name "每日日报" \
-  --agent main \
-  --cron "0 22 * * *" \
-  --tz "Asia/Shanghai" \
-  --message "生成今日日报：汇总今天完成的任务、遇到的问题、明天的计划。用简洁中文分点列出，同步写入 Notion 日报数据库。" \
-  --session isolated \
-  --token 你的gateway-token
-
-说明：
-- --cron 是标准 cron 表达式，"0 22 * * *" = 每天 22:00
-- --tz 指定时区，"Asia/Shanghai" = 北京时间
-- --message 是你要朝廷执行的指令，用自然语言写
-- --agent 指定哪个 agent 来执行
-- --session isolated 表示每次独立会话（推荐）
-
-案例 2：每周自动周报
-
-clawdbot cron add \
-  --name "每周周报" \
-  --agent main \
-  --cron "0 20 * * 0" \
-  --tz "Asia/Shanghai" \
-  --message "生成本周周报：汇总本周各项目进展、关键数据、遇到的挑战和解决方案、下周计划。同步写入 Notion 周报数据库。" \
-  --session isolated \
-  --token 你的gateway-token
-
-案例 3：项目进展自动同步
-
-clawdbot cron add \
-  --name "项目同步" \
-  --agent bingbu \
-  --cron "0 18 * * 1,4" \
-  --tz "Asia/Shanghai" \
-  --message "检查所有 GitHub 仓库的最近提交和未关闭 Issue，更新 Notion 项目数据库的状态和进度。" \
-  --session isolated \
-  --token 你的gateway-token
-
-管理 cron 任务：
-
-# 查看所有 cron 任务
-clawdbot cron list --token 你的gateway-token
-
-# 删除某个 cron 任务
-clawdbot cron remove --name "每日日报" --token 你的gateway-token
-
-💡 关键区别：Clawdbot 的 cron 不是 Linux crontab！
-不需要写 bash 脚本，直接用自然语言告诉朝廷要做什么。
-Clawdbot 会启动一个 agent session 来执行你的指令。
-⚠️ 注意：cron 配置不能直接写在 clawdbot.json 里！必须用命令行添加。
+具体的 clawdbot cron add 命令和参数说明，请翻到第四章。
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -717,7 +669,7 @@ crontab -r
 crontab -e
 
 # 添加任务（每天凌晨 3 点备份）
-0 3 * * * cd ~/clawd && ./backup.sh >> ~/clawd/backup.log 2>&1
+0 3 * * * cd ~/clawd && ./auto-backup.sh >> ~/clawd/backup.log 2>&1
 
 # 保存退出（vi: :wq, nano: Ctrl+X → Y → Enter）
 
@@ -1254,12 +1206,13 @@ clawdbot cron add \
 
 🎉 进阶完成！
 
-现在你掌握了朝廷进阶的全部 5 个神器：
+现在你掌握了朝廷进阶的全部 6 个神器：
 ✅ tmux：SSH 断线不怕，多面板高效开发
 ✅ GitHub 自动化：代码自动备份，变更自动追踪
 ✅ Notion 数据库：奏折自动写，数据自动汇总
 ✅ cron：定时任务自动执行，解放双手
 ✅ Discord：朝廷总部，多人协作管理
+✅ Prompt 技巧：让朝廷更懂你的需求
 
 效率提升：
 📈 远程开发稳定性：+100%
