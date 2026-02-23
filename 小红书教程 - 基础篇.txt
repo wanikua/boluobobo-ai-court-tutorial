@@ -415,10 +415,58 @@ nano ~/.clawdbot/clawdbot.json
   },
   "channels": {
     "discord": {
-      "enabled": false
+      "enabled": true,
+      "token": "你的Discord Bot Token",
+      "guilds": {
+        "你的服务器ID": {
+          "channels": {
+            "兵部频道名": { "allow": true },
+            "户部频道名": { "allow": true },
+            "礼部频道名": { "allow": true },
+            "命令中心": { "allow": true }
+          }
+        }
+      }
     }
-  }
+  },
+  "bindings": [
+    {
+      "agentId": "bingbu",
+      "match": {
+        "channel": "discord",
+        "guildId": "你的服务器ID",
+        "peer": { "kind": "channel", "id": "兵部频道ID" }
+      }
+    },
+    {
+      "agentId": "hubu",
+      "match": {
+        "channel": "discord",
+        "guildId": "你的服务器ID",
+        "peer": { "kind": "channel", "id": "户部频道ID" }
+      }
+    },
+    {
+      "agentId": "libu",
+      "match": {
+        "channel": "discord",
+        "guildId": "你的服务器ID",
+        "peer": { "kind": "channel", "id": "礼部频道ID" }
+      }
+    }
+  ]
 }
+
+⚠️ 重要！替换以下内容：
+- "你的Discord Bot Token" → Discord Developer Portal 获取
+- "你的服务器ID" → 右键服务器 → 复制服务器 ID
+- "兵部频道ID" 等 → 右键频道 → 复制频道 ID
+
+💡 bindings 的作用：
+不同 Discord 频道绑定不同 AI Agent。
+在兵部频道发消息 → 兵部 Agent 回复（编程专家）
+在户部频道发消息 → 户部 Agent 回复（财务专家）
+没有绑定的频道 → 默认由大内总管回复
 
 保存退出：
 - nano：Ctrl+O → 回车保存 → Ctrl+X 退出
@@ -447,19 +495,23 @@ clawdbot gateway status
 
 6.2 测试对话
 
-# 测试大内总管
-在 Discord 里 @司礼监 说"你好，自我介绍一下"
+# 测试大内总管（在命令中心频道）
+@Bot名字 你好，自我介绍一下
 
-# 测试兵部
-在 Discord 里 @对应部门 说"用 Python 写个 Hello World"
+# 测试兵部（切到兵部频道发消息）
+@Bot名字 用 Python 写个 Hello World
 
-# 测试户部
-在 Discord 里 @对应部门 说"如何控制 AI API 成本"
+# 测试户部（切到户部频道发消息）
+@Bot名字 如何控制 AI API 成本
 
-# 测试礼部
-在 Discord 里 @对应部门 说"写条小红书文案，主题是 AI 工具推荐"
+# 测试礼部（切到礼部频道发消息）
+@Bot名字 写条小红书文案，主题是 AI 工具推荐
 
-📍 成功标志：每个部门都能正常回复就对了！✅
+💡 关键：不同频道会自动路由到不同 Agent！
+你不需要指定部门，只要在对应频道发消息就行。
+
+📍 成功标志：每个频道的回复风格不一样就对了！✅
+比如兵部会直接给代码，户部会给数据分析。
 
 6.3 常用命令
 

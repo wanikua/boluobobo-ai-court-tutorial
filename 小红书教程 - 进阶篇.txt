@@ -1151,29 +1151,30 @@ A: 检查 clawdbot.json 配置是否正确，Gateway 是否启动
 
 案例 2：自动汇报到指定频道
 
-# 配置自动汇报（在 clawdbot.json 中设置）
-{
-  "discord": {
-    "autoReport": {
-      "daily": {
-        "channel": "日报频道 ID",
-        "time": "18:00",
-        "timezone": "Asia/Shanghai"
-      },
-      "weekly": {
-        "channel": "周报频道 ID",
-        "time": "17:00",
-        "day": "Friday"
-      }
-    }
+用 Clawdbot 内置 cron 实现自动汇报：
+
+在 clawdbot.json 中添加 cron 配置：
+
+"cron": [
+  {
+    "id": "daily-report",
+    "schedule": "0 10 * * *",
+    "text": "生成今日日报，发送到 Discord 日报频道",
+    "agent": "main"
+  },
+  {
+    "id": "weekly-report",
+    "schedule": "0 9 * * 5",
+    "text": "生成本周周报，发送到 Discord 周报频道",
+    "agent": "main"
   }
-}
+]
 
-# 效果：
-# - 每天 18:00 自动在日报频道发送日报
-# - 每周五 17:00 自动在周报频道发送周报
+效果：
+- 每天 UTC 10:00（北京 18:00）自动生成日报
+- 每周五 UTC 9:00（北京 17:00）自动生成周报
 
-📍 配图 27：自动日报在 Discord 频道的展示效果
+📍 配图 27：cron 配置 + Discord 自动日报效果
 
 案例 3：多人协作管理
 
