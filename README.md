@@ -256,6 +256,8 @@ clawdbot doctor
 
 ## 相关链接
 
+- [AI 朝廷 Skill（一键安装）](https://github.com/wanikua/ai-court-skill)
+
 - [Clawdbot 官方文档](https://docs.clawd.bot)
 - [Clawdbot GitHub](https://github.com/clawdbot/clawdbot)
 - [Oracle Cloud 免费套餐](https://www.oracle.com/cloud/free/)
