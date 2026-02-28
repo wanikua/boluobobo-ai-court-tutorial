@@ -56,9 +56,9 @@ Clawdbot Gateway（Node.js 守护进程）
 
 ---
 
-## 🏮 科举入门——三步上朝
+## 快速开始
 
-### 乡试：一键部署（5 分钟）
+### 第一步：一键部署（5 分钟）
 
 领好 [Oracle Cloud 免费服务器](https://www.oracle.com/cloud/free/)（ARM 4核 24GB，永久免费），SSH 连上，跑这一行：
 
@@ -76,7 +76,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 
 安装脚本带彩色输出和进度提示，每一步都有 ✓ 成功标记。
 
-### 会试：填 Key 上线（10 分钟）
+### 第二步：填 Key 上线（10 分钟）
 
 跑完脚本，你只需要填两样东西：
 
@@ -96,7 +96,7 @@ systemctl --user status clawdbot-gateway
 
 在 Discord @你的 Bot 说句话，收到回复就成功了。
 
-### 殿试：全六部上线 + 自动化（15 分钟）
+### 第三步：全六部上线 + 自动化（15 分钟）
 
 ```
 @兵部 帮我写个用户登录的 API
