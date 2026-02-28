@@ -115,6 +115,25 @@ Oracle Cloud Always Free 套餐，ARM 4核 24GB，永久免费。需要信用卡
 **Q: 和直接用 ChatGPT 有什么区别？**
 ChatGPT 是一个通才。这套系统是多个专家——每个 Agent 有自己的专业领域、记忆和工具权限。能自动写代码、管 GitHub、写 Notion 文档。
 
+**Q: @everyone 不触发 Agent 回复？**
+Discord Developer Portal 里每个 Bot 要开启 **Message Content Intent** 和 **Server Members Intent**，服务器里 Bot 角色要有 View Channels 权限。Clawdbot 会把 @everyone 当作对每个 Bot 的显式 mention，权限到位就能触发。
+
+**Q: 开了 sandbox 后 Agent 报没有权限写文件？**
+sandbox mode 设成 all 会把 Agent 跑在 Docker 容器里，默认只读文件系统、断网、不继承环境变量。要么关掉（`sandbox.mode: "off"`），要么在 `clawdbot.json` 的 `agents.defaults` 里加：
+```json
+"sandbox": {
+  "mode": "all",
+  "workspaceAccess": "rw",
+  "docker": {
+    "network": "bridge",
+    "env": { "ANTHROPIC_API_KEY": "sk-..." }
+  }
+}
+```
+- `workspaceAccess: "rw"` — 让沙盒能读写工作目录（包括 skills 文件夹）
+- `docker.network: "bridge"` — 允许联网，默认断网会导致很多 skill 跑不了
+- `docker.env` — 传入 API Key，沙盒不继承主机环境变量
+
 **Q: 能用其他模型吗？**
 能。Clawdbot 支持 Anthropic、OpenAI、Google、Qwen 等。在 `clawdbot.json` 里改 model 就行。
 
