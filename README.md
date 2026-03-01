@@ -266,31 +266,33 @@ clawdbot doctor
 
 ---
 
-## ⚠️ 免责声明
+## ⚠️ 免责声明 / Disclaimer
 
-本项目按"原样"提供，不承担任何直接或间接责任。
+本项目按"原样"提供，不承担任何直接或间接责任。/ This project is provided "as is" without any warranties.
 
-**使用前请注意：**
+**使用前请注意 / Please note:**
 
-1. **AI 生成内容仅供参考**
+1. **AI 生成内容仅供参考 / AI-generated content is for reference only**
    - AI 生成的代码、文案、建议等可能存在错误或不准确之处
    - 使用前请自行审核，确认无风险后再实际应用
+   - Code, suggestions, etc. may contain errors. Please review before using in production.
 
-2. **代码安全**
+2. **代码安全 / Code Security**
    - 自动生成的代码建议在合并前进行 code review
    - 涉及财务、安全敏感的操作请务必人工复核
+   - Review AI-generated code before merging. Human review required for financial/sensitive operations.
 
-3. **API 密钥安全**
-   - 请妥善保管您的 API 密钥
-   - 不要将包含密钥的配置文件提交到公开仓库
+3. **API 密钥安全 / API Key Security**
+   - 请妥善保管您的 API 密钥 / Keep your API keys safe
+   - 不要将包含密钥的配置文件提交到公开仓库 / Don't commit config files with keys to public repos
 
-4. **服务器费用**
-   - 免费服务器（Oracle Cloud 等）有一定使用限额
-   - 超出限额后可能产生费用，请留意账单
+4. **服务器费用 / Server Costs**
+   - 免费服务器（Oracle Cloud 等）有一定使用限额 / Free servers have usage limits
+   - 超出限额后可能产生费用，请留意账单 / Excess usage may incur charges
 
-5. **数据备份**
-   - 建议定期备份您的工作区和数据
-   - 本项目不提供任何数据保证
+5. **数据备份 / Data Backup**
+   - 建议定期备份您的工作区和数据 / Regularly backup your workspace
+   - 本项目不提供任何数据保证 / This project provides no data guarantees
 
 ---
 
