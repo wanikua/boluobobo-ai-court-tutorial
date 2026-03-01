@@ -21,8 +21,8 @@
 
 一、领免费服务器（10 分钟）
 
-1.1 打开 Oracle Cloud 官网
-网址：https://signup.cloud.oracle.com
+1.1 打开 云服务商 官网
+网址：https://你的云服务商注册页
 
 
 1.2 填写基本信息
@@ -36,7 +36,7 @@
 
 
 1.3 验证邮箱
-1. 打开邮箱，找到 Oracle 发的验证邮件
+1. 打开邮箱，找到 云服务商发的验证邮件
 2. 复制 6 位验证码
 3. 粘贴回注册页面，点击 "Verify Code"
 
@@ -46,7 +46,7 @@
 - 至少 8 个字符
 - 至少 1 个大写字母 + 1 个小写字母 + 1 个数字 + 1 个特殊字符
 
-💡 建议格式：MyOracle2026! 这种
+💡 建议格式：MyCloud2026! 这种
 
 
 1.5 选择主区域（⚠️ 最重要！）
@@ -68,7 +68,7 @@
 ❗ 易错点：+86 有时收不到短信，多试几次或换个时间段
 
 1.7 添加信用卡
-🔒 不会扣费！只是身份验证，Oracle 会预授权$1（之后退回）
+🔒 不会扣费！只是身份验证，云服务商会预授权$1（之后退回）
 
 支持的卡：
 ✅ Visa 信用卡/借记卡
@@ -85,12 +85,12 @@
 2. 点击 "Start my free trial"
 3. 等待激活（通常几分钟到几小时）
 
-📍 成功标志：收到邮件"Your Oracle Cloud account is activated" ✅
+📍 成功标志：收到邮件"Your 云服务商 account is activated" ✅
 
 1.9 登录控制台
-1. 访问：https://cloud.oracle.com
+1. 访问：https://你的云服务商控制台
 2. 输入 Cloud Account Name（注册时填的）
-3. 选择 "Oracle Cloud Infrastructure Direct Sign-In"
+3. 选择 "云服务商 Infrastructure Direct Sign-In"
 4. 输入邮箱和密码登录
 
 
@@ -103,7 +103,7 @@
 配置实例（按顺序）：
 
 Name：clawdbot-server（随便起）
-Image：Ubuntu 24.04（一定要改！默认是 Oracle Linux）
+Image：Ubuntu 24.04（一定要改！默认是 默认系统）
 Shape：VM.Standard.A1.Flex（ARM 架构）
 OCPUs：4（免费最大 4 核）
 Memory：24（免费最大 24GB）
@@ -220,13 +220,13 @@ npm install -g clawdbot --registry=https://registry.npmmirror.com
 
 四、配置 API Key（5 分钟）
 
-4.1 获取 Anthropic API Key
-1. 访问：https://console.anthropic.com
+4.1 获取 LLM API Key
+1. 访问：https://你的LLM服务商控制台
 2. 注册/登录账号
 3. 左侧点击 "API Keys"
 4. 点击 "Create Key"
-5. 起个名字（如 oracle-server）
-6. 复制 Key（格式：sk-ant-api03-xxxxx）
+5. 起个名字（如 my-server）
+6. 复制 Key（格式：LLM_API_KEY）
 
 ⏱️ 耗时：2 分钟
 🔴 超级重要：API Key 只显示一次！复制后妥善保存！
@@ -234,7 +234,7 @@ npm install -g clawdbot --registry=https://registry.npmmirror.com
 
 💡 费用说明：
 - 新账号通常有$5 免费额度
-- Claude Sonnet：约$3/百万 token
+- 快速模型：约$3/百万 token
 - 正常用每月$10-30 够了
 
 4.2 保存好你的 API Key
@@ -280,21 +280,21 @@ nano ~/.clawdbot/clawdbot.json
 {
   "models": {
     "providers": {
-      "anthropic": {
-        "baseUrl": "https://api.anthropic.com",
-        "apiKey": "sk-ant-api03-你的密钥",
-        "api": "anthropic-messages",
+      "your-provider": {
+        "baseUrl": "https://your-llm-provider-api-url",
+        "apiKey": "你的LLM_API_KEY",
+        "api": "your-api-format",
         "models": [
           {
-            "id": "claude-sonnet-4-5",
-            "name": "Claude Sonnet 4.5",
+            "id": "fast-model",
+            "name": "快速模型",
             "input": ["text", "image"],
             "contextWindow": 200000,
             "maxTokens": 8192
           },
           {
-            "id": "claude-opus-4-6",
-            "name": "Claude Opus 4.6",
+            "id": "strong-model",
+            "name": "强力模型",
             "input": ["text", "image"],
             "contextWindow": 200000,
             "maxTokens": 8192
@@ -306,34 +306,34 @@ nano ~/.clawdbot/clawdbot.json
   "agents": {
     "defaults": {
       "workspace": "/home/ubuntu/clawd",
-      "model": { "primary": "anthropic/claude-sonnet-4-5" },
+      "model": { "primary": "your-provider/fast-model" },
       "sandbox": { "mode": "non-main" }
     },
     "list": [
       {
         "id": "main",
         "name": "司礼监",
-        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "model": { "primary": "your-provider/fast-model" },
         "sandbox": { "mode": "off" }
       },
       {
         "id": "bingbu",
         "name": "兵部",
-        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "model": { "primary": "your-provider/strong-model" },
         "identity": { "theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "hubu",
         "name": "户部",
-        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "model": { "primary": "your-provider/strong-model" },
         "identity": { "theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "libu",
         "name": "礼部",
-        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "model": { "primary": "your-provider/fast-model" },
         "identity": { "theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       }
@@ -375,20 +375,20 @@ nano ~/.clawdbot/clawdbot.json
   ]
 }
 
-💡 想省钱？礼部等轻量任务可以换成 Qwen 模型：
-   1. 在 models.providers 中添加 dashscope provider：
-      "dashscope": {
-        "baseUrl": "https://dashscope.aliyuncs.com/compatible-mode",
-        "apiKey": "sk-你的通义千问密钥",
+💡 想省钱？礼部等轻量任务可以换成 经济模型 模型：
+   1. 在 models.providers 中添加 your-provider provider：
+      "your-provider": {
+        "baseUrl": "https://your-provider-api-url",
+        "apiKey": "sk-你的其他服务商密钥",
         "api": "openai-chat",
-        "models": [{ "id": "qwen-plus", "name": "Qwen Plus", "input": ["text"], "contextWindow": 131072, "maxTokens": 8192 }]
+        "models": [{ "id": "budget-model", "name": "经济模型", "input": ["text"], "contextWindow": 131072, "maxTokens": 8192 }]
       }
-   2. 把礼部的 model 改为 { "primary": "dashscope/qwen-plus" }
-   3. 获取地址：https://dashscope.console.aliyun.com
-   4. Qwen 比 Claude 便宜 50 倍，适合内容创作、日常对话等轻量任务
+   2. 把礼部的 model 改为 { "primary": "your-provider/budget-model" }
+   3. 获取地址：https://你的服务商控制台
+   4. 经济模型 比 其他模型便宜 50 倍，适合内容创作、日常对话等轻量任务
 
 ⚠️ 重要！替换以下内容（获取方法见下面的详细步骤）：
-- "sk-ant-api03-你的密钥" → 你的 Anthropic API Key
+- "你的LLM_API_KEY" → 你的 LLM API Key
 - "司礼监的Bot Token" 等 → 每个部门的 Discord Bot Token（下一步创建）
 
 💡 注意 groupPolicy: "open" 这个配置很重要！
@@ -518,7 +518,7 @@ systemctl --user stop clawdbot-gateway
 
 七、常见问题 Q&A
 
-Q1: Oracle 注册一直失败怎么办？
+Q1: 云服务商注册一直失败怎么办？
 
 解决：
 - 检查是否用了国内 IP（换梯子节点）
@@ -555,7 +555,7 @@ Q5: SSH 连接被拒绝？
 - 确认实例状态是"RUNNING"
 - 确认用户名是 ubuntu（不是 root）
 - 确认使用了正确的私钥文件
-- 检查 Oracle 安全组是否开放 22 端口
+- 检查 云服务商安全组是否开放 22 端口
 
 Q6: clawdbot 命令找不到？
 
@@ -584,9 +584,9 @@ clawdbot doctor
 Q8: 如何降低成本？
 
 建议：
-1. 日常对话用 Sonnet（便宜 10 倍）
-2. 简单任务用 Qwen（便宜 50 倍）
-3. 复杂任务才上 Opus
+1. 日常对话用 快速模型（便宜 10 倍）
+2. 简单任务用 经济模型（便宜 50 倍）
+3. 复杂任务才上 强力模型
 4. 每月$10-30 够用
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -594,19 +594,19 @@ Q8: 如何降低成本？
 八、15 张配图清单
 
 编号 | 内容 | 截图位置 | 标注重点
-1 | Oracle 注册首页 | https://signup.cloud.oracle.com | 圈出"Sign Up"按钮
+1 | 云服务商注册首页 | https://你的云服务商注册页 | 圈出"Sign Up"按钮
 2 | 注册表单 | 邮箱输入区域 | 圈出邮箱框和验证按钮
 3 | 验证邮件 | 邮箱收件箱 | 圈出 6 位验证码
 4 | 密码设置 | 密码输入页面 | 标注密码要求
 5 | 区域选择 | Home Region 下拉框 | 圈出"ap-tokyo-1"
 6 | 信用卡填写 | 卡号输入页面 | 圈出 Visa/MasterCard 标识
-7 | Oracle 登录页 | https://cloud.oracle.com | 圈出登录入口
+7 | 云服务商登录页 | https://你的云服务商控制台 | 圈出登录入口
 8 | Instances 页面 | Compute → Instances | 圈出"Create Instance"
 9 | 实例配置页 | Shape 和 SSH 密钥区域 | 圈出 ARM 选择和下载按钮
 10 | 实例详情页 | 实例运行状态 | 圈出公网 IP 地址
 11 | MobaXterm 配置 | Session 设置窗口 | 圈出 IP、用户名、密钥选择
 12 | 安装完成截图 | 终端输出 | 圈出"部署完成！"
-13 | Anthropic API 页 | https://console.anthropic.com | 圈出"Create Key"
+13 | LLM API 页 | https://你的LLM服务商控制台 | 圈出"Create Key"
 14 | ~/clawd 目录 | ls -la 输出 | 圈出 SOUL.md、IDENTITY.md 等
 15 | 配置文件 | clawdbot.json 内容 | 圈出 agents.list 配置
 

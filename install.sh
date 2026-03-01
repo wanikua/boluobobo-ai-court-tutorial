@@ -1,7 +1,7 @@
 #!/bin/bash
 # ============================================
 # AI 朝廷一键部署脚本
-# 适用于 Oracle Cloud ARM / Ubuntu 24.04（22.04 也可用）
+# 适用于 云服务商 ARM / Ubuntu 24.04（22.04 也可用）
 # ============================================
 set -e
 
@@ -22,7 +22,7 @@ sudo apt-get update -qq
 
 # ---- 2. 防火墙 ----
 echo -e "${YELLOW}[2/8] 配置防火墙...${NC}"
-# Oracle Cloud 默认 iptables 有一条 REJECT 规则会阻断非 SSH 流量，只删这条
+# 云服务商 默认 iptables 有一条 REJECT 规则会阻断非 SSH 流量，只删这条
 # 注意：不能 flush 整个链，否则在 DROP 策略下会丢失 SSH 连接
 sudo iptables -D INPUT -j REJECT --reject-with icmp-host-prohibited 2>/dev/null || true
 sudo iptables -D FORWARD -j REJECT --reject-with icmp-host-prohibited 2>/dev/null || true
@@ -123,9 +123,9 @@ cat > IDENTITY.md << 'ID_EOF'
 ## 模型分层
 | 层级 | 模型 | 说明 |
 |---|---|---|
-| 调度层 | Claude Sonnet | 日常对话，快速响应 |
-| 执行层（重） | Claude Opus | 编码、深度分析 |
-| 执行层（轻） | Qwen Plus（可选） | 轻量任务，省钱 |
+| 调度层 | 快速模型 | 日常对话，快速响应 |
+| 执行层（重） | 强力模型 | 编码、深度分析 |
+| 执行层（轻） | 经济模型（可选） | 轻量任务，省钱 |
 
 ## 六部
 - 兵部：软件工程、系统架构
@@ -156,21 +156,21 @@ cat > "$CONFIG_DIR/clawdbot.json" << CONFIG_EOF
 {
   "models": {
     "providers": {
-      "anthropic": {
-        "baseUrl": "https://api.anthropic.com",
-        "apiKey": "YOUR_ANTHROPIC_API_KEY",
-        "api": "anthropic-messages",
+      "your-provider": {
+        "baseUrl": "https://your-llm-provider-api-url",
+        "apiKey": "YOUR_LLM_API_KEY",
+        "api": "your-api-format",
         "models": [
           {
-            "id": "claude-sonnet-4-5",
-            "name": "Claude Sonnet 4.5",
+            "id": "fast-model",
+            "name": "快速模型",
             "input": ["text", "image"],
             "contextWindow": 200000,
             "maxTokens": 8192
           },
           {
-            "id": "claude-opus-4-6",
-            "name": "Claude Opus 4.6",
+            "id": "strong-model",
+            "name": "强力模型",
             "input": ["text", "image"],
             "contextWindow": 200000,
             "maxTokens": 8192
@@ -182,55 +182,55 @@ cat > "$CONFIG_DIR/clawdbot.json" << CONFIG_EOF
   "agents": {
     "defaults": {
       "workspace": "$HOME/clawd",
-      "model": { "primary": "anthropic/claude-sonnet-4-5" },
+      "model": { "primary": "your-provider/fast-model" },
       "sandbox": { "mode": "non-main" }
     },
     "list": [
       {
         "id": "main",
         "name": "司礼监",
-        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "model": { "primary": "your-provider/fast-model" },
         "sandbox": { "mode": "off" }
       },
       {
         "id": "bingbu",
         "name": "兵部",
-        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "model": { "primary": "your-provider/strong-model" },
         "identity": { "theme": "你是兵部尚书，专精软件工程、系统架构、代码审查。回答用中文，直接给方案。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "hubu",
         "name": "户部",
-        "model": { "primary": "anthropic/claude-opus-4-6" },
+        "model": { "primary": "your-provider/strong-model" },
         "identity": { "theme": "你是户部尚书，专精财务分析、成本管控、电商运营。回答用中文，数据驱动。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "libu",
         "name": "礼部",
-        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "model": { "primary": "your-provider/fast-model" },
         "identity": { "theme": "你是礼部尚书，专精品牌营销、社交媒体、内容创作。回答用中文，风格活泼。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "gongbu",
         "name": "工部",
-        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "model": { "primary": "your-provider/fast-model" },
         "identity": { "theme": "你是工部尚书，专精 DevOps、服务器运维、CI/CD、基础设施。回答用中文，注重实操。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "libu2",
         "name": "吏部",
-        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "model": { "primary": "your-provider/fast-model" },
         "identity": { "theme": "你是吏部尚书，专精项目管理、创业孵化、团队协调。回答用中文，条理清晰。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       },
       {
         "id": "xingbu",
         "name": "刑部",
-        "model": { "primary": "anthropic/claude-sonnet-4-5" },
+        "model": { "primary": "your-provider/fast-model" },
         "identity": { "theme": "你是刑部尚书，专精法务合规、知识产权、合同审查。回答用中文，严谨专业。" },
         "sandbox": { "mode": "all", "scope": "agent" }
       }
@@ -311,8 +311,8 @@ echo "接下来你需要完成以下配置："
 echo ""
 echo -e "  ${YELLOW}1. 设置 API Key${NC}"
 echo "     编辑 ~/.clawdbot/clawdbot.json"
-echo "     把 YOUR_ANTHROPIC_API_KEY 替换成你的 Anthropic API Key"
-echo "     获取地址：https://console.anthropic.com"
+echo "     把 YOUR_LLM_API_KEY 替换成你的 LLM API Key"
+echo "     获取地址：https://你的LLM服务商控制台"
 echo ""
 echo -e "  ${YELLOW}2. 创建 Discord Bot（每个部门一个）${NC}"
 echo "     a) 访问 https://discord.com/developers/applications"
