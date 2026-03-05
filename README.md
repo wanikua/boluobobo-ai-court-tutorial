@@ -59,7 +59,7 @@ Clawdbot Gateway（Node.js 守护进程）
 
 ### 第一步：一键部署（5 分钟）
 
-领好 [云服务器](https://www.你的云服务商/)（ARM 4核 24GB，永久免费），SSH 连上，跑这一行：
+领好 云服务器（ARM 4核 24GB，永久免费），SSH 连上，跑这一行：
 
 ```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-tutorial/main/install.sh)
@@ -79,7 +79,7 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 
 跑完脚本，你只需要填两样东西：
 
-1. **LLM API Key** → [你的LLM服务商控制台](https://你的LLM服务商控制台)
+1. **LLM API Key** → 你的 LLM 服务商控制台
 2. **Discord Bot Token**（每个部门一个）→ [discord.com/developers](https://discord.com/developers/applications)
 
 ```bash
