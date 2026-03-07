@@ -2,7 +2,7 @@
 
 # 🏛️ 30 分钟搭建你的 AI 朝廷
 
-> 一台免费服务器 + [Clawdbot](https://github.com/clawdbot/clawdbot) = 一支 7×24 在线的 AI 团队
+> 一台免费服务器 + [Openclaw](https://github.com/openclaw/openclaw) = 一支 7×24 在线的 AI 团队
 
 写代码、管财务、搞营销、写日报、运维部署——你只需要在 Discord 里发一条消息。
 
@@ -36,7 +36,7 @@
 ```
 Discord 消息
     ↓
-Clawdbot Gateway（Node.js 守护进程）
+Openclaw Gateway（Node.js 守护进程）
     ├── 消息路由：@mention → 匹配 binding → 分发到对应 Agent
     ├── 会话隔离：每个 Agent 独立会话、独立工作目录
     ├── 自动 Thread：大任务自动开 Thread，频道不刷屏
@@ -59,7 +59,7 @@ Clawdbot Gateway（Node.js 守护进程）
 - **独立记忆**：每个 Agent 有自己的 `memory/` 目录，越用越懂你
 - **独立模型**：重活用 强力模型，轻活用 快速模型，省钱又高效
 - **独立沙箱**：Agent 代码执行互不干扰，安全隔离
-- **身份注入**：Clawdbot 自动将 SOUL.md + IDENTITY.md + 工作区文件组装为系统提示
+- **身份注入**：Openclaw 自动将 SOUL.md + IDENTITY.md + 工作区文件组装为系统提示
 
 ---
 
@@ -77,8 +77,8 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 - ✅ 系统更新 + 云服务商防火墙配置
 - ✅ 4GB Swap（防 OOM）
 - ✅ Node.js 22 + GitHub CLI + Chromium
-- ✅ Clawdbot 全局安装
-- ✅ 工作区初始化（SOUL.md / IDENTITY.md / USER.md / clawdbot.json 多 Agent 模板）
+- ✅ Openclaw 全局安装
+- ✅ 工作区初始化（SOUL.md / IDENTITY.md / USER.md / openclaw.json 多 Agent 模板）
 - ✅ Gateway 系统服务安装（开机自启）
 
 安装脚本带彩色输出和进度提示，每一步都有 ✓ 成功标记。
@@ -92,13 +92,13 @@ bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-t
 
 ```bash
 # 编辑配置，填入 API Key 和 Bot Token
-nano ~/.clawdbot/clawdbot.json
+nano ~/.openclaw/openclaw.json
 
 # 启动朝廷
-systemctl --user start clawdbot-gateway
+systemctl --user start openclaw-gateway
 
 # 验证
-systemctl --user status clawdbot-gateway
+systemctl --user status openclaw-gateway
 ```
 
 在 Discord @你的 Bot 说句话，收到回复就成功了。
@@ -122,10 +122,10 @@ systemctl --user status clawdbot-gateway
 配置自动日报：
 ```bash
 # 获取 Gateway Token
-clawdbot gateway token
+openclaw gateway token
 
 # 每天 22:00（北京时间）自动生成日报
-clawdbot cron add \
+openclaw cron add \
   --name "每日日报" --agent main \
   --cron "0 22 * * *" --tz "Asia/Shanghai" \
   --message "生成今日日报，写入 Notion 并发送到 Discord" \
@@ -158,7 +158,7 @@ clawdbot cron add \
 
 ### 🤖 多 Agent 协作
 每个部门是独立 Bot，@谁谁回复，@everyone 全员响应。大任务自动新建 Thread 保持频道整洁。
-> ⚠️ 想让 Bot 之间互相触发（如成语接龙、多 Bot 讨论），需在 `clawdbot.json` 的 `channels.discord` 中加上 `"allowBots": true`。不加的话 Bot 默认忽略其他 Bot 的消息。同时每个 account 都要设置 `"groupPolicy": "open"`，否则群聊消息会被静默丢弃。
+> ⚠️ 想让 Bot 之间互相触发（如成语接龙、多 Bot 讨论），需在 `openclaw.json` 的 `channels.discord` 中加上 `"allowBots": true`。不加的话 Bot 默认忽略其他 Bot 的消息。同时每个 account 都要设置 `"groupPolicy": "open"`，否则群聊消息会被静默丢弃。
 
 ### 🧠 独立记忆系统
 每个 Agent 有独立的工作区和 `memory/` 目录。对话积累的项目知识会持久化到文件，跨会话保留。Agent 越用越懂你的项目。
@@ -211,7 +211,7 @@ Agent 可以运行在 Docker 沙箱中，代码执行互不干扰。支持配置
 ChatGPT 是一个通才，对话结束就失忆。这套系统是多个专家——每个 Agent 有自己的专业领域、持久记忆和工具权限。能自动写代码提交 GitHub、自动写文档到 Notion、定时执行任务。
 
 **Q: 能用其他模型吗？**
-能。Clawdbot 支持 LLM 服务商、OpenAI、Google Gemini、其他服务商（经济模型）等。在 `clawdbot.json` 里改 model 配置就行。不同部门可以用不同模型。
+能。Openclaw 支持 LLM 服务商、OpenAI、Google Gemini、其他服务商（经济模型）等。在 `openclaw.json` 里改 model 配置就行。不同部门可以用不同模型。
 
 **Q: 每月 API 费用大概多少？**
 看使用强度。轻度使用 $10-15/月，中度 $20-30/月。省钱技巧：重活用 强力模型，轻活用 快速模型（便宜约 5 倍），简单任务可接入 经济模型 等国产模型进一步降本。
@@ -219,7 +219,7 @@ ChatGPT 是一个通才，对话结束就失忆。这套系统是多个专家—
 ### 技术问题
 
 **Q: @everyone 不触发 Agent 回复？**
-Discord Developer Portal 里每个 Bot 要开启 **Message Content Intent** 和 **Server Members Intent**，服务器里 Bot 角色要有 View Channels 权限。Clawdbot 会把 @everyone 当作对每个 Bot 的显式 mention，权限到位就能触发。
+Discord Developer Portal 里每个 Bot 要开启 **Message Content Intent** 和 **Server Members Intent**，服务器里 Bot 角色要有 View Channels 权限。Openclaw 会把 @everyone 当作对每个 Bot 的显式 mention，权限到位就能触发。
 
 **Q: 开了 sandbox 后 Agent 报没有权限写文件？**
 sandbox mode 设成 `all` 会把 Agent 跑在 Docker 容器里，默认只读文件系统、断网、不继承环境变量。解决方法：
@@ -239,24 +239,24 @@ sandbox mode 设成 `all` 会把 Agent 跑在 Docker 容器里，默认只读文
 - `docker.env` — 传入 API Key（沙箱不继承主机环境变量）
 
 **Q: 多人同时 @ 同一个 Agent 会冲突吗？**
-不会。Clawdbot 为每个用户 × Agent 组合维护独立的会话（session）。多人同时 @兵部，各自的对话互不干扰。
+不会。Openclaw 为每个用户 × Agent 组合维护独立的会话（session）。多人同时 @兵部，各自的对话互不干扰。
 
 **Q: Agent 之间能互相调用吗？**
 能。Agent 可以通过 `sessions_spawn` 产生子任务给其他 Agent，也可以通过 `sessions_send` 发消息给其他 Agent 的会话。比如司礼监可以把编码任务派给兵部。
 
 **Q: 怎么自定义 Skill？**
-Clawdbot 有内置的 Skill Creator 工具，可以创建自定义 Skill。每个 Skill 是一个包含 `SKILL.md`（指令）+ 脚本 + 资源的目录。放到工作区的 `skills/` 目录下即可被 Agent 使用。
+Openclaw 有内置的 Skill Creator 工具，可以创建自定义 Skill。每个 Skill 是一个包含 `SKILL.md`（指令）+ 脚本 + 资源的目录。放到工作区的 `skills/` 目录下即可被 Agent 使用。
 
 **Q: 怎么接入私有模型（Ollama 等）？**
-在 `clawdbot.json` 的 `models.providers` 中添加兼容 OpenAI API 格式的 provider，指定 `baseUrl` 到你的 Ollama 地址即可。Ollama 本地模型零 API 费用。
+在 `openclaw.json` 的 `models.providers` 中添加兼容 OpenAI API 格式的 provider，指定 `baseUrl` 到你的 Ollama 地址即可。Ollama 本地模型零 API 费用。
 
 **Q: Gateway 启动失败怎么排查？**
 ```bash
 # 查看详细日志
-journalctl --user -u clawdbot-gateway --since today --no-pager
+journalctl --user -u openclaw-gateway --since today --no-pager
 
 # 配置检查
-clawdbot doctor
+openclaw doctor
 
 # 常见原因：API Key 未填、JSON 格式错误、Bot Token 无效
 ```
@@ -277,8 +277,8 @@ clawdbot doctor
 - [AI 朝廷 Skill — 中文版](https://github.com/wanikua/ai-court-skill)
 - [Become CEO — English](https://github.com/wanikua/become-ceo)
 
-- [Clawdbot 官方文档](https://docs.clawd.bot)
-- [Clawdbot GitHub](https://github.com/clawdbot/clawdbot)
+- [Openclaw 官方文档](https://docs.clawd.bot)
+- [Openclaw GitHub](https://github.com/openclaw/openclaw)
 
 ## ⚠️ 免责声明 / Disclaimer
 

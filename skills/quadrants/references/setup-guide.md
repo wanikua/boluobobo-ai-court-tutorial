@@ -1,4 +1,4 @@
-# Quadrants + Clawdbot Setup Guide
+# Quadrants + Openclaw Setup Guide
 
 ## 1. Vercel Environment Variables
 
@@ -11,11 +11,11 @@ QUADRANTS_SERVICE_USER_ID=<your-clerk-user-id>
 
 For the chat widget (optional):
 ```
-NEXT_PUBLIC_CLAWDBOT_GATEWAY_URL=http://100.125.166.54:18789
-NEXT_PUBLIC_CLAWDBOT_GATEWAY_TOKEN=45371aba4d03c1a3e7faf31ed6f5dc778c8069ec04e2c98f
+NEXT_PUBLIC_OPENCLAW_GATEWAY_URL=http://100.125.166.54:18789
+NEXT_PUBLIC_OPENCLAW_GATEWAY_TOKEN=45371aba4d03c1a3e7faf31ed6f5dc778c8069ec04e2c98f
 ```
 
-## 2. Clawdbot Environment
+## 2. Openclaw Environment
 
 Export or add to agent env:
 ```
@@ -29,18 +29,18 @@ The following new files need to be committed and deployed:
 
 ### New API Routes:
 - `app/api/service/route.ts` — Service API (all CRUD operations via API key)
-- `app/api/webhooks/clawdbot/route.ts` — Webhook receiver
+- `app/api/webhooks/openclaw/route.ts` — Webhook receiver
 
 ### New Component:
-- `components/clawdbot-chat-widget.tsx` — Floating chat widget
+- `components/openclaw-chat-widget.tsx` — Floating chat widget
 
 ### To embed the widget in Quadrants:
 Add to `app/layout.tsx` or the projects page:
 ```tsx
-import { ClawdbotChatWidget } from '@/components/clawdbot-chat-widget'
+import { OpenclawChatWidget } from '@/components/openclaw-chat-widget'
 
 // In JSX:
-<ClawdbotChatWidget projectId={currentProjectId} />
+<OpenclawChatWidget projectId={currentProjectId} />
 ```
 
 ## 4. Heartbeat Integration
@@ -60,11 +60,11 @@ Every morning at 8:00 AM: Fetch Quadrants priority tasks and send summary to Dis
 
 ```
 ┌─────────────────┐     Service API      ┌──────────────────┐
-│   Clawdbot      │ ──────────────────── │   Quadrants      │
+│   Openclaw      │ ──────────────────── │   Quadrants      │
 │   (Skill/CLI)   │     /api/service     │   (Vercel)       │
 │                 │ ◄────────────────── │                  │
 │                 │     Webhook          │   /api/webhooks/ │
-└────────┬────────┘     /clawdbot        └────────┬─────────┘
+└────────┬────────┘     /openclaw        └────────┬─────────┘
          │                                        │
     Discord/Signal                          Chat Widget
     (user commands)                    (embedded in Quadrants UI)

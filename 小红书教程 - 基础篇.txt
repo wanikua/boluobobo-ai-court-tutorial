@@ -10,7 +10,7 @@
 
 1. 领免费服务器（10 分钟）
 2. 连接服务器（5 分钟）
-3. 一键安装 Clawdbot（5 分钟）
+3. 一键安装 Openclaw（5 分钟）
 4. 配置 API Key（5 分钟）
 5. 搭建朝廷架构（15 分钟）
 6. 启动并测试（5 分钟）
@@ -102,7 +102,7 @@
 
 配置实例（按顺序）：
 
-Name：clawdbot-server（随便起）
+Name：openclaw-server（随便起）
 Image：Ubuntu 24.04（一定要改！默认是 默认系统）
 Shape：VM.Standard.A1.Flex（ARM 架构）
 OCPUs：4（免费最大 4 核）
@@ -144,7 +144,7 @@ Boot Volume：200GB（免费最大）
 - 腾讯云/阿里云学生机（¥9.9/月）
 
 🟢 方案 3：本地运行（最简单⭐⭐⭐）
-- Mac/Windows 直接装 Clawdbot
+- Mac/Windows 直接装 Openclaw
 - 不用服务器，但电脑需要保持开机
 - 成本：0 元（只付 API 费）
 
@@ -190,7 +190,7 @@ ssh -i ~/Downloads/ssh-key-2025-xx-xx.key ubuntu@你的服务器 IP
 Are you sure you want to continue connecting (yes/no)?
 输入 yes 回车。
 
-📍 成功标志：看到 ubuntu@clawdbot-server:~$ 提示符就对了！✅
+📍 成功标志：看到 ubuntu@openclaw-server:~$ 提示符就对了！✅
 
 ❗ 易错点：
 - 用户名是 ubuntu，不是 root！
@@ -204,16 +204,16 @@ SSH 连上服务器后，复制粘贴这一行：
 
 bash <(curl -fsSL https://raw.githubusercontent.com/wanikua/boluobobo-ai-court-tutorial/main/install.sh)
 
-脚本会自动完成：系统更新、防火墙配置、Swap、Node.js 22、GitHub CLI、Clawdbot 安装、工作区初始化。
+脚本会自动完成：系统更新、防火墙配置、Swap、Node.js 22、GitHub CLI、Openclaw 安装、工作区初始化。
 
 安装完成后验证：
-clawdbot --version
+openclaw --version
 
 ⏱️ 耗时：3-5 分钟（看网速）
 📍 成功标志：能看到版本号就对了！✅
 
 💡 如果 npm 下载慢，可以手动安装：
-npm install -g clawdbot --registry=https://registry.npmmirror.com
+npm install -g openclaw --registry=https://registry.npmmirror.com
 
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -240,7 +240,7 @@ npm install -g clawdbot --registry=https://registry.npmmirror.com
 4.2 保存好你的 API Key
 
 🔴 API Key 只显示一次！先复制到记事本保存好。
-下一步（5.2）会把它填进配置文件 clawdbot.json。
+下一步（5.2）会把它填进配置文件 openclaw.json。
 
 💡 不需要设环境变量。API Key 直接写在配置文件里就行。
 
@@ -269,10 +269,10 @@ nano IDENTITY.md
 
 ⏱️ 耗时：2 分钟
 
-5.2 配置 Clawdbot
+5.2 配置 Openclaw
 
 编辑配置文件：
-nano ~/.clawdbot/clawdbot.json
+nano ~/.openclaw/openclaw.json
 
 一键脚本已生成包含 7 个部门的完整模板。基础篇只用 4 个（司礼监+兵部+户部+礼部），
 你可以直接在模板上修改，或者替换成以下精简配置（记得替换 API Key 和 Bot Token）：
@@ -421,7 +421,7 @@ channels 和每个 account 里都要加。
 对每个 Application：
 1. 左边菜单点 "Bot"
 2. 点击 "Reset Token" → 复制 Token（只显示一次！）
-3. 把 Token 填到 clawdbot.json 的 accounts 对应位置
+3. 把 Token 填到 openclaw.json 的 accounts 对应位置
 
 ⚠️ Bot 设置（同一页面往下滚，每个 Bot 都要做）：
 - Message Content Intent → 打开 ✅（必须！否则收不到消息）
@@ -473,17 +473,17 @@ channels 和每个 account 里都要加。
 6.1 启动 Gateway
 
 # 安装 Gateway 服务（如果一键脚本没装上，手动装一次）
-clawdbot gateway install
+openclaw gateway install
 
 # 启动服务
-systemctl --user start clawdbot-gateway
+systemctl --user start openclaw-gateway
 
 # 查看状态
-systemctl --user status clawdbot-gateway
+systemctl --user status openclaw-gateway
 
 📍 成功标志：看到"active (running)"就对了！✅
 
-💡 也可以用 clawdbot gateway start 手动启动（适合调试，Ctrl+C 停止）
+💡 也可以用 openclaw gateway start 手动启动（适合调试，Ctrl+C 停止）
 
 6.2 测试对话
 
@@ -508,16 +508,16 @@ systemctl --user status clawdbot-gateway
 6.3 常用命令
 
 # 查看状态
-systemctl --user status clawdbot-gateway
+systemctl --user status openclaw-gateway
 
 # 重启
-systemctl --user restart clawdbot-gateway
+systemctl --user restart openclaw-gateway
 
 # 查看日志
-journalctl --user -u clawdbot-gateway --since today
+journalctl --user -u openclaw-gateway --since today
 
 # 停止
-systemctl --user stop clawdbot-gateway
+systemctl --user stop openclaw-gateway
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -562,27 +562,27 @@ Q5: SSH 连接被拒绝？
 - 确认使用了正确的私钥文件
 - 检查 云服务商安全组是否开放 22 端口
 
-Q6: clawdbot 命令找不到？
+Q6: openclaw 命令找不到？
 
 解决：
 # 刷新 PATH
 source ~/.bashrc
 
 # 如果还不行，重新安装
-sudo npm install -g clawdbot
+sudo npm install -g openclaw
 
 Q7: Gateway 启动失败？
 
 解决：
 # 查看详细日志
-journalctl --user -u clawdbot-gateway --since today --no-pager
+journalctl --user -u openclaw-gateway --since today --no-pager
 
-# 用 clawdbot doctor 检查配置问题
-clawdbot doctor
+# 用 openclaw doctor 检查配置问题
+openclaw doctor
 
 # 常见原因：
-# 1. API Key 未配置 → 检查 ~/.clawdbot/clawdbot.json 中的 apiKey
-# 2. 配置文件语法错误 → clawdbot doctor 会告诉你哪里不对
+# 1. API Key 未配置 → 检查 ~/.openclaw/openclaw.json 中的 apiKey
+# 2. 配置文件语法错误 → openclaw doctor 会告诉你哪里不对
 # 3. Bot Token 无效 → 确认 Token 没过期、没被 Reset
 # 4. 端口被占用 → ss -tlnp | grep 18789
 
@@ -613,7 +613,7 @@ Q8: 如何降低成本？
 12 | 安装完成截图 | 终端输出 | 圈出"部署完成！"
 13 | LLM API 页 | https://你的LLM服务商控制台 | 圈出"Create Key"
 14 | ~/clawd 目录 | ls -la 输出 | 圈出 SOUL.md、IDENTITY.md 等
-15 | 配置文件 | clawdbot.json 内容 | 圈出 agents.list 配置
+15 | 配置文件 | openclaw.json 内容 | 圈出 agents.list 配置
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -627,5 +627,5 @@ Q8: 如何降低成本？
 1. 根据需求添加更多部门（工部、吏部、刑部）
 2. 配置定时任务（cron）自动汇报
 3. 接入 Notion 自动写日报
-4. 探索更多 Clawdbot 功能
+4. 探索更多 Openclaw 功能
 

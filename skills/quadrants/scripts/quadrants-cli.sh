@@ -1,5 +1,5 @@
 #!/bin/bash
-# Quadrants CLI — Clawdbot integration
+# Quadrants CLI — Openclaw integration
 # Usage: bash quadrants-cli.sh <action> [args...]
 
 set -euo pipefail

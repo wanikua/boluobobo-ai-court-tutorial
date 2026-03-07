@@ -27,8 +27,8 @@ const AGENT_DEPT_MAP = {
 };
 
 const HOME = process.env.HOME || '/home/ubuntu';
-const AGENTS_DIR = join(HOME, '.clawdbot/agents');
-const CONFIG_PATH = join(HOME, '.clawdbot/clawdbot.json');
+const AGENTS_DIR = join(HOME, '.openclaw/agents');
+const CONFIG_PATH = join(HOME, '.openclaw/openclaw.json');
 
 app.use(cors({ origin: ['https://gui.at2.one'] }));
 app.use(express.json());
@@ -52,7 +52,7 @@ function formatUptime(seconds) {
   return parts.join(' ');
 }
 
-function getClawdbotConfig() {
+function getOpenclawConfig() {
   try {
     if (existsSync(CONFIG_PATH)) {
       return JSON.parse(readFileSync(CONFIG_PATH, 'utf-8'));
@@ -132,7 +132,7 @@ function getRecentLogs(limit = 100) {
 }
 
 app.get('/api/status', authMiddleware, async (req, res) => {
-  const config = getClawdbotConfig();
+  const config = getOpenclawConfig();
   const defaultModel = config?.agents?.defaults?.model?.primary || 'default';
 
   let agentIds = [];
@@ -241,7 +241,7 @@ function getTokenStats() {
     }
   }
 
-  const rawConfig = getClawdbotConfig();
+  const rawConfig = getOpenclawConfig();
   const tokenPrice = rawConfig?.tokenPricePerM || 0.3;
   for (const d of byDepartment) {
     d.cost = (d.tokens / 1000000 * tokenPrice).toFixed(3);
@@ -815,7 +815,7 @@ app.get('/api/departments/:name/recent', authMiddleware, (req, res) => {
 // Gateway config (read-only, masks secrets)
 app.get('/api/config', authMiddleware, (req, res) => {
   try {
-    const config = getClawdbotConfig();
+    const config = getOpenclawConfig();
     if (!config) return res.json({ config: null, error: 'Config not found' });
     
     // Deep clone and mask sensitive fields
@@ -853,7 +853,7 @@ app.post('/api/notion/sync', authMiddleware, (req, res) => {
 
 app.get('/api/notion/data', authMiddleware, (req, res) => {
   const { type = 'daily' } = req.query;
-  const config = getClawdbotConfig();
+  const config = getOpenclawConfig();
   
   if (type === 'daily') {
     const data = [];
@@ -944,7 +944,7 @@ app.get('/api/weather', authMiddleware, (req, res) => {
 app.get('/api/platforms', authMiddleware, (req, res) => {
   try {
     // 直接读取 gateway 配置和 agent 数据（不再 curl 自己）
-    const config = getClawdbotConfig();
+    const config = getOpenclawConfig();
     const channels = config?.channels || {};
     
     // 读取 agent 数据获取在线账号数和会话数
@@ -1007,7 +1007,7 @@ app.get('/api/cron', authMiddleware, (req, res) => {
   // 从 Gateway 获取真实 Cron Jobs
   const { execSync } = require('child_process');
   try {
-    const output = execSync('clawdbot cron list --json 2>/dev/null', { encoding: 'utf-8', timeout: 5000 });
+    const output = execSync('openclaw cron list --json 2>/dev/null', { encoding: 'utf-8', timeout: 5000 });
     const data = JSON.parse(output);
     const jobs = (data.jobs || []).map((j) => {
       // 解析调度规则
@@ -1056,7 +1056,7 @@ app.post('/api/cron/run/:id', authMiddleware, (req, res) => {
   const id = req.params.id.replace(/[^a-zA-Z0-9_\-]/g, '');
   const { execSync } = require('child_process');
   try {
-    execSync(`clawdbot cron run ${id}`, { encoding: 'utf-8', timeout: 10000 });
+    execSync(`openclaw cron run ${id}`, { encoding: 'utf-8', timeout: 10000 });
     res.json({ success: true, message: `任务 ${id} 已触发执行` });
   } catch (e) {
     res.json({ success: false, message: `任务 ${id} 执行失败: ${e.message}` });
@@ -1072,14 +1072,14 @@ app.patch('/api/cron/jobs/:id', authMiddleware, (req, res) => {
     
     if (typeof enabled === 'boolean') {
       const action = enabled ? 'enable' : 'disable';
-      // Try clawdbot CLI
+      // Try openclaw CLI
       try {
-        execSync(`clawdbot cron ${action} ${id}`, { encoding: 'utf-8', timeout: 10000 });
+        execSync(`openclaw cron ${action} ${id}`, { encoding: 'utf-8', timeout: 10000 });
         res.json({ success: true, message: `任务 ${id} 已${enabled ? '启用' : '禁用'}`, id, enabled });
       } catch (cliErr) {
         // Fallback: try to update config directly
         try {
-          const config = getClawdbotConfig();
+          const config = getOpenclawConfig();
           if (config?.cron?.jobs) {
             const job = config.cron.jobs.find(j => j.id === id);
             if (job) {
@@ -1108,7 +1108,7 @@ app.patch('/api/cron/jobs/:id', authMiddleware, (req, res) => {
 app.get('/api/cron/jobs', authMiddleware, (req, res) => {
   const { execSync } = require('child_process');
   try {
-    const output = execSync('clawdbot cron list --json 2>/dev/null', { encoding: 'utf-8', timeout: 5000 });
+    const output = execSync('openclaw cron list --json 2>/dev/null', { encoding: 'utf-8', timeout: 5000 });
     const data = JSON.parse(output);
     const jobs = (data.jobs || []).map((j) => {
       let scheduleStr = '';
@@ -1142,19 +1142,19 @@ function readGatewayLogs(opts = {}) {
   const logs = [];
   
   try {
-    // Try journalctl for clawdbot service logs
+    // Try journalctl for openclaw service logs
     const { execSync } = require('child_process');
-    let cmd = 'journalctl -u clawdbot --no-pager -n 200 --output=short-iso 2>/dev/null';
+    let cmd = 'journalctl -u openclaw --no-pager -n 200 --output=short-iso 2>/dev/null';
     if (since) cmd += ` --since="${String(since).replace(/[^a-zA-Z0-9:\-_ ]/g, "")}"`;
     
     let output = '';
     try {
       output = execSync(cmd, { encoding: 'utf-8', timeout: 5000 });
     } catch {
-      // Fallback: read from clawdbot log file
+      // Fallback: read from openclaw log file
       const logPaths = [
-        `${HOME}/.clawdbot/logs/gateway.log`,
-        '/tmp/clawdbot.log',
+        `${HOME}/.openclaw/logs/gateway.log`,
+        '/tmp/openclaw.log',
         '/tmp/boluo-gui.log',
       ];
       for (const p of logPaths) {

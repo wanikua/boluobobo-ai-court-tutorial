@@ -5,7 +5,7 @@ description: Manage Quadrants tasks and projects via natural language. Use when 
 
 # Quadrants Skill
 
-Manage tasks on the Quadrants Eisenhower Matrix (quadrants.ch) from Clawdbot.
+Manage tasks on the Quadrants Eisenhower Matrix (quadrants.ch) from Openclaw.
 
 ## Setup
 
@@ -66,7 +66,7 @@ The Eisenhower Matrix has 4 quadrants based on urgency (0-100) and importance (0
 ]
 ```
 
-## Integration with Clawdbot
+## Integration with Openclaw
 
 ### Heartbeat Check
 Add to HEARTBEAT.md to periodically check priority tasks:

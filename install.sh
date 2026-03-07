@@ -71,7 +71,7 @@ else
     sudo snap install chromium 2>/dev/null || sudo apt-get install -y chromium-browser -qq
     echo -e "  ${GREEN}✓ Chromium 安装完成${NC}"
 fi
-# 设置 Puppeteer 浏览器路径（Clawdbot 的浏览器 skill 需要）
+# 设置 Puppeteer 浏览器路径（Openclaw 的浏览器 skill 需要）
 if ! grep -q PUPPETEER_EXECUTABLE_PATH ~/.bashrc 2>/dev/null; then
     CHROME_BIN="/snap/chromium/current/usr/lib/chromium-browser/chrome"
     if [ ! -f "$CHROME_BIN" ]; then
@@ -81,19 +81,19 @@ if ! grep -q PUPPETEER_EXECUTABLE_PATH ~/.bashrc 2>/dev/null; then
     echo -e "  ${GREEN}✓ 浏览器路径已配置 ($CHROME_BIN)${NC}"
 fi
 
-# ---- 7. Clawdbot ----
-echo -e "${YELLOW}[7/8] 安装 Clawdbot...${NC}"
-if command -v clawdbot &>/dev/null; then
-    CURRENT_VER=$(clawdbot --version 2>/dev/null || echo "unknown")
-    echo -e "  ${GREEN}✓ Clawdbot 已安装 ($CURRENT_VER)，更新中...${NC}"
+# ---- 7. Openclaw ----
+echo -e "${YELLOW}[7/8] 安装 Openclaw...${NC}"
+if command -v openclaw &>/dev/null; then
+    CURRENT_VER=$(openclaw --version 2>/dev/null || echo "unknown")
+    echo -e "  ${GREEN}✓ Openclaw 已安装 ($CURRENT_VER)，更新中...${NC}"
 fi
-sudo npm install -g clawdbot --loglevel=error
-echo -e "  ${GREEN}✓ Clawdbot $(clawdbot --version 2>/dev/null) 安装完成${NC}"
+sudo npm install -g openclaw --loglevel=error
+echo -e "  ${GREEN}✓ Openclaw $(openclaw --version 2>/dev/null) 安装完成${NC}"
 
 # ---- 8. 初始化工作区 ----
 echo -e "${YELLOW}[8/8] 初始化朝廷工作区...${NC}"
 WORKSPACE="$HOME/clawd"
-CONFIG_DIR="$HOME/.clawdbot"
+CONFIG_DIR="$HOME/.openclaw"
 mkdir -p "$WORKSPACE"
 mkdir -p "$CONFIG_DIR"
 cd "$WORKSPACE"
@@ -150,9 +150,9 @@ USER_EOF
 echo -e "  ${GREEN}✓ USER.md 已创建${NC}"
 fi
 
-# clawdbot.json 模板 → 写到 ~/.clawdbot/
-if [ ! -f "$CONFIG_DIR/clawdbot.json" ]; then
-cat > "$CONFIG_DIR/clawdbot.json" << CONFIG_EOF
+# openclaw.json 模板 → 写到 ~/.openclaw/
+if [ ! -f "$CONFIG_DIR/openclaw.json" ]; then
+cat > "$CONFIG_DIR/openclaw.json" << CONFIG_EOF
 {
   "models": {
     "providers": {
@@ -291,7 +291,7 @@ cat > "$CONFIG_DIR/clawdbot.json" << CONFIG_EOF
   ]
 }
 CONFIG_EOF
-echo -e "  ${GREEN}✓ clawdbot.json 模板已创建 ($CONFIG_DIR/clawdbot.json)${NC}"
+echo -e "  ${GREEN}✓ openclaw.json 模板已创建 ($CONFIG_DIR/openclaw.json)${NC}"
 fi
 
 # 创建 memory 目录
@@ -299,9 +299,9 @@ mkdir -p memory
 
 # ---- 安装 Gateway 服务（开机自启）----
 echo -e "${YELLOW}安装 Gateway 服务...${NC}"
-clawdbot gateway install 2>/dev/null \
+openclaw gateway install 2>/dev/null \
     && echo -e "  ${GREEN}✓ Gateway 服务已安装（开机自启）${NC}" \
-    || echo -e "  ${YELLOW}⚠ Gateway 服务安装跳过（配置填好后运行 clawdbot gateway install）${NC}"
+    || echo -e "  ${YELLOW}⚠ Gateway 服务安装跳过（配置填好后运行 openclaw gateway install）${NC}"
 
 echo ""
 echo "================================"
@@ -311,7 +311,7 @@ echo ""
 echo "接下来你需要完成以下配置："
 echo ""
 echo -e "  ${YELLOW}1. 设置 API Key${NC}"
-echo "     编辑 ~/.clawdbot/clawdbot.json"
+echo "     编辑 ~/.openclaw/openclaw.json"
 echo "     把 YOUR_LLM_API_KEY 替换成你的 LLM API Key"
 echo "     获取地址：https://你的LLM服务商控制台"
 echo ""
@@ -319,20 +319,20 @@ echo -e "  ${YELLOW}2. 创建 Discord Bot（每个部门一个）${NC}"
 echo "     a) 访问 https://discord.com/developers/applications"
 echo "     b) 创建 Application → Bot → 复制 Token"
 echo "     c) 重复创建多个 Bot（司礼监、兵部、户部...按需）"
-echo "     d) 把每个 Token 填到 clawdbot.json 的 accounts 对应位置"
+echo "     d) 把每个 Token 填到 openclaw.json 的 accounts 对应位置"
 echo "     e) 每个 Bot 都要开启 Message Content Intent"
 echo "     f) 邀请所有 Bot 到你的 Discord 服务器"
 echo ""
 echo -e "  ${YELLOW}3. 启动朝廷${NC}"
-echo "     systemctl --user start clawdbot-gateway"
+echo "     systemctl --user start openclaw-gateway"
 echo ""
 echo -e "  ${YELLOW}4. 验证${NC}"
-echo "     systemctl --user status clawdbot-gateway"
+echo "     systemctl --user status openclaw-gateway"
 echo "     然后在 Discord @你的Bot 说话试试"
 echo ""
 echo -e "  ${YELLOW}5. 添加定时任务（可选）${NC}"
-echo "     获取 Token：clawdbot gateway token"
-echo "     添加 cron： clawdbot cron add --name '每日简报' \\"
+echo "     获取 Token：openclaw gateway token"
+echo "     添加 cron： openclaw cron add --name '每日简报' \\"
 echo "       --agent main --cron '0 22 * * *' --tz Asia/Shanghai \\"
 echo "       --message '生成今日简报' --session isolated --token <你的token>"
 echo ""

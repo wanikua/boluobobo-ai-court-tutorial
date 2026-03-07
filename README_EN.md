@@ -2,7 +2,7 @@
 
 # 🏛️ Build Your AI Court in 30 Minutes
 
-> One free server + [Clawdbot](https://github.com/clawdbot/clawdbot) = A 24/7 AI team at your command
+> One free server + [Openclaw](https://github.com/openclaw/openclaw) = A 24/7 AI team at your command
 
 Writing code, managing finances, running marketing campaigns, generating daily reports, handling DevOps — all you need to do is send a message in Discord.
 
@@ -35,7 +35,7 @@ Writing code, managing finances, running marketing campaigns, generating daily r
 ```
 Discord Message
     ↓
-Clawdbot Gateway (Node.js daemon)
+Openclaw Gateway (Node.js daemon)
     ├── Message routing: @mention → match binding → dispatch to agent
     ├── Session isolation: each agent has its own session & workspace
     ├── Auto-threading: large tasks automatically spawn Threads
@@ -58,7 +58,7 @@ Each agent is a standalone Discord Bot bound to its own AI identity:
 - **Independent memory**: Every agent has its own `memory/` directory — the more you use it, the better it knows your projects
 - **Independent models**: Use power models for heavy lifting, fast models for light work — save money without sacrificing quality
 - **Sandboxed execution**: Agent code runs in isolation, no cross-contamination
-- **Identity injection**: Clawdbot automatically assembles SOUL.md + IDENTITY.md + workspace files into the system prompt
+- **Identity injection**: Openclaw automatically assembles SOUL.md + IDENTITY.md + workspace files into the system prompt
 
 ---
 
@@ -76,8 +76,8 @@ The script automatically handles:
 - ✅ System updates + cloud provider firewall configuration
 - ✅ 4 GB Swap (prevents OOM kills)
 - ✅ Node.js 22 + GitHub CLI + Chromium
-- ✅ Global Clawdbot installation
-- ✅ Workspace initialization (SOUL.md / IDENTITY.md / USER.md / clawdbot.json multi-agent template)
+- ✅ Global Openclaw installation
+- ✅ Workspace initialization (SOUL.md / IDENTITY.md / USER.md / openclaw.json multi-agent template)
 - ✅ Gateway systemd service (auto-starts on boot)
 
 The install script features color-coded output with progress indicators and ✓ success markers for each step.
@@ -91,13 +91,13 @@ After the script finishes, you just need two things:
 
 ```bash
 # Edit config — fill in API Key and Bot Tokens
-nano ~/.clawdbot/clawdbot.json
+nano ~/.openclaw/openclaw.json
 
 # Start the court
-systemctl --user start clawdbot-gateway
+systemctl --user start openclaw-gateway
 
 # Verify
-systemctl --user status clawdbot-gateway
+systemctl --user status openclaw-gateway
 ```
 
 @mention your Bot in Discord and say something. If it replies, you're live.
@@ -121,10 +121,10 @@ systemctl --user status clawdbot-gateway
 Set up automated daily reports:
 ```bash
 # Get the Gateway Token
-clawdbot gateway token
+openclaw gateway token
 
 # Auto-generate daily report at 22:00 Beijing time
-clawdbot cron add \
+openclaw cron add \
   --name "Daily Report" --agent main \
   --cron "0 22 * * *" --tz "Asia/Shanghai" \
   --message "Generate today's daily report, write to Notion and post to Discord" \
@@ -157,7 +157,7 @@ Inspired by the Ming Dynasty's six-ministry system, each "department" is an inde
 
 ### 🤖 Multi-Agent Collaboration
 Each department is its own Bot. @mention one and it responds; @everyone triggers all of them. Large tasks automatically spawn Threads to keep channels tidy.
-> ⚠️ To enable Bot-to-Bot interactions (e.g., word chain games, multi-Bot discussions), add `"allowBots": true` in the `channels.discord` section of `clawdbot.json`. Without this, Bots ignore messages from other Bots by default. Each account also needs `"groupPolicy": "open"`, otherwise group messages will be silently dropped.
+> ⚠️ To enable Bot-to-Bot interactions (e.g., word chain games, multi-Bot discussions), add `"allowBots": true` in the `channels.discord` section of `openclaw.json`. Without this, Bots ignore messages from other Bots by default. Each account also needs `"groupPolicy": "open"`, otherwise group messages will be silently dropped.
 
 ### 🧠 Independent Memory System
 Each agent has its own workspace and `memory/` directory. Project knowledge accumulated through conversations is persisted to files and retained across sessions. The more you use an agent, the better it understands your project.
@@ -210,7 +210,7 @@ Cloud providers' free tiers (where available).
 ChatGPT is a single generalist that forgets everything when you close the tab. This system gives you multiple specialists — each agent has its own domain expertise, persistent memory, and tool permissions. They can automatically commit code to GitHub, write docs to Notion, and run tasks on a schedule.
 
 **Q: Can I use other models?**
-Yes. Clawdbot supports various LLM providers, OpenAI, Google Gemini, and others (including economy models). Just change the model config in `clawdbot.json`. Different departments can use different models.
+Yes. Openclaw supports various LLM providers, OpenAI, Google Gemini, and others (including economy models). Just change the model config in `openclaw.json`. Different departments can use different models.
 
 **Q: How much does the API cost per month?**
 Depends on usage intensity. Light usage: $10–15/month, moderate: $20–30/month. Cost-saving tip: use power models for heavy tasks, fast models for light tasks (roughly 5× cheaper), and plug in economy models for simple tasks to save even more.
@@ -218,7 +218,7 @@ Depends on usage intensity. Light usage: $10–15/month, moderate: $20–30/mont
 ### Technical
 
 **Q: @everyone doesn't trigger agent responses?**
-In the Discord Developer Portal, each Bot needs **Message Content Intent** and **Server Members Intent** enabled. The Bot's role in the server also needs View Channels permission. Clawdbot treats @everyone as an explicit mention for every Bot — once permissions are set correctly, it will trigger responses.
+In the Discord Developer Portal, each Bot needs **Message Content Intent** and **Server Members Intent** enabled. The Bot's role in the server also needs View Channels permission. Openclaw treats @everyone as an explicit mention for every Bot — once permissions are set correctly, it will trigger responses.
 
 **Q: Agent reports permission errors after enabling sandbox?**
 Sandbox mode set to `all` runs the agent inside a Docker container with a read-only filesystem, no network access, and no inherited environment variables by default. Fix:
@@ -238,24 +238,24 @@ Sandbox mode set to `all` runs the agent inside a Docker container with a read-o
 - `docker.env` — Passes in API keys (sandbox doesn't inherit host environment variables)
 
 **Q: Will multiple users @mentioning the same agent cause conflicts?**
-No. Clawdbot maintains independent sessions for each user × agent combination. Multiple people can @mention 兵部 bingbu simultaneously — their conversations won't interfere with each other.
+No. Openclaw maintains independent sessions for each user × agent combination. Multiple people can @mention 兵部 bingbu simultaneously — their conversations won't interfere with each other.
 
 **Q: Can agents call each other?**
 Yes. Agents can use `sessions_spawn` to delegate sub-tasks to other agents, or `sessions_send` to message another agent's session. For example, 司礼监 (Chief Steward) can assign coding tasks to 兵部 bingbu.
 
 **Q: How do I create custom Skills?**
-Clawdbot has a built-in Skill Creator tool for creating custom Skills. Each Skill is a directory containing `SKILL.md` (instructions) + scripts + resources. Place it in the `skills/` directory of your workspace, and agents can use it immediately.
+Openclaw has a built-in Skill Creator tool for creating custom Skills. Each Skill is a directory containing `SKILL.md` (instructions) + scripts + resources. Place it in the `skills/` directory of your workspace, and agents can use it immediately.
 
 **Q: How do I connect private models (Ollama, etc.)?**
-Add an OpenAI API-compatible provider in the `models.providers` section of `clawdbot.json`, pointing `baseUrl` to your Ollama address. Local Ollama models have zero API costs.
+Add an OpenAI API-compatible provider in the `models.providers` section of `openclaw.json`, pointing `baseUrl` to your Ollama address. Local Ollama models have zero API costs.
 
 **Q: How do I troubleshoot Gateway startup failures?**
 ```bash
 # Check detailed logs
-journalctl --user -u clawdbot-gateway --since today --no-pager
+journalctl --user -u openclaw-gateway --since today --no-pager
 
 # Run diagnostics
-clawdbot doctor
+openclaw doctor
 
 # Common causes: missing API Key, malformed JSON, invalid Bot Token
 ```
@@ -276,8 +276,8 @@ clawdbot doctor
 - [AI Court Skill — Chinese](https://github.com/wanikua/ai-court-skill)
 - [Become CEO — English](https://github.com/wanikua/become-ceo)
 
-- [Clawdbot Official Documentation](https://docs.clawd.bot)
-- [Clawdbot GitHub](https://github.com/clawdbot/clawdbot)
+- [Openclaw Official Documentation](https://docs.clawd.bot)
+- [Openclaw GitHub](https://github.com/openclaw/openclaw)
 
 ## ⚠️ 免责声明 / Disclaimer
 
