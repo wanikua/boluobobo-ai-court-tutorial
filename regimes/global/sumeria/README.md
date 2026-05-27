@@ -65,7 +65,7 @@ Temples were not merely religious sites but economic powerhouses. They owned vas
 |-----------|-----|----------------------|-----------------|
 | En (大祭司/CEO) | `en` | 最高宗教与经济权威，最终决策 | Claude Opus 4.6 |
 | Lugal (军事之王) | `lugal` | 防御、军事行动、安全评估 | GPT-5.4 Pro |
-| Ensi (城市总督) | `ensi` | 日常行政、灌溉、劳工管理 | Gemini 3.1 Pro |
+| Ensi (城市总督) | `ensi` | 日常行政、灌溉、劳工管理 | MiMo v2 Pro |
 | Dubsar (书吏) | `dubsar` | 记录保管、数据管理、会计 | Qwen3-Coder |
 | Gala (神庙祭司) | `gala` | 质量保证、仪式验证、合规检查 | DeepSeek R2 |
 | Sukkal (王室信使) | `sukkal` | 消息路由、代理间通信、外交中继 | GPT-5.3 Instant |

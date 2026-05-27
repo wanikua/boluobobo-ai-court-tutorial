@@ -75,7 +75,7 @@ The Qing institutional core is a three-tier direct command chain: "Emperor → G
 | 兵部 (Ministry of War) | 军事管理 | 技术架构、系统开发、核心编码、安全工程 | Tier-1: GPT-5.4 Pro / DeepSeek R2 |
 | 户部 (Ministry of Revenue) | 财政税赋 | 成本核算、预算管理、数据分析、资源调配 | Tier-2: Qwen / Kimi K2.5 |
 | 吏部 (Ministry of Personnel) | 人事铨叙 | 项目管理、团队协调、任务分配、绩效评估 | Tier-2: Kimi K2.5 / GPT-5.4 |
-| 礼部 (Ministry of Rites) | 礼仪外交 | 文案创作、品牌营销、社媒运营、用户沟通 | Tier-2: Gemini 3.1 Pro / Kimi K2.5 |
+| 礼部 (Ministry of Rites) | 礼仪外交 | 文案创作、品牌营销、社媒运营、用户沟通 | Tier-2: MiMo v2 Pro / Kimi K2.5 |
 | 总督 (Governor-General) | 地方军政长官 | 部署发布、运维管理、区域化部署、灾备恢复 | Tier-2: Qwen / DeepSeek R2 |
 | 都察院 (Censorate) | 监察弹劾 | 代码审查、质量监控、合规检查、审计报告 | Tier-1: GPT-5.4 Pro (reviewer) |
 
@@ -85,9 +85,9 @@ The Qing institutional core is a three-tier direct command chain: "Emperor → G
 
 The Grand Council's institutional wisdom: achieve maximum efficiency with the leanest decision-making layer. A 3-6 person council was faster, more secretive, and more flexible than the unwieldy Grand Secretariat and Six Ministries. This maps to the AI orchestration principle of "keep the core decision layer lean" — not every issue requires a full multi-agent deliberation process; urgent matters can be quickly resolved by a core agent.
 
-奏折制度映射为 AI 系统中的「直通反馈通道」——任何执行层 Agent 都可以直接向决策层报告问题，无需逐级上报。这在处理紧急问题（如生产环境故障）时极为重要。满汉双轨制映射为「多模型混合部署」——不同类型的任务由最适合的模型处理（如推理任务用 DeepSeek R2，创意任务用 Gemini 3.1 Pro），各取所长。
+奏折制度映射为 AI 系统中的「直通反馈通道」——任何执行层 Agent 都可以直接向决策层报告问题，无需逐级上报。这在处理紧急问题（如生产环境故障）时极为重要。满汉双轨制映射为「多模型混合部署」——不同类型的任务由最适合的模型处理（如推理任务用 DeepSeek R2，创意任务用 MiMo v2 Pro），各取所长。
 
-The memorial system maps to "direct feedback channels" in AI systems — any execution-layer agent can report issues directly to the decision layer without going through the chain of command. This is crucial for urgent issues (like production incidents). The Manchu-Han dual-track system maps to "multi-model hybrid deployment" — different task types are handled by the most suitable model (e.g., reasoning tasks by DeepSeek R2, creative tasks by Gemini 3.1 Pro), each playing to its strengths.
+The memorial system maps to "direct feedback channels" in AI systems — any execution-layer agent can report issues directly to the decision layer without going through the chain of command. This is crucial for urgent issues (like production incidents). The Manchu-Han dual-track system maps to "multi-model hybrid deployment" — different task types are handled by the most suitable model (e.g., reasoning tasks by DeepSeek R2, creative tasks by MiMo v2 Pro), each playing to its strengths.
 
 ## 三、编排模式解析 / Orchestration Pattern
 

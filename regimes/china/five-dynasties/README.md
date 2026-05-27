@@ -62,7 +62,7 @@ The essential structure of this period was a loose federation of nominally-centr
 | Agent 名称 | 历史角色 | AI 职责 | 推荐模型层级 |
 |---|---|---|---|
 | 朝廷 (Court) | 名义中央朝廷 | 发布任务目标、名义协调、汇总结果、选择最优方案 | Tier-1 (Coordinator): GPT-5.4 / Claude Sonnet 4.6 |
-| 节度使A (Warlord A) | 独立藩镇（如河东节度使） | 方案A生成、独立代码实现、专精领域A（如前端） | Tier-2 (Specialist): Gemini 3.1 Pro / Qwen3-Coder |
+| 节度使A (Warlord A) | 独立藩镇（如河东节度使） | 方案A生成、独立代码实现、专精领域A（如前端） | Tier-2 (Specialist): MiMo v2 Pro / Qwen3-Coder |
 | 节度使B (Warlord B) | 独立藩镇（如淮南节度使） | 方案B生成、独立代码实现、专精领域B（如后端） | Tier-2 (Specialist): DeepSeek / Kimi K2.5 |
 | 节度使C (Warlord C) | 独立藩镇（如西川节度使） | 方案C生成、独立代码实现、专精领域C（如算法） | Tier-2 (Specialist): GPT-5.4 Pro / DeepSeek R2 |
 | 掌书记 (Scribe) | 幕府文书、跨镇联络 | 信息汇总、方案对比、冲突调停、结果记录 | Tier-3 (Support): GPT-5.3 Instant / Kimi K2.5 |
@@ -134,7 +134,7 @@ Step 5: 掌书记记录决策，归档方案
 
 - **创意竞标 / Creative Bidding**: 多 Agent 各自提出不同的 UI/UX 设计方案，由评审 Agent 选择最佳方案。适合设计冲刺、黑客松等场景。
 - **A/B/C 技术路线评估 / Technical Route Evaluation**: 对同一问题尝试不同技术栈（React vs Vue vs Svelte），并行实现后对比性能和可维护性。
-- **多模型基准测试 / Multi-Model Benchmarking**: 让不同 AI 模型（GPT-5.4、Claude、Gemini 3.1 Pro）各自执行同一任务，对比输出质量，选择最优。
+- **多模型基准测试 / Multi-Model Benchmarking**: 让不同 AI 模型（GPT-5.4、Claude、MiMo v2 Pro）各自执行同一任务，对比输出质量，选择最优。
 - **分布式微服务开发 / Distributed Microservice Development**: 各团队（Agent）独立负责不同微服务，最终集成测试时汇总。
 - **红蓝对抗 / Red-Blue Team Exercise**: 一个 Agent 攻击、一个 Agent 防御、一个 Agent 审计，模拟安全攻防演练。
 - **多语言本地化 / Multi-language Localization**: 各 Agent 分别负责不同语言的翻译和本地化，独立执行后统一校审。

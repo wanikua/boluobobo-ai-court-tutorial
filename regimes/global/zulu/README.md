@@ -77,7 +77,7 @@ The Zulu Kingdom's political structure was inseparable from its military organiz
 |---|---|---|---|
 | Inkosi (inkosi) | 国王/沙卡 / Supreme Ruler | Ultimate decision-maker, strategic vision, resource allocation, final judgment | Claude Opus 4.6 |
 | Induna_Enkulu (induna-enkulu) | 大首领 / Chief Commander | Strategy-to-operations translation, force coordination, campaign planning | GPT-5.4 Pro |
-| Izinduna (izinduna) | 团指挥官 / Regimental Cmdrs | Tactical execution, parallel processing, distributed operations | Gemini 3.1 Pro |
+| Izinduna (izinduna) | 团指挥官 / Regimental Cmdrs | Tactical execution, parallel processing, distributed operations | MiMo v2 Pro |
 | Izangoma (izangoma) | 占卜师 / Diviners | Intelligence analysis, risk assessment, anomaly detection, validation | DeepSeek R2 |
 | Umnumzane (umnumzane) | 村落首领 / Kraal Head | Resource management, data ingestion, preprocessing, logistics | Kimi K2.5 |
 

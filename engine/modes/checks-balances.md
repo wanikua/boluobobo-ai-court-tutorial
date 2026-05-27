@@ -15,7 +15,7 @@ User → Coordinator
          │
          ├─ 1. Draft: Agent A (Opus/Codex) produces solution
          │
-         ├─ 2. Review: Agent B (Gemini/Codex:review) evaluates
+         ├─ 2. Review: Agent B (Codex:review) evaluates
          │     ├─ PASS → proceed to execute
          │     └─ REJECT (with reasons) → return to Draft (max 3 rounds)
          │

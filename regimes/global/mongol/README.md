@@ -77,7 +77,7 @@ Mongol governance fused steppe democratic traditions with military centralizatio
 |---|---|---|---|
 | Great Khan / 大汗 | 忽里勒台推举的最高统治者 | 最终决策权，战略指挥 | Tier 1 (主模型，如 Claude Opus 4.6) |
 | Kurultai / 忽里勒台 | 贵族大会，推举汗和重大决策 | 集体讨论，方案投票，共识形成 | Tier 1 (多模型投票) |
-| Noyan_West / 西路统帅 | 西方战区军事指挥 | 前端/西方市场领域Agent | Tier 2 (领域模型，如 Gemini 3.1 Pro) |
+| Noyan_West / 西路统帅 | 西方战区军事指挥 | 前端/西方市场领域Agent | Tier 2 (领域模型，如 MiMo v2 Pro) |
 | Noyan_East / 东路统帅 | 东方战区军事指挥 | 后端/东方市场领域Agent | Tier 2 (领域模型，如 Qwen3-Coder) |
 | Darughachi / 达鲁花赤 | 被征服地区行政长官 | 运维管理，部署执行，监控 | Tier 3 (执行模型，如 Kimi K2.5) |
 | Jarghuchi / 断事官 | 最高司法官，雅萨解释者 | 合规审查，标准执行，争议仲裁 | Tier 2 (审查模型，如 DeepSeek R2) |

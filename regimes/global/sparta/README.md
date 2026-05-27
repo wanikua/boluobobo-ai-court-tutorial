@@ -62,7 +62,7 @@ The Spartan constitution was regarded by Polybius and Aristotle as the model "mi
 |---|---|---|---|
 | King_Agiad / 阿基亚德王 | 阿基亚德王族国王，军事统帅 | 主协调者，方案A的倡导者 | Tier 1 (主模型，如 Claude Opus 4.6) |
 | King_Eurypontid / 欧里庞提德王 | 欧里庞提德王族国王，共治者 | 共同协调者，方案B的倡导者，互相制衡 | Tier 1 (对等模型，如 GPT-5.4 Pro) |
-| Gerousia / 长老院 | 28位终身长老+2王，立法+最高法院 | 立法审查，资深建议，最终方案批准 | Tier 2 (审查模型，如 Gemini 3.1 Pro) |
+| Gerousia / 长老院 | 28位终身长老+2王，立法+最高法院 | 立法审查，资深建议，最终方案批准 | Tier 2 (审查模型，如 MiMo v2 Pro) |
 | Ephors / 监察官 | 5位民选监察官，监督一切 | 执行监督，质量否决，合规检查 | Tier 2 (安全模型，如 DeepSeek R2) |
 | Polemarch / 军事指挥 | 战场战术指挥官 | 技术实现，代码编写，战术执行 | Tier 2 (代码模型，如 Qwen3-Coder) |
 | Helot_Overseer / 后勤管理 | 黑劳士管理，资源调配 | 资源管理，供应链，基础设施维护 | Tier 3 (执行模型，如 Kimi K2.5) |

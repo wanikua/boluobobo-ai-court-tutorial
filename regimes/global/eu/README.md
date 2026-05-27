@@ -66,7 +66,7 @@ The EU's institutional design is based on the principle of "institutional balanc
 | European_Parliament (parliament) | 欧洲议会 / Citizens | Democratic validator, co-legislator, Commission watchdog | GPT-5.4 Pro |
 | Court_of_Justice (ecj) | 欧洲法院 / Judiciary | Treaty compliance, legal uniformity, judicial review | DeepSeek R2 |
 | European_Council (euco) | 欧洲理事会 / Strategic | Crisis resolver, priority setter, political compass | Claude Opus 4.6 |
-| European_Central_Bank (ecb) | 欧洲央行 / Monetary | Resource management, cost optimization, financial governance | Gemini 3.1 Pro |
+| European_Central_Bank (ecb) | 欧洲央行 / Monetary | Resource management, cost optimization, financial governance | MiMo v2 Pro |
 | High_Representative (high-rep) | 外交高级代表 / Foreign Policy | External API management, third-party coordination | Kimi K2.5 |
 
 ### 设计理念：从历史到 AI / Design Philosophy: From History to AI

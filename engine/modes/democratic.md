@@ -15,7 +15,7 @@ User → Coordinator
          │
          ├─ Agent A (Opus): produces solution independently
          ├─ Agent B (Codex): produces solution independently
-         ├─ Agent C (Gemini): produces solution independently
+         ├─ Agent C (MiMo): produces solution independently
          │
          └─ Vote:
               ├─ MAJORITY AGREES → accept that solution
@@ -27,7 +27,7 @@ User → Coordinator
 
 - Agent A = `Agent(model="opus")`
 - Agent B = `codex:rescue` (GPT-5.4)
-- Agent C = `gemini -p` (Gemini CLI)
+- Agent C = `cn:mimo` (MiMo, 1M ctx — third model family)
 - All three run in parallel for speed
 - Coordinator compares outputs, identifies majority position
 - Condorcet theorem: if each agent >50% accurate, ensemble → higher accuracy

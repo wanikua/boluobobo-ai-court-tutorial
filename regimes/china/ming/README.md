@@ -70,7 +70,7 @@ The Ming core architecture is a "proposal-approval" dual-track system. The Grand
 | 兵部 (Ministry of War) | 军事 | 技术架构、系统开发、核心编码、性能优化 | Tier-1: DeepSeek / GPT-5.4 Pro |
 | 户部 (Ministry of Revenue) | 财政 | 成本核算、预算管理、数据分析、资源监控 | Tier-2: Kimi K2.5 / Qwen3-Coder |
 | 吏部 (Ministry of Personnel) | 人事 | 项目管理、团队协调、任务分配、进度跟踪 | Tier-2: Kimi K2.5 / GPT-5.4 |
-| 礼部 (Ministry of Rites) | 礼仪文教 | 文案创作、品牌设计、营销策划、用户体验 | Tier-2: Gemini 3.1 Pro / Claude Sonnet 4.6 |
+| 礼部 (Ministry of Rites) | 礼仪文教 | 文案创作、品牌设计、营销策划、用户体验 | Tier-2: MiMo v2 Pro / Claude Sonnet 4.6 |
 | 刑部 (Ministry of Justice) | 刑法 | 法务合规、安全审计、合同审查、漏洞扫描 | Tier-2: DeepSeek / Codex |
 | 工部 (Ministry of Works) | 工程建设 | 运维部署、DevOps、CI/CD、基础设施管理 | Tier-2: Qwen / Kimi K2.5 |
 

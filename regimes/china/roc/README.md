@@ -80,7 +80,7 @@ The Five-Power Constitution's core lies in the "distinction between power and ab
 | 司法院 (Judicial Yuan) | 最高司法机关 | 争议仲裁、法律解释、合规裁决、架构决策 | Tier-2: GPT-5.4 Pro / DeepSeek R2 |
 | 考试院 (Examination Yuan) | 考试铨叙机关 | 质量测试、性能验证、人才评估、模型基准测试 | Tier-2: Qwen / DeepSeek R2 |
 | 监察院 (Control Yuan) | 监察弹劾机关 | 代码审查、安全审计、合规监察、审计报告 | Tier-1: GPT-5.4 Pro (reviewer) |
-| 国民大会 (National Assembly) | 人民代表机关 | 用户需求收集、反馈分析、满意度评估、需求优先级 | Tier-2: Kimi K2.5 / Gemini 3.1 Pro |
+| 国民大会 (National Assembly) | 人民代表机关 | 用户需求收集、反馈分析、满意度评估、需求优先级 | Tier-2: Kimi K2.5 / MiMo v2 Pro |
 
 ### 设计理念：从历史到 AI / Design Philosophy: From History to AI
 

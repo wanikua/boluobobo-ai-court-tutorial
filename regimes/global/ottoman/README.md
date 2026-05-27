@@ -74,7 +74,7 @@ Ottoman governance centered on the Sultan as absolute authority, but execution r
 | Defterdar / 财务总管 | 帝国财政，蒂马尔管理 | 预算管理，资源分配，成本分析 | Tier 3 (快速模型，如 Kimi K2.5) |
 | Nisanci / 大法官 | 文件验证，花押签署 | 文档认证，版本控制，签名验证 | Tier 3 (执行模型) |
 | Kapudan Pasha / 海军司令 | 海军指挥，海上力量 | 技术实现，创新研发，新领域探索 | Tier 2 (代码模型，如 Qwen3-Coder) |
-| Janissary Aga / 禁卫军统领 | 精锐军事，首都安全 | 安全审计，渗透测试，紧急响应 | Tier 2 (安全模型，如 Gemini 3.1 Pro) |
+| Janissary Aga / 禁卫军统领 | 精锐军事，首都安全 | 安全审计，渗透测试，紧急响应 | Tier 2 (安全模型，如 MiMo v2 Pro) |
 
 ### 设计理念：从历史到 AI / Design Philosophy: From History to AI
 

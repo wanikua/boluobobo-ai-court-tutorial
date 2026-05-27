@@ -13,7 +13,7 @@ Results are compared. Agreement = high confidence. Divergence = escalate.
 User → Coordinator
          │
          ├─ Track A: Agent A (Opus) produces solution
-         ├─ Track B: Agent B (Codex/Gemini) produces solution independently
+         ├─ Track B: Agent B (Codex/MiMo) produces solution independently
          │
          └─ Compare:
               ├─ AGREE → accept solution
@@ -24,7 +24,7 @@ User → Coordinator
 ## CC Implementation
 
 - Track A = `Agent(model="opus")` with worktree isolation
-- Track B = `codex:rescue` or `gemini -p` (different model family)
+- Track B = `codex:rescue` or `cn:mimo` (different model family)
 - Comparison = main CC session evaluates both outputs
 - Key: tracks must use uncorrelated models for maximum divergence detection
 

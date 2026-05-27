@@ -75,7 +75,7 @@ The Liberum Veto, initially a safeguard of noble liberty, gradually became a too
 | Sejm (瑟姆议会) | Supreme legislative body | GPT-5.4 Pro | 0.8 | Highest |
 | Senate (元老院) | Upper house, advisory | GPT-5.4 | 0.5 | High |
 | Hetman (大统领) | Supreme military commander | DeepSeek R2 | 0.5 | Medium |
-| Chancellor (大法官) | Legal officer, Great Seal | Gemini 3.1 Pro | 0.4 | Medium |
+| Chancellor (大法官) | Legal officer, Great Seal | MiMo v2 Pro | 0.4 | Medium |
 | Marshal of the Sejm (瑟姆元帅) | Parliamentary speaker | Kimi K2.5 | 0.5 | Medium |
 
 ---

@@ -62,7 +62,7 @@ Hannibal Barca (247-183 BC), Carthage's greatest general, stunned Rome by crossi
 | Suffete Alpha (苏菲特甲) | `suffete-a` | 民政、贸易政策、内政 | Claude Opus 4.6 |
 | Suffete Beta (苏菲特乙) | `suffete-b` | 军事、海军、外交 | GPT-5.4 Pro |
 | Council of 104 (百人议会) | `council-104` | 最高审计、监督、问责 | DeepSeek R2 |
-| Senate (元老院) | `senate` | 长期战略、条约批准、仲裁 | Gemini 3.1 Pro |
+| Senate (元老院) | `senate` | 长期战略、条约批准、仲裁 | MiMo v2 Pro |
 | Rab (海军将领) | `rab` | 海军指挥、技术实施、舰队 | GPT-5.4 |
 | Shophet (法官) | `shophet` | 法律解释、合同执行、争议 | Kimi K2.5 |
 | Trader (商人) | `trader` | 贸易路线、市场情报、系统集成 | Qwen3-Coder |

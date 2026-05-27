@@ -71,7 +71,7 @@ The core of the Swiss system lies in "nobody is the boss." The seven-member Fede
 |---|---|---|---|
 | Federal_Council (bundesrat) | 联邦委员会 / Collective Executive | Consensus decision-making, policy coordination, 7-way deliberation | Claude Opus 4.6 |
 | National_Council (nationalrat) | 国民院 / Lower House | Proportional review, democratic validation, budget approval | GPT-5.4 |
-| Council_of_States (staenderat) | 联邦院 / Upper House | Cantonal balance, expert review, equal co-legislation | Gemini 3.1 Pro |
+| Council_of_States (staenderat) | 联邦院 / Upper House | Cantonal balance, expert review, equal co-legislation | MiMo v2 Pro |
 | Federal_Supreme_Court (bundesgericht) | 联邦最高法院 / Judiciary | Cantonal law review, rights protection, legal consistency | DeepSeek R2 |
 | Cantonal_Assembly (landsgemeinde) | 州民大会 / Direct Democracy | Referendum trigger, popular initiative, citizen override | GPT-5.4 Pro |
 | Federal_Chancellor (kanzler) | 联邦总理 / Administration | Process management, coordination, referendum logistics | Kimi K2.5 |

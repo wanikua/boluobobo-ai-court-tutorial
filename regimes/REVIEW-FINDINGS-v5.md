@@ -15,7 +15,7 @@ Codex audit of 5 sample regimes after PR #6 auto-generation. Actionable items fo
 
 ## Not yet reviewed (other sampling rounds failed)
 
-- Gemini second-round review blocked on CodeAssist OAuth (API-key mode was not picked up by this invocation — known intermittent issue).
+- A second-round review (originally attempted on a now-removed provider) did not complete.
 - cc-mimo third-round review hit `--max-turns 1` limit mid-output; re-run needed.
 
-v5.1 plan: complete Gemini + Mimo rounds on a dedicated branch, fix Byzantine/Roman/Prussian/Ottoman per above.
+v5.1 plan: complete the second/third review rounds via Codex + opencode + Mimo on a dedicated branch, fix Byzantine/Roman/Prussian/Ottoman per above. (gemini is no longer used — see CHANGELOG v5.1.0.)

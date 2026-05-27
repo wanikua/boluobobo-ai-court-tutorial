@@ -1,5 +1,25 @@
 # 📜 Changelog
 
+## v5.1.0 (unreleased) — R1 Engine Robustness 🔧
+
+Backend robustness pass (iteration plan: [ITERATION_PLAN.md](./ITERATION_PLAN.md), Round 1). Focus: correctness, concurrency safety, and removing the hard external dependency on Gemini.
+
+### Fixed
+- **Tournament concurrency (P0)** — parallel civilizations previously shared a single global `~/.civagent/.active-regime` file (`switch` then `run`), so racing civs could all run as the same regime. `tournament.mjs` now spawns `run-v5.mjs` directly with an explicit regime + backend + match id per civ. No shared mutable state. (`engine/v5/tournament.mjs`)
+- **Gemini removed end-to-end (P0)** — Gemini was hard-coded as the tournament judge and the skill auditor, and was a civ backend in the team config. All paths now route through `engine/v5/judge.mjs`, which excludes Gemini structurally (it is filtered out of any provider chain). Generated CLAUDE.md, orchestration mode docs, and `providers.json` scrubbed too.
+- **Skill audit ordering** — cheap deterministic guards (injection + frontmatter) now run *before* spending an audit call; the auditor prefers a different engine than the extractor (codex) to avoid self-endorsement.
+
+### Added
+- **`engine/v5/backends.mjs`** — pluggable civ backend routing (`--backend`): maps `native`/`cn:*` ids to Claude-Code-compatible binaries. Fails fast on forbidden (gemini), incompatible (codex/opencode), or unknown backends instead of silently falling back to `claude`. Wires the previously-inert per-civ backend config into `run-v5.mjs`.
+- **`engine/v5/judge.mjs`** — evaluation/review provider with retry + fallback (codex → opencode reviewer → cc-glm). Never Gemini.
+- **`engine/v5/events.mjs` + `schemas/match-event.schema.json`** — structured per-match event stream (`~/.civagent/matches/<id>/events.jsonl` + `meta.json`) and tournament `manifest.json`. This is the stable contract the frontend consumes.
+- **Tests** — 9 → 32: backend routing, judge provider selection + gemini-exclusion guarantee, tournament spawn contract (proves no global `switch`), `run-v5` arg parsing. `skill-sediment` test now imports the real helpers instead of hand-copied regexes.
+
+### Notes
+- Civ backends are Claude-Code-compatible CLIs only (`claude`, `cc-*`). Codex/opencode are judges, not civ backends; the team config's `civ-rome` "codex" backend is an Agent-Team delegation hint, not a `run-v5` backend.
+
+---
+
 ## v5.0.1 (2026-04-14) — Engine Data Source Fix 🩹
 
 ### Critical fix

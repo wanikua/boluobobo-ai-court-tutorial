@@ -1,8 +1,9 @@
 {
+  "_policy": "gemini is disabled project-wide; it is intentionally absent from every list below. See engine/v5/judge.mjs and engine/v5/backends.mjs.",
   "strong": [
     { "id": "cc-opus",    "type": "cc",     "desc": "Claude Opus — best reasoning",        "cmd": "claude" },
     { "id": "codex",      "type": "codex",  "desc": "GPT-5.4 via Codex — code review",     "cmd": "codex" },
-    { "id": "gemini",     "type": "gemini", "desc": "Gemini 2.5 Pro — 1M context",          "cmd": "gemini" }
+    { "id": "cn-mimo",    "type": "cn-cc",  "desc": "MiMo (Xiaomi) — 1M ctx, flagship reasoning", "cmd": "cc-mimo" }
   ],
   "fast": [
     { "id": "cc-sonnet",  "type": "cc",     "desc": "Claude Sonnet — fast & capable",       "cmd": "claude" },
@@ -11,14 +12,29 @@
     { "id": "cn-kimi",    "type": "cn-cc",  "desc": "Kimi — 128K long context",              "cmd": "cc-kimi" },
     { "id": "cn-glm",     "type": "cn-cc",  "desc": "GLM — reasoning / Chinese NLU",         "cmd": "cc-glm" },
     { "id": "cn-stepfun", "type": "cn-cc",  "desc": "StepFun — math / logic",                "cmd": "cc-stepfun" },
-    { "id": "cn-minimax", "type": "cn-cc",  "desc": "MiniMax — high-speed inference",        "cmd": "cc-minimax" },
-    { "id": "cn-mimo",    "type": "cn-cc",  "desc": "MiMo (Xiaomi) — 1M ctx, flagship reasoning", "cmd": "cc-mimo" }
+    { "id": "cn-minimax", "type": "cn-cc",  "desc": "MiniMax — high-speed inference",        "cmd": "cc-minimax" }
   ],
+  "civ_backends": {
+    "_note": "Claude-Code-compatible backends a civilization can run on (run-v5 --backend). Mirrors engine/v5/backends.mjs.",
+    "native": "claude",
+    "cn:doubao": "cc-doubao",
+    "cn:qwen": "cc-qwen",
+    "cn:kimi": "cc-kimi",
+    "cn:glm": "cc-glm",
+    "cn:stepfun": "cc-stepfun",
+    "cn:minimax": "cc-minimax",
+    "cn:mimo": "cc-mimo"
+  },
+  "judge_chain": {
+    "_note": "Evaluation/review engines for tournament ranking + skill audit (engine/v5/judge.mjs). Never gemini.",
+    "tournament": ["codex", "opencode-reviewer", "cn-glm"],
+    "skill_audit": ["opencode-reviewer", "codex", "cn-glm"]
+  },
   "role_model_map": {
     "coordinator":        { "model": "sonnet",  "note": "Fast routing, low cost" },
     "engineering":        { "model": "opus",    "note": "Best code quality", "alt": "codex" },
     "review":             { "model": "opus",    "note": "Deep analysis",    "alt": "codex:adversarial-review" },
-    "research":           { "model": "opus",    "note": "Deep reasoning",   "alt": "gemini" },
+    "research":           { "model": "opus",    "note": "Deep reasoning",   "alt": "cn-mimo" },
     "data":               { "model": "sonnet",  "note": "Data analysis",    "alt": "cn-qwen" },
     "devops":             { "model": "sonnet",  "note": "Shell execution" },
     "content":            { "model": "sonnet",  "note": "Writing tasks",    "alt": "cn-doubao" },

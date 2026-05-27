@@ -19,10 +19,11 @@ v4 每局完全无状态。v5 引入 **跨局学习闭环**，让文明随对局
 ### 2. `skill-sediment.mjs` — 经验沉淀
 对局结束后：
 ```
-main CC → 读取 transcript
+main CC → 读取 transcript（结构化事件流 events.jsonl）
        → 调用 codex exec 提取「治理经验」
-       → 经 gemini -p 审核（避免幻觉/重复）
-       → 写入 regimes/<civ>/skills/learned-<YYYY-MM-DD>-<topic>.md
+       → 注入防护 + frontmatter 闸门（确定性，审稿前）
+       → 经 judge.mjs 独立审稿（opencode reviewer → codex 兜底，绝不用 gemini）
+       → 写入 regimes/<civ>/skills/learned-<YYYY-MM-DD>-<topic>-<matchId>.md
 ```
 skill 文件格式（与 agentskills.io 标准兼容）：
 ```yaml
@@ -39,24 +40,24 @@ description: 中书省草案与门下省审核冲突时的三轮反驳模板
 包装 v4 的 `regime-to-cc.mjs` 输出，在启动 CC 前：
 1. 设置 `HOME=~/.civagent/envs/<regime>/`
 2. 加载 `regimes/<civ>/skills/*.md` 到 CC skill 列表
-3. 对局中所有消息写入 `~/.civagent/transcripts/<match-id>.jsonl`
+3. 对局中所有消息写入结构化事件流 `~/.civagent/matches/<match-id>/events.jsonl`（+ `meta.json`，schema 见 `schemas/match-event.schema.json`）
 4. 退出时触发 `skill-sediment.mjs`
 
 ## MVP 范围（先验证闭环）
 4 个对照文明：
 - `china/tang` — checks-and-balances（Opus drafter + Codex reviewer）
 - `china/qin` — centralized（单 Opus，无审查）
-- `global/athens` — democratic（3 模型并行投票：Opus/Codex/Gemini）
+- `global/athens` — democratic（3 模型并行投票：Opus/Codex/MiMo）
 - `global/rome-republic` — checks-and-balances（对照唐朝）
 
-验证指标：连跑 5 局同题目，观察 `skills/learned-*.md` 是否出现重复治理 pattern，和裁判（第三方 Gemini）对「治理质量」打分趋势。
+验证指标：连跑 5 局同题目，观察 `skills/learned-*.md` 是否出现重复治理 pattern，和裁判（Codex via judge.mjs）对「治理质量」打分趋势。
 
 ## Agent Teams 编排
 创建 team `civagent-v5`：
 - `team-lead` (sonnet) — 裁判 + 出题
 - `civ-tang` (opus) — 唐朝 coordinator，沉淀 skill 到 china/tang
 - `civ-qin` (cc-doubao) — 秦朝 coordinator
-- `civ-athens` (gemini) — 雅典 coordinator
+- `civ-athens` (cc-glm) — 雅典 coordinator（gemini 已按项目策略移除，GLM 提供第三个模型族）
 - `civ-rome` (codex) — 罗马 coordinator
 
 team-lead 通过 inbox 派发同一题目给 4 个 civ，各自在隔离 HOME 里跑完，回报结果。
@@ -86,5 +87,5 @@ regimes/ 目录结构不变，仅新增 `regimes/<civ>/skills/` 子目录（可�
 - [ ] `bin/civagent` 增加 `--v5` / `skills` / `match-log` / `tournament`
 - [ ] Agent Team `civagent-v5` 配置
 - [ ] MVP 5 局测试 + 裁判评分
-- [ ] 交叉审查（Gemini + Codex）
+- [ ] 交叉审查（Codex + opencode；gemini 已移除）
 - [ ] PR to fork main

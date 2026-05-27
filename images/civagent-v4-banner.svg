@@ -21,7 +21,7 @@
   <text x="200" y="250" text-anchor="middle" fill="#d4a574" font-family="monospace" font-size="14">57 Regimes</text>
   <text x="400" y="250" text-anchor="middle" fill="#7ec8e3" font-family="monospace" font-size="14">6 Modes</text>
   <text x="600" y="250" text-anchor="middle" fill="#a3d977" font-family="monospace" font-size="14">10 Models</text>
-  <text x="800" y="250" text-anchor="middle" fill="#e8a0bf" font-family="monospace" font-size="14">CC + Codex + Gemini</text>
+  <text x="800" y="250" text-anchor="middle" fill="#e8a0bf" font-family="monospace" font-size="14">CC + Codex + MiMo</text>
   <text x="1000" y="250" text-anchor="middle" fill="#f0d9a0" font-family="monospace" font-size="14">6 CN Backends</text>
   <!-- Decorative lines -->
   <line x1="100" y1="160" x2="1100" y2="160" stroke="#333355" stroke-width="1"/>

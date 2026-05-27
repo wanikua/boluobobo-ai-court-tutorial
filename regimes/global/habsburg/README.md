@@ -60,7 +60,7 @@ The system governed one of Europe's most ethnically diverse states: Germans, Hun
 | Kaiser (共同君主) | Shared monarch, supreme arbiter | Claude Opus 4.6 | 0.5 | Highest |
 | Austrian PM (奥地利首相) | Head of Cisleithanian government | GPT-5.4 Pro | 0.6 | High |
 | Hungarian PM (匈牙利首相) | Head of Transleithanian government | GPT-5.4 | 0.6 | High |
-| Joint Foreign Minister (共同外交大臣) | Unified foreign policy | Gemini 3.1 Pro | 0.4 | High |
+| Joint Foreign Minister (共同外交大臣) | Unified foreign policy | MiMo v2 Pro | 0.4 | High |
 | Joint War Minister (共同陆军大臣) | k.u.k. armed forces | DeepSeek R2 | 0.4 | Medium |
 | Joint Finance Minister (共同财政大臣) | Shared budget & Quota | Kimi K2.5 | 0.3 | Medium |
 | Imperial Parliament (帝国议会) | Delegations oversight | Qwen3-Coder | 0.7 | Medium |

@@ -79,7 +79,7 @@ The HRE's governance architecture was an extremely decentralized federation. The
 | Agent | 历史角色 / Historical Role | AI 职责 / AI Responsibility | 推荐模型层级 / Model Tier |
 |---|---|---|---|
 | Emperor / 皇帝 | 选帝首尊，主持帝国事务 | 协调者（非独裁者），共识推动者 | Tier 1 (协调模型，如 Claude Opus 4.6) |
-| Elector of Mainz / 美因茨大主教 | 帝国首席大法官，桥梁角色 | 选举主持，宗教/世俗桥梁，议程设置 | Tier 2 (分析模型，如 Gemini 3.1 Pro) |
+| Elector of Mainz / 美因茨大主教 | 帝国首席大法官，桥梁角色 | 选举主持，宗教/世俗桥梁，议程设置 | Tier 2 (分析模型，如 MiMo v2 Pro) |
 | Elector of Saxony / 萨克森选帝侯 | 北方世俗诸侯代表 | 领域A的自治Agent（如后端） | Tier 2 (领域模型，如 Qwen3-Coder) |
 | Elector of Brandenburg / 勃兰登堡选帝侯 | 东部新兴力量代表 | 领域B的自治Agent（如前端） | Tier 2 (领域模型，如 DeepSeek R2) |
 | Imperial Diet / 帝国议会 | 三等级立法协商机构 | 多Agent辩论平台，共识形成机制 | Tier 1 (多模型讨论) |

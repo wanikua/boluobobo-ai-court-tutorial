@@ -32,7 +32,7 @@ ${BOLD}Usage:${NC}
                                         Parallel match across civilizations + judge ranking
   civagent agents                       Show generated CC agents for active regime
   civagent modes                        List 6 orchestration modes
-  civagent setup                        Check tool availability (CC, Codex, Gemini, cn-cc)
+  civagent setup                        Check tool availability (CC, Codex, opencode, cn-cc)
 
 ${BOLD}Examples:${NC}
   civagent switch china/tang
@@ -227,17 +227,17 @@ cmd_setup() {
     echo -e "  ${RED}✗${NC} Codex CLI      not found"
   fi
 
-  # Gemini
-  if command -v gemini &>/dev/null; then
-    echo -e "  ${GREEN}✓${NC} Gemini CLI     available"
+  # opencode (skill audit / review fallback judge)
+  if command -v opencode &>/dev/null; then
+    echo -e "  ${GREEN}✓${NC} opencode       available"
   else
-    echo -e "  ${RED}✗${NC} Gemini CLI     not found"
+    echo -e "  ${YELLOW}○${NC} opencode       not found (optional judge fallback)"
   fi
 
   # CN models
   echo ""
   echo -e "  ${BOLD}CN Model Backends:${NC}"
-  for cc in cc-doubao cc-qwen cc-kimi cc-glm cc-stepfun cc-minimax; do
+  for cc in cc-doubao cc-qwen cc-kimi cc-glm cc-stepfun cc-minimax cc-mimo; do
     if command -v "$cc" &>/dev/null; then
       echo -e "    ${GREEN}✓${NC} $cc"
     else
@@ -273,12 +273,16 @@ cmd_skills() {
 }
 
 cmd_match_log() {
-  local dir="$STATE_DIR/transcripts"
+  local dir="$STATE_DIR/matches"
   [[ -d "$dir" ]] || { echo "No matches yet."; return; }
   echo -e "${BOLD}Match history${NC}"
-  ls -1t "$dir" | head -20 | while read f; do
-    local size=$(wc -c < "$dir/$f")
-    echo "  $f  (${size}B)"
+  ls -1t "$dir" 2>/dev/null | head -20 | while read m; do
+    local meta="$dir/$m/meta.json"
+    if [[ -f "$meta" ]]; then
+      python3 -c "import json,sys;d=json.load(open(sys.argv[1]));print(f\"  {d.get('matchId','?')}  [{d.get('regime','?')} via {d.get('backend','?')}]  exit={d.get('exitCode','?')}\")" "$meta" 2>/dev/null || echo "  $m"
+    else
+      echo "  $m"
+    fi
   done
 }
 
