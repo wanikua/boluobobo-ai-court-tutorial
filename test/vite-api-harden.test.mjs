@@ -24,6 +24,23 @@ function safeResolve(root, ...segments) {
   return { ok: true, resolved };
 }
 
+function resolveFixedFile(validatedDir, filename) {
+  if (
+    filename === '.' ||
+    filename === '..' ||
+    filename.includes('/') ||
+    filename.includes('\\')
+  ) {
+    return null;
+  }
+  const resolvedDir = path.resolve(validatedDir);
+  const resolved = path.resolve(path.join(validatedDir, filename));
+  if (resolved !== resolvedDir && !resolved.startsWith(resolvedDir + path.sep)) {
+    return null;
+  }
+  return resolved;
+}
+
 function decodePathSegments(pathname) {
   return pathname.split('/').filter(Boolean).map((s) => {
     try {
@@ -100,15 +117,59 @@ test('safeResolve rejects segments with dots', () => {
   assert.equal(r.ok, false);
 });
 
+test('safeResolve rejects user-controlled "result.md" as a segment', () => {
+  const r = safeResolve('/base', 'result.md');
+  assert.equal(r.ok, false);
+});
+
 test('safeResolve rejects empty segment', () => {
   const r = safeResolve('/base', '');
   assert.equal(r.ok, false);
 });
 
+test('resolveFixedFile returns path for valid dir + fixed filename', () => {
+  const p = resolveFixedFile('/tmp/test-vite-api', 'result.md');
+  assert.notEqual(p, null);
+  assert.ok(p.endsWith(path.join('test-vite-api', 'result.md')));
+});
+
+test('resolveFixedFile returns null when fixed filename is "."', () => {
+  assert.equal(resolveFixedFile('/tmp/x', '.'), null);
+});
+
+test('resolveFixedFile returns null when fixed filename is ".."', () => {
+  assert.equal(resolveFixedFile('/tmp/x', '..'), null);
+});
+
+test('resolveFixedFile returns null when fixed filename contains slash', () => {
+  assert.equal(resolveFixedFile('/tmp/x', 'a/b'), null);
+});
+
+test('resolveFixedFile returns null when fixed filename contains backslash', () => {
+  assert.equal(resolveFixedFile('/tmp/x', 'a\\b'), null);
+});
+
+test('tournament result path: safeResolve validates id, then read fixed result.md', () => {
+  const resolved = safeResolve('/tmp/civagent', 'tournaments', 'match-01');
+  assert.equal(resolved.ok, true);
+  const resultPath = resolveFixedFile(resolved.resolved, 'result.md');
+  assert.notEqual(resultPath, null);
+  assert.ok(resultPath.endsWith(path.join('tournaments', 'match-01', 'result.md')));
+});
+
+test('tournament id ".." is rejected, result.md is never reached', () => {
+  const resolved = safeResolve('/tmp/civagent', 'tournaments', '..');
+  assert.equal(resolved.ok, false);
+});
+
+test('tournament id with dot is rejected', () => {
+  const resolved = safeResolve('/tmp/civagent', 'tournaments', 'bad.id');
+  assert.equal(resolved.ok, false);
+});
+
 test('decodePathSegments keeps encoded slashes in one segment (caught by safeResolve)', () => {
   const segs = decodePathSegments('/tournaments/id%2F..%2Fetc');
   const joined = segs.join('/');
-  // %2F decodes to '/' inside the segment, not as a path separator
   assert.match(joined, /\/\.\.\//);
 });
 

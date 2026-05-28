@@ -50,6 +50,26 @@ function safeResolve(
   return { ok: true, resolved };
 }
 
+function resolveFixedFile(
+  validatedDir: string,
+  filename: string
+): string | null {
+  if (
+    filename === '.' ||
+    filename === '..' ||
+    filename.includes('/') ||
+    filename.includes('\\')
+  ) {
+    return null;
+  }
+  const resolvedDir = path.resolve(validatedDir);
+  const resolved = path.resolve(path.join(validatedDir, filename));
+  if (resolved !== resolvedDir && !resolved.startsWith(resolvedDir + path.sep)) {
+    return null;
+  }
+  return resolved;
+}
+
 function parseEventsJsonl(raw: string): unknown[] {
   const events: unknown[] = [];
   const lines = raw.split('\n');
@@ -203,11 +223,14 @@ function civagentApiPlugin() {
                 if (fs.existsSync(manifestPath)) {
                   try {
                     const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-                    
+
                     let judgeResult = '';
-                    const resolvedResult = safeResolve(tournamentsDir, dir, 'result.md');
-                    if (resolvedResult.ok && fs.existsSync(resolvedResult.resolved)) {
-                      judgeResult = fs.readFileSync(resolvedResult.resolved, 'utf8');
+                    const resolvedDir = safeResolve(tournamentsDir, dir);
+                    if (resolvedDir.ok) {
+                      const resultPath = resolveFixedFile(resolvedDir.resolved, 'result.md');
+                      if (resultPath && fs.existsSync(resultPath)) {
+                        judgeResult = fs.readFileSync(resultPath, 'utf8');
+                      }
                     }
 
                     list.push({
@@ -239,11 +262,11 @@ function civagentApiPlugin() {
             if (fs.existsSync(manifestPath)) {
               try {
                 const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
-                
+
                 let judgeResult = '';
-                const resolvedResult = safeResolve(rootDir, 'tournaments', id, 'result.md');
-                if (resolvedResult.ok && fs.existsSync(resolvedResult.resolved)) {
-                  judgeResult = fs.readFileSync(resolvedResult.resolved, 'utf8');
+                const resultPath = resolveFixedFile(resolved.resolved, 'result.md');
+                if (resultPath && fs.existsSync(resultPath)) {
+                  judgeResult = fs.readFileSync(resultPath, 'utf8');
                 }
 
                 json(res, 200, {
