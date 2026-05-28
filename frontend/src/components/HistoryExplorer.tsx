@@ -2,6 +2,87 @@ import React, { useState } from 'react';
 import { History, Calendar, ShieldCheck, FileText, ChevronRight, Terminal } from 'lucide-react';
 import type { MatchSummary, MatchEvent } from '../types/api';
 
+function formatSediment(sediment: any): { label: string, status: 'saved' | 'rejected' | 'skipped' | 'error' | 'none', text: string } {
+  if (!sediment) {
+    return { label: 'None', status: 'none', text: 'No skill sedimentation recorded.' };
+  }
+
+  // If it's a string
+  if (typeof sediment === 'string') {
+    if (sediment === 'success') {
+      return { label: 'Saved', status: 'saved', text: 'Skill extracted successfully.' };
+    }
+    if (sediment.startsWith('failed') || sediment.includes('error') || sediment.includes('fail')) {
+      return { label: 'Failed', status: 'error', text: sediment };
+    }
+    return { label: 'Status', status: 'none', text: sediment };
+  }
+
+  // If it's an object
+  if (typeof sediment === 'object') {
+    if (sediment.saved) {
+      const parts = String(sediment.saved).split('/');
+      const filename = parts[parts.length - 1] || 'skill.md';
+      let text = `Skill saved: ${filename}`;
+      if (sediment.auditedBy) {
+        text += ` (Audited by: ${sediment.auditedBy})`;
+      }
+      return { label: 'Saved', status: 'saved', text };
+    }
+    if (sediment.rejected) {
+      let text = `Skill rejected: ${sediment.rejected}`;
+      if (sediment.auditedBy) {
+        text += ` (Audited by: ${sediment.auditedBy})`;
+      }
+      return { label: 'Rejected', status: 'rejected', text };
+    }
+    if (sediment.skipped) {
+      return { label: 'Skipped', status: 'skipped', text: `Skill skipped: ${sediment.skipped}` };
+    }
+    if (sediment.error) {
+      return { label: 'Error', status: 'error', text: `Error: ${sediment.error}` };
+    }
+  }
+
+  return { label: 'Status', status: 'none', text: String(JSON.stringify(sediment)) };
+}
+
+function formatSkillEvent(e: MatchEvent): { title: string, desc: string, color: string } {
+  if (e.status) {
+    let title = `SKILL ${e.status.toUpperCase()}`;
+    let desc = '';
+    let color = 'var(--accent-cyan)'; // default cyan for saved
+    if (e.status === 'saved') {
+      const parts = (e.skillPath || '').split('/');
+      const skillFile = parts[parts.length - 1] || 'skill.md';
+      desc = `Successfully extracted & registered new skill: ${skillFile}`;
+      if (e.auditedBy) {
+        desc += ` (Audited by: ${e.auditedBy})`;
+      }
+    } else if (e.status === 'rejected') {
+      desc = `Skill rejected: ${e.reason || 'does not meet criteria'}`;
+      if (e.auditedBy) {
+        desc += ` (Audited by: ${e.auditedBy})`;
+      }
+      color = 'var(--accent-crimson)'; // crimson
+    } else if (e.status === 'skipped') {
+      desc = `Skill skipped: ${e.reason || 'no novel patterns detected'}`;
+      color = 'var(--accent-gold)'; // gold
+    } else if (e.status === 'error') {
+      desc = `Skill sedimentation error: ${e.reason || 'internal error'}`;
+      color = 'var(--accent-crimson)'; // crimson
+    }
+    return { title, desc, color };
+  }
+  
+  // Legacy fallback
+  return {
+    title: 'SKILL EXTRACTED',
+    desc: e.text || 'Nous Hermes skill extracted successfully.',
+    color: 'var(--accent-cyan)'
+  };
+}
+
 interface HistoryExplorerProps {
   matches: MatchSummary[];
   onSelectMatch: (matchId: string) => void;
@@ -232,29 +313,15 @@ export const HistoryExplorer: React.FC<HistoryExplorerProps> = ({
                     const skillsToDisplay = [...skillEvents];
 
                     if (skillsToDisplay.length === 0 && matchMeta?.sediment) {
-                      if (matchMeta.sediment === 'success') {
+                      const formatted = formatSediment(matchMeta.sediment);
+                      if (formatted.status !== 'none') {
                         skillsToDisplay.push({
                           matchId: activeMatchId!,
                           ts: Date.now(),
                           type: 'skill',
                           seq: 999,
-                          text: 'Nous Hermes skill extracted successfully and saved to active registry.'
-                        });
-                      } else if (matchMeta.sediment.startsWith('failed')) {
-                        skillsToDisplay.push({
-                          matchId: activeMatchId!,
-                          ts: Date.now(),
-                          type: 'skill',
-                          seq: 999,
-                          text: `Skill sedimentation process finished with alert: ${matchMeta.sediment}`
-                        });
-                      } else {
-                        skillsToDisplay.push({
-                          matchId: activeMatchId!,
-                          ts: Date.now(),
-                          type: 'skill',
-                          seq: 999,
-                          text: `Skill status: ${matchMeta.sediment}`
+                          status: formatted.status as any,
+                          text: formatted.text
                         });
                       }
                     }
@@ -268,22 +335,25 @@ export const HistoryExplorer: React.FC<HistoryExplorerProps> = ({
                       );
                     }
 
-                    return skillsToDisplay.map((e, idx) => (
-                      <div key={idx} className="relative pl-6 border-l-2 border-[rgba(0,240,255,0.2)]" style={{ position: 'relative', paddingLeft: '24px', borderLeft: '2px solid rgba(0,240,255,0.2)' }}>
-                        <div
-                          className="absolute w-3.5 h-3.5 rounded-full bg-cyan-400 flex items-center justify-center"
-                          style={{ position: 'absolute', left: '-8px', top: '2px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: 'var(--accent-cyan)' }}
-                        >
-                          <ShieldCheck size={8} className="text-black" />
+                    return skillsToDisplay.map((e, idx) => {
+                      const formatted = formatSkillEvent(e);
+                      return (
+                        <div key={idx} className="relative pl-6 border-l-2" style={{ position: 'relative', paddingLeft: '24px', borderLeft: `2px solid ${formatted.color}` }}>
+                          <div
+                            className="absolute w-3.5 h-3.5 rounded-full flex items-center justify-center"
+                            style={{ position: 'absolute', left: '-8px', top: '2px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: formatted.color }}
+                          >
+                            <ShieldCheck size={8} className="text-black" />
+                          </div>
+                          <div>
+                            <span className="text-[10px] font-mono text-[var(--text-secondary)] block">STAGE: SEDIMENT (seq #{e.seq})</span>
+                            <p className="text-xs mt-1 leading-relaxed font-mono" style={{ fontSize: '11px', color: formatted.color, marginTop: '4px' }}>
+                              {formatted.desc}
+                            </p>
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-[10px] font-mono text-[var(--text-secondary)] block">STAGE: SEDIMENT (seq #{e.seq})</span>
-                          <p className="text-xs text-[#a0e9ee] mt-1 leading-relaxed font-mono" style={{ fontSize: '11px', color: '#a0e9ee', marginTop: '4px' }}>
-                            {e.text}
-                          </p>
-                        </div>
-                      </div>
-                    ));
+                      );
+                    });
                   })()}
                 </div>
               </div>

@@ -202,9 +202,18 @@ function civagentApiPlugin() {
                 const manifestPath = path.join(tournamentsDir, dir, 'manifest.json');
                 if (fs.existsSync(manifestPath)) {
                   try {
+                    const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+                    
+                    let judgeResult = '';
+                    const resolvedResult = safeResolve(tournamentsDir, dir, 'result.md');
+                    if (resolvedResult.ok && fs.existsSync(resolvedResult.resolved)) {
+                      judgeResult = fs.readFileSync(resolvedResult.resolved, 'utf8');
+                    }
+
                     list.push({
                       id: dir,
-                      manifest: JSON.parse(fs.readFileSync(manifestPath, 'utf8')),
+                      manifest,
+                      judgeResult,
                     });
                   } catch (err) {
                     console.error(`Error parsing tournament manifest: ${manifestPath}`, err);
@@ -228,8 +237,23 @@ function civagentApiPlugin() {
 
             const manifestPath = path.join(resolved.resolved, 'manifest.json');
             if (fs.existsSync(manifestPath)) {
-              res.setHeader('Content-Type', 'application/json');
-              res.end(fs.readFileSync(manifestPath, 'utf8'));
+              try {
+                const manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf8'));
+                
+                let judgeResult = '';
+                const resolvedResult = safeResolve(rootDir, 'tournaments', id, 'result.md');
+                if (resolvedResult.ok && fs.existsSync(resolvedResult.resolved)) {
+                  judgeResult = fs.readFileSync(resolvedResult.resolved, 'utf8');
+                }
+
+                json(res, 200, {
+                  id,
+                  manifest,
+                  judgeResult,
+                });
+              } catch (err: any) {
+                json(res, 500, { error: err.message });
+              }
             } else {
               json(res, 404, { error: `Tournament '${id}' not found` });
             }

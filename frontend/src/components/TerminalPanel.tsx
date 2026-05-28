@@ -9,7 +9,88 @@ interface TerminalPanelProps {
   events: MatchEvent[];
   isStreaming?: boolean;
   status: 'running' | 'completed' | 'failed' | 'idle';
-  sedimentStatus?: string;
+  sediment?: any;
+}
+
+function formatSediment(sediment: any): { label: string, status: 'saved' | 'rejected' | 'skipped' | 'error' | 'none', text: string } {
+  if (!sediment) {
+    return { label: 'None', status: 'none', text: 'No skill sedimentation recorded.' };
+  }
+
+  // If it's a string
+  if (typeof sediment === 'string') {
+    if (sediment === 'success') {
+      return { label: 'Saved', status: 'saved', text: 'Skill extracted successfully.' };
+    }
+    if (sediment.startsWith('failed') || sediment.includes('error') || sediment.includes('fail')) {
+      return { label: 'Failed', status: 'error', text: sediment };
+    }
+    return { label: 'Status', status: 'none', text: sediment };
+  }
+
+  // If it's an object
+  if (typeof sediment === 'object') {
+    if (sediment.saved) {
+      const parts = String(sediment.saved).split('/');
+      const filename = parts[parts.length - 1] || 'skill.md';
+      let text = `Skill saved: ${filename}`;
+      if (sediment.auditedBy) {
+        text += ` (Audited by: ${sediment.auditedBy})`;
+      }
+      return { label: 'Saved', status: 'saved', text };
+    }
+    if (sediment.rejected) {
+      let text = `Skill rejected: ${sediment.rejected}`;
+      if (sediment.auditedBy) {
+        text += ` (Audited by: ${sediment.auditedBy})`;
+      }
+      return { label: 'Rejected', status: 'rejected', text };
+    }
+    if (sediment.skipped) {
+      return { label: 'Skipped', status: 'skipped', text: `Skill skipped: ${sediment.skipped}` };
+    }
+    if (sediment.error) {
+      return { label: 'Error', status: 'error', text: `Error: ${sediment.error}` };
+    }
+  }
+
+  return { label: 'Status', status: 'none', text: String(JSON.stringify(sediment)) };
+}
+
+function formatSkillEvent(e: MatchEvent): { title: string, desc: string, color: string } {
+  if (e.status) {
+    let title = `SKILL ${e.status.toUpperCase()}`;
+    let desc = '';
+    let color = 'var(--accent-cyan)'; // default cyan for saved
+    if (e.status === 'saved') {
+      const parts = (e.skillPath || '').split('/');
+      const skillFile = parts[parts.length - 1] || 'skill.md';
+      desc = `Successfully extracted & registered new skill: ${skillFile}`;
+      if (e.auditedBy) {
+        desc += ` (Audited by: ${e.auditedBy})`;
+      }
+    } else if (e.status === 'rejected') {
+      desc = `Skill rejected: ${e.reason || 'does not meet criteria'}`;
+      if (e.auditedBy) {
+        desc += ` (Audited by: ${e.auditedBy})`;
+      }
+      color = 'var(--accent-crimson)'; // crimson
+    } else if (e.status === 'skipped') {
+      desc = `Skill skipped: ${e.reason || 'no novel patterns detected'}`;
+      color = 'var(--accent-gold)'; // gold
+    } else if (e.status === 'error') {
+      desc = `Skill sedimentation error: ${e.reason || 'internal error'}`;
+      color = 'var(--accent-crimson)'; // crimson
+    }
+    return { title, desc, color };
+  }
+  
+  // Legacy fallback
+  return {
+    title: 'SKILL EXTRACTED',
+    desc: e.text || 'Nous Hermes skill extracted successfully.',
+    color: 'var(--accent-cyan)'
+  };
 }
 
 export const TerminalPanel: React.FC<TerminalPanelProps> = ({
@@ -19,7 +100,7 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
   events = [],
   isStreaming = false,
   status,
-  sedimentStatus,
+  sediment,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const [autoScroll, setAutoScroll] = useState(true);
@@ -86,7 +167,7 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
     const term = searchTerm.toLowerCase();
     return (
       (e.actor && e.actor.toLowerCase().includes(term)) ||
-      e.text.toLowerCase().includes(term) ||
+      (e.text && e.text.toLowerCase().includes(term)) ||
       e.type.toLowerCase().includes(term)
     );
   });
@@ -204,6 +285,21 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
               }
 
               if (e.type === 'skill' || e.type === 'judge') {
+                if (e.type === 'skill') {
+                  const formatted = formatSkillEvent(e);
+                  return (
+                    <div key={index} className="p-2.5 rounded border flex items-start gap-2.5" style={{ display: 'flex', gap: '10px', background: `${formatted.color}08`, border: `1px solid ${formatted.color}26`, borderRadius: '4px', padding: '10px', color: formatted.color }}>
+                      <ShieldCheck className="shrink-0" size={14} style={{ marginTop: '2px', color: formatted.color }} />
+                      <div>
+                        <span className="font-semibold uppercase tracking-wider text-[9px] block mb-0.5" style={{ display: 'block', fontSize: '9px', fontWeight: 600, letterSpacing: '0.05em', marginBottom: '2px', color: formatted.color }}>
+                          {formatted.title}
+                        </span>
+                        <p className="text-xs text-[#ccd2eb]" style={{ fontSize: '12px', color: '#ccd2eb' }}>{formatted.desc}</p>
+                      </div>
+                    </div>
+                  );
+                }
+
                 return (
                   <div key={index} className="p-2.5 rounded border border-[rgba(0,240,255,0.15)] bg-[rgba(0,240,255,0.03)] text-[var(--accent-cyan)] flex items-start gap-2.5" style={{ display: 'flex', gap: '10px', background: 'rgba(0,240,255,0.03)', border: '1px solid rgba(0,240,255,0.15)', borderRadius: '4px', padding: '10px' }}>
                     <ShieldCheck className="shrink-0 text-cyan-400" size={14} style={{ marginTop: '2px' }} />
@@ -247,16 +343,23 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
       )}
 
       {/* Sediment sedimentation tag */}
-      {status === 'completed' && sedimentStatus && (
+      {status === 'completed' && sediment !== undefined && (
         <div className="px-4 py-1.5 bg-[#09151e] border-t border-[rgba(255,255,255,0.04)] text-[10px] flex items-center justify-between shrink-0" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 16px', borderTop: '1px solid rgba(255,255,255,0.04)', background: '#09151e', fontSize: '10px' }}>
           <span className="text-[var(--text-muted)]">CROSS-MATCH MEMORY LOOP:</span>
-          {sedimentStatus.includes('failed') ? (
-            <span className="text-[var(--accent-crimson)] font-mono">{sedimentStatus}</span>
-          ) : (
-            <span className="text-[var(--accent-cyan)] flex items-center gap-1 font-semibold" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
-              <ShieldCheck size={11} /> Skill Sedimented
-            </span>
-          )}
+          {(() => {
+            const formatted = formatSediment(sediment);
+            if (formatted.status === 'error' || formatted.status === 'rejected') {
+              return <span className="text-[var(--accent-crimson)] font-mono">{formatted.text}</span>;
+            }
+            if (formatted.status === 'skipped') {
+              return <span className="text-[var(--accent-gold)] font-mono">{formatted.text}</span>;
+            }
+            return (
+              <span className="text-[var(--accent-cyan)] flex items-center gap-1 font-semibold" style={{ display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 600 }}>
+                <ShieldCheck size={11} /> {formatted.text}
+              </span>
+            );
+          })()}
         </div>
       )}
     </div>

@@ -95,6 +95,7 @@ export const App: React.FC = () => {
   const [tournaments, setTournaments] = useState<any[]>([]);
   const [activeTournament, setActiveTournament] = useState<any | null>(null);
   const [realMatchEvents, setRealMatchEvents] = useState<{ [matchId: string]: MatchEvent[] }>({});
+  const [realMatchMetas, setRealMatchMetas] = useState<{ [matchId: string]: any }>({});
   const [isDemoMode, setIsDemoMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [apiError, setApiError] = useState<string | null>(null);
@@ -189,7 +190,7 @@ export const App: React.FC = () => {
         const res = await fetch(`/api/matches/${civ.matchId}`);
         if (res.ok) {
           const matchData = await res.json();
-          return { matchId: civ.matchId, events: matchData.events || [] };
+          return { matchId: civ.matchId, events: matchData.events || [], meta: matchData.meta };
         }
       } catch (e) {
         console.error(`Failed to fetch events for match ${civ.matchId}:`, e);
@@ -199,15 +200,21 @@ export const App: React.FC = () => {
 
     const results = await Promise.all(promises);
     const updatedEvents: { [matchId: string]: MatchEvent[] } = {};
+    const updatedMetas: { [matchId: string]: any } = {};
     results.forEach(res => {
       if (res) {
         updatedEvents[res.matchId] = res.events;
+        updatedMetas[res.matchId] = res.meta;
       }
     });
 
     setRealMatchEvents(prev => ({
       ...prev,
       ...updatedEvents
+    }));
+    setRealMatchMetas(prev => ({
+      ...prev,
+      ...updatedMetas
     }));
   };
 
@@ -219,12 +226,11 @@ export const App: React.FC = () => {
 
     // Check if any match in selected tournament is still running
     const hasRunning = activeTournament.manifest.civs.some((civ: any) => civ.exitCode === null);
+    if (!hasRunning) return;
 
     const interval = setInterval(() => {
       fetchRealTournamentEvents();
-      if (hasRunning) {
-        fetchTournaments(false);
-      }
+      fetchTournaments(false);
     }, 2000);
 
     return () => clearInterval(interval);
@@ -537,7 +543,7 @@ export const App: React.FC = () => {
                           backend={civ.backend}
                           events={evs}
                           status={civStatus}
-                          sedimentStatus={civStatus === 'completed' ? 'success' : undefined}
+                          sediment={civStatus === 'completed' ? 'success' : undefined}
                         />
                       );
                     })}
@@ -612,7 +618,8 @@ export const App: React.FC = () => {
                         const name = parts[parts.length - 1];
                         const displayName = name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
 
-                        const hasSediment = evs.some((e: any) => e.type === 'skill') || civ.exitCode === 0;
+                        const matchMeta = realMatchMetas[civ.matchId];
+                        const sediment = matchMeta ? matchMeta.sediment : undefined;
 
                         return (
                           <TerminalPanel
@@ -622,16 +629,17 @@ export const App: React.FC = () => {
                             backend={civ.backend}
                             events={evs}
                             status={civStatus}
-                            sedimentStatus={hasSediment ? 'success' : undefined}
+                            sediment={sediment}
                           />
                         );
                       })}
                     </div>
 
                     {/* Real scoreboard/Leaderboard (renders when judge Result is loaded) */}
-                    {activeTournament.judgeResult && (
+                    {(activeTournament.judgeResult || (activeTournament.manifest.judge && activeTournament.manifest.judge.scores && activeTournament.manifest.judge.scores.length > 0)) && (
                       <div className="animate-fade-in">
                         <JudgeLeaderboard
+                          manifest={activeTournament.manifest}
                           judgeResult={activeTournament.judgeResult}
                         />
                       </div>

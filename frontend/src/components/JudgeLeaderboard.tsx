@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Award, Star } from 'lucide-react';
+import type { TournamentManifest } from '../types/api';
 
 interface ScoreDetails {
   legality: number;
@@ -8,6 +9,7 @@ interface ScoreDetails {
 }
 
 interface JudgeLeaderboardProps {
+  manifest?: TournamentManifest; // Real tournament manifest containing structured judge scores/topRegime
   judgeResult?: string; // Real markdown results from result.md
   scores?: { [regime: string]: ScoreDetails };
   verdicts?: { [regime: string]: string };
@@ -65,24 +67,47 @@ function parseResultMarkdown(md: string): { ranks: ParsedRank[], verdict: string
 }
 
 export const JudgeLeaderboard: React.FC<JudgeLeaderboardProps> = ({
+  manifest,
   judgeResult,
   scores = {},
   verdicts = {},
   civNames = {},
 }) => {
-  // Use real data or mock data
-  const hasRealData = !!judgeResult;
-  const parsed = hasRealData ? parseResultMarkdown(judgeResult!) : { ranks: [], verdict: '' };
+  // Check if we have a real manifest with judge scores
+  const hasRealManifest = !!manifest && !!manifest.judge && Array.isArray(manifest.judge.scores) && manifest.judge.scores.length > 0;
+  
+  // Parse result.md if available
+  const hasRealResult = !!judgeResult;
+  const parsed = hasRealResult ? parseResultMarkdown(judgeResult!) : { ranks: [], verdict: '' };
 
-  const regimes = hasRealData ? parsed.ranks.map(r => r.civ) : Object.keys(scores);
-  const [selectedRegime, setSelectedRegime] = useState<string | null>(regimes[0] || null);
+  // Determine available regimes
+  let regimes: string[] = [];
+  if (hasRealManifest) {
+    regimes = manifest.judge.scores!.map(s => s.regime);
+  } else if (hasRealResult) {
+    regimes = parsed.ranks.map(r => r.civ);
+  } else {
+    regimes = Object.keys(scores);
+  }
+
+  // Determine default selected regime: prefer topRegime from manifest, then first in list
+  const initialRegime = (hasRealManifest && manifest.judge.topRegime) 
+    ? manifest.judge.topRegime 
+    : (regimes[0] || null);
+
+  const [selectedRegime, setSelectedRegime] = useState<string | null>(initialRegime);
 
   // Set default selected regime if regimes changes
   React.useEffect(() => {
-    if (regimes.length > 0 && (!selectedRegime || !regimes.includes(selectedRegime))) {
-      setSelectedRegime(regimes[0]);
+    if (regimes.length > 0) {
+      if (!selectedRegime || !regimes.includes(selectedRegime)) {
+        const topReg = (hasRealManifest && manifest.judge.topRegime) 
+          ? manifest.judge.topRegime 
+          : regimes[0];
+        setSelectedRegime(topReg);
+      }
     }
-  }, [judgeResult, regimes, selectedRegime]);
+  }, [manifest, judgeResult, regimes, selectedRegime]);
 
   if (regimes.length === 0) {
     return (
@@ -93,8 +118,11 @@ export const JudgeLeaderboard: React.FC<JudgeLeaderboardProps> = ({
   }
 
   const getAverageScore = (regime: string) => {
-    if (hasRealData) {
-      const r = parsed.ranks.find(rank => rank.civ === regime);
+    if (hasRealManifest) {
+      const s = manifest.judge.scores!.find(item => item.regime === regime);
+      return s ? s.score.toFixed(1) : '7.0';
+    } else if (hasRealResult) {
+      const r = parsed.ranks.find(rank => rank.civ === regime || rank.civ.includes(regime) || regime.includes(rank.civ));
       return r ? r.score.toFixed(1) : '7.0';
     } else {
       const s = scores[regime];
@@ -111,13 +139,15 @@ export const JudgeLeaderboard: React.FC<JudgeLeaderboardProps> = ({
     return { label: 'D', color: 'var(--accent-crimson)' };
   };
 
-  const sortedRegimes = hasRealData 
-    ? parsed.ranks.map(r => r.civ) 
-    : [...regimes].sort((a, b) => {
-        const avgA = parseFloat(getAverageScore(a));
-        const avgB = parseFloat(getAverageScore(b));
-        return avgB - avgA;
-      });
+  const sortedRegimes = hasRealManifest
+    ? regimes
+    : hasRealResult
+      ? regimes
+      : [...regimes].sort((a, b) => {
+          const avgA = parseFloat(getAverageScore(a));
+          const avgB = parseFloat(getAverageScore(b));
+          return avgB - avgA;
+        });
 
   const getCivName = (regime: string) => {
     const parts = regime.split('/');
@@ -126,12 +156,14 @@ export const JudgeLeaderboard: React.FC<JudgeLeaderboardProps> = ({
   };
 
   const getSelectedReason = (regime: string) => {
-    if (hasRealData) {
-      const r = parsed.ranks.find(rank => rank.civ === regime);
+    if (hasRealResult) {
+      const r = parsed.ranks.find(rank => rank.civ === regime || rank.civ.includes(regime) || regime.includes(rank.civ));
       return r ? r.reason : '';
     }
     return '';
   };
+
+  const hasRealData = hasRealManifest || hasRealResult;
 
   return (
     <div className="glass-panel glass-panel-gold p-6 space-y-6" style={{ padding: '24px', display: 'flex', flexDirection: 'column', gap: '24px' }}>

@@ -26,6 +26,12 @@ export interface RegimeDetail {
   skills: LearnedSkill[];
 }
 
+export interface JudgeScore {
+  regime: string;
+  score: number;
+  reason?: string;
+}
+
 export interface MatchEvent {
   matchId: string;
   regime?: string;
@@ -34,7 +40,11 @@ export interface MatchEvent {
   type: 'match_start' | 'turn' | 'tool' | 'judge' | 'skill' | 'match_end' | 'chunk';
   seq: number;
   actor?: string;
-  text: string;
+  text?: string;
+  status?: 'saved' | 'rejected' | 'skipped' | 'error';
+  skillPath?: string;
+  reason?: string;
+  auditedBy?: string | null;
   meta?: any;
 }
 
@@ -46,7 +56,13 @@ export interface MatchMeta {
   tsStart?: number;
   tsEnd?: number;
   exitCode?: number;
-  sediment?: string; // e.g. "failed: ..." or "success"
+  sediment?: string | {
+    saved?: string;
+    rejected?: string;
+    skipped?: string;
+    error?: string;
+    auditedBy?: string;
+  };
   prompt?: string;
   [key: string]: any;
 }
@@ -74,6 +90,8 @@ export interface TournamentManifest {
   judge: {
     provider: string | null;
     resultPath: string; // absolute path to result.md
+    scores?: JudgeScore[];
+    topRegime?: string | null;
   };
 }
 
