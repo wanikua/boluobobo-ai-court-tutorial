@@ -2,8 +2,13 @@
 
 export interface RegimeMetadata {
   id: string;
-  name?: string;
+  name?: string | { zh: string; en: string };
+  era?: { zh: string; en: string };
   epoch?: string;
+  region?: 'china' | 'global' | string;
+  system?: { zh: string; en: string };
+  description?: { zh: string; en: string };
+  agentCount?: number;
   orchestrationPattern: string;
   tags?: string[];
 }

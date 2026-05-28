@@ -36,6 +36,9 @@ function civagentApiPlugin() {
               if (!fs.existsSync(dir)) return;
               const files = fs.readdirSync(dir);
               for (const file of files) {
+                // Ignore templates or hidden directories/files starting with _ or .
+                if (file.startsWith('_') || file.startsWith('.')) continue;
+
                 const fullPath = path.join(dir, file);
                 if (fs.statSync(fullPath).isDirectory()) {
                   if (fs.existsSync(path.join(fullPath, 'metadata.json'))) {
@@ -80,6 +83,49 @@ function civagentApiPlugin() {
             walk(regimesDir);
             res.end(JSON.stringify(result));
             return;
+          }
+
+          // Endpoint: /api/regimes/:region/:id/identity
+          if (url.startsWith('/regimes/') && url.endsWith('/identity')) {
+            const parts = url.split('/').filter(Boolean);
+            if (parts.length >= 4) {
+              const region = parts[1];
+              const id = parts[2];
+
+              // Validation to prevent path traversal
+              const nameRegex = /^[a-zA-Z0-9_-]+$/;
+              if (!nameRegex.test(region) || !nameRegex.test(id)) {
+                res.statusCode = 400;
+                res.end(JSON.stringify({ error: 'Invalid region or regime ID' }));
+                return;
+              }
+
+              const projectRoot = path.resolve(__dirname, '..');
+              const regimesDir = path.join(projectRoot, 'regimes');
+              const identityPath = path.join(regimesDir, region, id, 'IDENTITY.md');
+              
+              const resolvedRegimesDir = path.resolve(regimesDir);
+              const resolvedIdentityPath = path.resolve(identityPath);
+
+              if (!resolvedIdentityPath.startsWith(resolvedRegimesDir + path.sep)) {
+                res.statusCode = 403;
+                res.end(JSON.stringify({ error: 'Access denied: path traversal detected' }));
+                return;
+              }
+
+              if (fs.existsSync(identityPath)) {
+                try {
+                  const raw = fs.readFileSync(identityPath, 'utf8');
+                  res.end(JSON.stringify({ id, region, raw }));
+                } catch (err: any) {
+                  res.statusCode = 500;
+                  res.end(JSON.stringify({ error: err.message }));
+                }
+              } else {
+                res.end(JSON.stringify({ id, region, raw: null }));
+              }
+              return;
+            }
           }
 
           // Endpoint: /api/tournaments

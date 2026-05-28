@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Zap, History, BookOpen, Play, Cpu } from 'lucide-react';
+import { Zap, History, BookOpen, Play, Cpu, Layers } from 'lucide-react';
 import type { RegimeDetail, MatchSummary, MatchEvent } from './types/api';
 import TerminalPanel from './components/TerminalPanel';
 import JudgeLeaderboard from './components/JudgeLeaderboard';
 import HistoryExplorer from './components/HistoryExplorer';
 import CodexBrowser from './components/CodexBrowser';
+import RegimeBrowser from './components/RegimeBrowser';
 
 // Premium Simulated Data for Sandbox Mode
 const MOCK_PROMPT = "Establish secure and robust border defense policies for agricultural frontiers facing seasonal tribal raids.";
@@ -84,7 +85,7 @@ const MOCK_JUDGE_VERDICTS = {
 };
 
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<'live' | 'history' | 'codex'>('live');
+  const [activeTab, setActiveTab] = useState<'live' | 'history' | 'codex' | 'regimes'>('live');
   const [regimes, setRegimes] = useState<RegimeDetail[]>([]);
   const [matches, setMatches] = useState<MatchSummary[]>([]);
   const [selectedMatch, setSelectedMatch] = useState<MatchSummary | null>(null);
@@ -295,6 +296,18 @@ export const App: React.FC = () => {
           >
             <BookOpen size={14} /> Regimes Codex
           </button>
+
+          <button
+            onClick={() => setActiveTab('regimes')}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg border text-xs font-semibold uppercase tracking-wider transition-all ${
+              activeTab === 'regimes'
+                ? 'bg-[rgba(0,240,255,0.06)] border-[rgba(0,240,255,0.3)] text-[var(--accent-cyan)] shadow-[0_0_12px_rgba(0,240,255,0.05)]'
+                : 'bg-transparent border-transparent text-[var(--text-secondary)] hover:bg-[rgba(255,255,255,0.02)]'
+            }`}
+            style={{ display: 'flex', alignItems: 'center', gap: '12px', fontSize: '11px', fontWeight: 600, padding: '12px 16px', textAlign: 'left' }}
+          >
+            <Layers size={14} /> Regimes Browser
+          </button>
         </nav>
 
         {/* Footer info */}
@@ -413,6 +426,11 @@ export const App: React.FC = () => {
           {/* TAB 3: REGIMES CODEX */}
           {activeTab === 'codex' && (
             <CodexBrowser regimes={regimes} />
+          )}
+
+          {/* TAB 4: REGIMES BROWSER */}
+          {activeTab === 'regimes' && (
+            <RegimeBrowser regimes={regimes} />
           )}
 
         </div>
