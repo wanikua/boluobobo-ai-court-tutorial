@@ -1,0 +1,283 @@
+/* Modern, High-Fidelity UI Design System for CivAgent */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700&family=Fira+Code:wght@400;500&display=swap');
+
+:root {
+  /* Color Palette - Dark Mode Centered */
+  --bg-primary: #0a0b10;
+  --bg-secondary: #121420;
+  --bg-tertiary: #1b1e32;
+  --bg-glass: rgba(18, 20, 32, 0.65);
+  --bg-glass-hover: rgba(27, 30, 50, 0.8);
+  
+  --border-glass: rgba(255, 255, 255, 0.06);
+  --border-glass-glow: rgba(0, 240, 255, 0.25);
+  --border-glass-active: rgba(255, 215, 0, 0.3);
+
+  --text-primary: #f3f4f6;
+  --text-secondary: #9ca3af;
+  --text-muted: #6b7280;
+
+  /* Accent Glows */
+  --accent-cyan: #00f0ff;
+  --accent-purple: #bd00ff;
+  --accent-gold: #ffd700;
+  --accent-crimson: #ff2e93;
+  --accent-green: #39ff14;
+
+  /* Font Families */
+  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
+  --font-heading: 'Outfit', var(--font-sans);
+  --font-mono: 'Fira Code', ui-monospace, monospace;
+
+  /* Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-normal: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Shadows */
+  --shadow-glow-cyan: 0 0 15px rgba(0, 240, 255, 0.15);
+  --shadow-glow-gold: 0 0 15px rgba(255, 215, 0, 0.15);
+  --shadow-glow-purple: 0 0 20px rgba(189, 0, 255, 0.2);
+  --shadow-card: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-primary);
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(189, 0, 255, 0.08) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(0, 240, 255, 0.08) 0px, transparent 50%);
+  background-attachment: fixed;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Typography styling */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+code {
+  font-family: var(--font-mono);
+}
+
+/* Custom Glassmorphism Card Style */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--border-glass);
+  border-radius: 12px;
+  box-shadow: var(--shadow-card);
+  transition: all var(--transition-normal);
+}
+
+.glass-panel:hover {
+  background: var(--bg-glass-hover);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.glass-panel-cyan {
+  border-color: rgba(0, 240, 255, 0.15);
+  box-shadow: var(--shadow-glow-cyan), var(--shadow-card);
+}
+
+.glass-panel-cyan:hover {
+  border-color: var(--border-glass-glow);
+}
+
+.glass-panel-gold {
+  border-color: rgba(255, 215, 0, 0.15);
+  box-shadow: var(--shadow-glow-gold), var(--shadow-card);
+}
+
+.glass-panel-gold:hover {
+  border-color: var(--border-glass-active);
+}
+
+/* Live Badge Glow */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 9999px;
+  background: rgba(255, 46, 147, 0.1);
+  border: 1px solid rgba(255, 46, 147, 0.3);
+  color: var(--accent-crimson);
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-family: var(--font-heading);
+}
+
+.live-badge::before {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background-color: var(--accent-crimson);
+  box-shadow: 0 0 8px var(--accent-crimson);
+  animation: pulse-glow 1.5s infinite;
+}
+
+@keyframes pulse-glow {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 0 12px var(--accent-crimson);
+  }
+  100% {
+    transform: scale(0.9);
+    opacity: 0.6;
+  }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fadeIn var(--transition-normal) forwards;
+}
+
+/* Scroll Fades */
+.scroll-fade-y {
+  mask-image: linear-gradient(to bottom, transparent, black 15px, black calc(100% - 15px), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, black 15px, black calc(100% - 15px), transparent);
+}
+
+/* Role Badges for Logs */
+.role-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.role-coordinator {
+  background: rgba(255, 215, 0, 0.1);
+  color: var(--accent-gold);
+  border: 1px solid rgba(255, 215, 0, 0.25);
+}
+
+.role-engineering {
+  background: rgba(189, 0, 255, 0.1);
+  color: #d8b4fe;
+  border: 1px solid rgba(189, 0, 255, 0.25);
+}
+
+.role-review {
+  background: rgba(255, 46, 147, 0.1);
+  color: #fda4af;
+  border: 1px solid rgba(255, 46, 147, 0.25);
+}
+
+.role-research {
+  background: rgba(0, 240, 255, 0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0, 240, 255, 0.25);
+}
+
+.role-data {
+  background: rgba(57, 255, 20, 0.1);
+  color: #86efac;
+  border: 1px solid rgba(57, 255, 20, 0.25);
+}
+
+.role-management {
+  background: rgba(249, 115, 22, 0.1);
+  color: #fdba74;
+  border: 1px solid rgba(249, 115, 22, 0.25);
+}
+
+.role-content {
+  background: rgba(236, 72, 153, 0.1);
+  color: #fbcfe8;
+  border: 1px solid rgba(236, 72, 153, 0.25);
+}
+
+.role-devops {
+  background: rgba(14, 165, 233, 0.1);
+  color: #7dd3fc;
+  border: 1px solid rgba(14, 165, 233, 0.25);
+}
+
+.role-legal {
+  background: rgba(234, 179, 8, 0.1);
+  color: #fef08a;
+  border: 1px solid rgba(234, 179, 8, 0.25);
+}
+
+/* Custom interactive inputs styling */
+input[type="text"], select {
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-glass);
+  color: var(--text-primary);
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-family: var(--font-sans);
+  transition: all var(--transition-fast);
+}
+
+input[type="text"]:focus, select:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 8px rgba(0, 240, 255, 0.2);
+}
+
+button {
+  cursor: pointer;
+  border-radius: 8px;
+  font-family: var(--font-heading);
+  font-weight: 500;
+  transition: all var(--transition-fast);
+}
+
+button:active {
+  transform: scale(0.98);
+}
