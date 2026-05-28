@@ -110,7 +110,20 @@ async function main() {
     log.emit("turn", { text: chunk.toString() });
   });
 
-  const exitCode = await new Promise((res) => cc.on("close", res));
+  let exitCode;
+  try {
+    exitCode = await new Promise((res, rej) => {
+      cc.on("error", rej);
+      cc.on("close", res);
+    });
+  } catch (err) {
+    // Binary not found or failed to spawn (e.g. ENOENT).
+    console.error(`[v5] backend spawn failed: ${err.message}`);
+    log.emit("match_end", { exitCode: null, error: err.message });
+    await log.close();
+    writeMeta(matchId, { endedAt: Date.now(), exitCode: null, status: "failed", error: err.message });
+    process.exit(2);
+  }
   log.emit("match_end", { exitCode });
   await log.close();
 

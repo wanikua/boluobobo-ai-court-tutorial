@@ -16,7 +16,7 @@ import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import { validateRegime } from "./civ-memory.mjs";
 import { runJudge } from "./judge.mjs";
-import { readMatchText } from "./events.mjs";
+import { readMatchText, eventsPath } from "./events.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, "..", "..");
@@ -34,7 +34,8 @@ Output ONLY a markdown table with columns: Rank | Civilization | Score /10 | One
 Then one paragraph: "## Verdict" explaining the top choice.`;
 
 function newTournamentId() {
-  return new Date().toISOString().replace(/[:.]/g, "-").slice(0, 19);
+  const stamp = new Date().toISOString().replace(/[:.]/g, "-").slice(0, 23); // ms precision
+  return `${stamp}-${Math.random().toString(36).slice(2, 6)}`;
 }
 
 // Parse "regime" or "regime#backend" into { regime, backend }.
@@ -131,9 +132,9 @@ export async function runTournament({ civs, task }) {
       backend: r.backend,
       matchId: r.matchId,
       exitCode: r.code,
-      events: `matches/${r.matchId}/events.jsonl`,
+      events: eventsPath(r.matchId),
     })),
-    judge: { provider: verdict.provider, resultPath: "result.md" },
+    judge: { provider: verdict.provider, resultPath: resultFile },
   };
   fs.writeFileSync(path.join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
