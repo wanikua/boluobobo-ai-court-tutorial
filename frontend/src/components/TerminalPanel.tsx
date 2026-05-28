@@ -16,7 +16,7 @@ export const TerminalPanel: React.FC<TerminalPanelProps> = ({
   regimeId,
   displayName,
   backend = 'claude-3-5-sonnet',
-  events,
+  events = [],
   isStreaming = false,
   status,
   sedimentStatus,

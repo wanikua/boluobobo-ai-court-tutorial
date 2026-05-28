@@ -80,4 +80,5 @@ export interface TournamentManifest {
 export interface TournamentSummary {
   id: string;
   manifest: TournamentManifest;
+  judgeResult?: string;
 }

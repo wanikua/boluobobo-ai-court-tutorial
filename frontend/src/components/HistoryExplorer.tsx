@@ -226,31 +226,65 @@ export const HistoryExplorer: React.FC<HistoryExplorerProps> = ({
                 </div>
 
                 <div className="flex-1 bg-[rgba(10,11,16,0.3)] rounded border border-[rgba(255,255,255,0.04)] p-4 overflow-y-auto" style={{ flex: 1, overflowY: 'auto', padding: '16px', border: '1px solid rgba(255,255,255,0.04)', display: 'flex', flexDirection: 'column', gap: '16px' }}>
-                  {activeMatchEvents.filter(e => e.type === 'skill').length === 0 ? (
-                    <div className="flex flex-col items-center justify-center h-full text-[var(--text-muted)] text-xs italic gap-2" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '8px', fontSize: '12px' }}>
-                      <ShieldCheck size={28} className="text-[rgba(255,255,255,0.06)]" />
-                      <span>No skills sedimented in this match.</span>
-                    </div>
-                  ) : (
-                    activeMatchEvents
-                      .filter(e => e.type === 'skill')
-                      .map((e, idx) => (
-                        <div key={idx} className="relative pl-6 border-l-2 border-[rgba(0,240,255,0.2)]" style={{ position: 'relative', paddingLeft: '24px', borderLeft: '2px solid rgba(0,240,255,0.2)' }}>
-                          <div
-                            className="absolute w-3.5 h-3.5 rounded-full bg-cyan-400 flex items-center justify-center"
-                            style={{ position: 'absolute', left: '-8px', top: '2px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: 'var(--accent-cyan)' }}
-                          >
-                            <ShieldCheck size={8} className="text-black" />
-                          </div>
-                          <div>
-                            <span className="text-[10px] font-mono text-[var(--text-secondary)] block">STAGE: SEDIMENT (seq #{e.seq})</span>
-                            <p className="text-xs text-[#a0e9ee] mt-1 leading-relaxed font-mono" style={{ fontSize: '11px', color: '#a0e9ee', marginTop: '4px' }}>
-                              {e.text}
-                            </p>
-                          </div>
+                  {(() => {
+                    const matchMeta = matches.find(m => m.id === activeMatchId)?.meta;
+                    const skillEvents = activeMatchEvents.filter(e => e.type === 'skill');
+                    const skillsToDisplay = [...skillEvents];
+
+                    if (skillsToDisplay.length === 0 && matchMeta?.sediment) {
+                      if (matchMeta.sediment === 'success') {
+                        skillsToDisplay.push({
+                          matchId: activeMatchId!,
+                          ts: Date.now(),
+                          type: 'skill',
+                          seq: 999,
+                          text: 'Nous Hermes skill extracted successfully and saved to active registry.'
+                        });
+                      } else if (matchMeta.sediment.startsWith('failed')) {
+                        skillsToDisplay.push({
+                          matchId: activeMatchId!,
+                          ts: Date.now(),
+                          type: 'skill',
+                          seq: 999,
+                          text: `Skill sedimentation process finished with alert: ${matchMeta.sediment}`
+                        });
+                      } else {
+                        skillsToDisplay.push({
+                          matchId: activeMatchId!,
+                          ts: Date.now(),
+                          type: 'skill',
+                          seq: 999,
+                          text: `Skill status: ${matchMeta.sediment}`
+                        });
+                      }
+                    }
+
+                    if (skillsToDisplay.length === 0) {
+                      return (
+                        <div className="flex flex-col items-center justify-center h-full text-[var(--text-muted)] text-xs italic gap-2" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', gap: '8px', fontSize: '12px' }}>
+                          <ShieldCheck size={28} className="text-[rgba(255,255,255,0.06)]" />
+                          <span>No skills sedimented in this match.</span>
                         </div>
-                      ))
-                  )}
+                      );
+                    }
+
+                    return skillsToDisplay.map((e, idx) => (
+                      <div key={idx} className="relative pl-6 border-l-2 border-[rgba(0,240,255,0.2)]" style={{ position: 'relative', paddingLeft: '24px', borderLeft: '2px solid rgba(0,240,255,0.2)' }}>
+                        <div
+                          className="absolute w-3.5 h-3.5 rounded-full bg-cyan-400 flex items-center justify-center"
+                          style={{ position: 'absolute', left: '-8px', top: '2px', width: '14px', height: '14px', borderRadius: '50%', backgroundColor: 'var(--accent-cyan)' }}
+                        >
+                          <ShieldCheck size={8} className="text-black" />
+                        </div>
+                        <div>
+                          <span className="text-[10px] font-mono text-[var(--text-secondary)] block">STAGE: SEDIMENT (seq #{e.seq})</span>
+                          <p className="text-xs text-[#a0e9ee] mt-1 leading-relaxed font-mono" style={{ fontSize: '11px', color: '#a0e9ee', marginTop: '4px' }}>
+                            {e.text}
+                          </p>
+                        </div>
+                      </div>
+                    ));
+                  })()}
                 </div>
               </div>
 

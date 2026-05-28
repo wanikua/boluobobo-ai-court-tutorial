@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Zap, History, BookOpen, Play, Cpu, Layers } from 'lucide-react';
+import { Zap, History, BookOpen, Play, Cpu, Layers, RefreshCw, AlertCircle, PlayCircle } from 'lucide-react';
 import type { RegimeDetail, MatchSummary, MatchEvent } from './types/api';
 import TerminalPanel from './components/TerminalPanel';
 import JudgeLeaderboard from './components/JudgeLeaderboard';
@@ -91,7 +91,15 @@ export const App: React.FC = () => {
   const [selectedMatch, setSelectedMatch] = useState<MatchSummary | null>(null);
   const [selectedMatchEvents, setSelectedMatchEvents] = useState<MatchEvent[]>([]);
 
-  // Live simulation states
+  // Real Tournament states
+  const [tournaments, setTournaments] = useState<any[]>([]);
+  const [activeTournament, setActiveTournament] = useState<any | null>(null);
+  const [realMatchEvents, setRealMatchEvents] = useState<{ [matchId: string]: MatchEvent[] }>({});
+  const [isDemoMode, setIsDemoMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [apiError, setApiError] = useState<string | null>(null);
+
+  // Live simulation states for Demo mode
   const [isSimulating, setIsSimulating] = useState(false);
   const [simulationStatus, setSimulationStatus] = useState<'running' | 'completed' | 'idle'>('idle');
   const [simulationEvents, setSimulationEvents] = useState<{ [regime: string]: MatchEvent[] }>({
@@ -105,6 +113,7 @@ export const App: React.FC = () => {
   useEffect(() => {
     fetchRegimes();
     fetchMatches();
+    fetchTournaments(true);
   }, []);
 
   const fetchRegimes = async () => {
@@ -130,6 +139,96 @@ export const App: React.FC = () => {
       console.warn("Failed to fetch matches.", e);
     }
   };
+
+  const fetchTournaments = async (selectLatest = false) => {
+    setIsLoading(true);
+    setApiError(null);
+    try {
+      const res = await fetch('/api/tournaments');
+      if (res.ok) {
+        const data = await res.json();
+        setTournaments(data);
+        
+        if (data.length > 0) {
+          // Sort to find the latest
+          const sorted = [...data].sort((a, b) => b.manifest.createdAt - a.manifest.createdAt);
+          if (selectLatest || !activeTournament) {
+            setActiveTournament(sorted[0]);
+            setIsDemoMode(false); // Default to real if found
+          } else {
+            // Sync current active tournament if it exists
+            const currentSync = data.find((t: any) => t.id === activeTournament.id);
+            if (currentSync) {
+              setActiveTournament(currentSync);
+            }
+          }
+        } else {
+          // No tournaments in ~/.civagent. Activate Demo fallback!
+          setIsDemoMode(true);
+        }
+      } else {
+        setApiError("Failed to fetch tournaments from the server middleware.");
+        setIsDemoMode(true);
+      }
+    } catch (e: any) {
+      console.error("Failed to load tournaments:", e);
+      setApiError("Local API server offline or inaccessible.");
+      setIsDemoMode(true);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const fetchRealTournamentEvents = async () => {
+    if (!activeTournament || isDemoMode) return;
+    const civs = activeTournament.manifest.civs || [];
+    
+    // Fetch each civ's match details in parallel
+    const promises = civs.map(async (civ: any) => {
+      try {
+        const res = await fetch(`/api/matches/${civ.matchId}`);
+        if (res.ok) {
+          const matchData = await res.json();
+          return { matchId: civ.matchId, events: matchData.events || [] };
+        }
+      } catch (e) {
+        console.error(`Failed to fetch events for match ${civ.matchId}:`, e);
+      }
+      return null;
+    });
+
+    const results = await Promise.all(promises);
+    const updatedEvents: { [matchId: string]: MatchEvent[] } = {};
+    results.forEach(res => {
+      if (res) {
+        updatedEvents[res.matchId] = res.events;
+      }
+    });
+
+    setRealMatchEvents(prev => ({
+      ...prev,
+      ...updatedEvents
+    }));
+  };
+
+  // Real data polling hook
+  useEffect(() => {
+    if (isDemoMode || !activeTournament) return;
+
+    fetchRealTournamentEvents();
+
+    // Check if any match in selected tournament is still running
+    const hasRunning = activeTournament.manifest.civs.some((civ: any) => civ.exitCode === null);
+
+    const interval = setInterval(() => {
+      fetchRealTournamentEvents();
+      if (hasRunning) {
+        fetchTournaments(false);
+      }
+    }, 2000);
+
+    return () => clearInterval(interval);
+  }, [activeTournament, isDemoMode]);
 
   const fetchMatchDetails = async (matchId: string) => {
     try {
@@ -329,10 +428,57 @@ export const App: React.FC = () => {
             <span className="text-xs font-mono text-[var(--text-secondary)]">/Users/leo/Projects/civagent</span>
           </div>
 
+          {/* Mode Switcher */}
           <div className="flex items-center gap-3" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <span className="text-[10px] font-mono bg-[rgba(255,255,255,0.04)] border border-[rgba(255,255,255,0.06)] px-2 py-0.5 rounded text-[var(--text-secondary)]" style={{ fontSize: '10px', padding: '2px 8px' }}>
-              Models: 10 backends
-            </span>
+            
+            {/* API Status */}
+            {apiError && !isDemoMode && (
+              <span className="flex items-center gap-1 text-[10px] text-amber-400 font-mono" title={apiError}>
+                <AlertCircle size={12} /> Server Error
+              </span>
+            )}
+
+            {/* Mode Indicator & Selector */}
+            <div className="flex bg-[rgba(0,0,0,0.4)] border border-[rgba(255,255,255,0.08)] p-0.5 rounded-lg text-[10px] font-semibold" style={{ display: 'flex', padding: '2px', borderRadius: '8px' }}>
+              <button
+                onClick={() => {
+                  if (tournaments.length === 0) {
+                    alert("No real tournaments found in ~/.civagent. Run a CLI tournament first or stay in Demo mode.");
+                    return;
+                  }
+                  setIsDemoMode(false);
+                }}
+                className={`px-3 py-1 rounded transition-all uppercase tracking-wider ${
+                  !isDemoMode 
+                    ? 'bg-[var(--accent-cyan)] text-black font-bold shadow-[0_0_8px_rgba(0,240,255,0.2)]'
+                    : 'text-[var(--text-secondary)] hover:text-white'
+                }`}
+                style={{ padding: '4px 10px', borderRadius: '6px' }}
+              >
+                Live Monitor
+              </button>
+              <button
+                onClick={() => setIsDemoMode(true)}
+                className={`px-3 py-1 rounded transition-all uppercase tracking-wider ${
+                  isDemoMode 
+                    ? 'bg-amber-400 text-black font-bold shadow-[0_0_8px_rgba(251,191,36,0.2)]'
+                    : 'text-[var(--text-secondary)] hover:text-white'
+                }`}
+                style={{ padding: '4px 10px', borderRadius: '6px' }}
+              >
+                Simulated Demo
+              </button>
+            </div>
+
+            <button
+              onClick={() => fetchTournaments(true)}
+              className="p-1.5 rounded border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] text-[var(--text-secondary)] hover:text-white hover:border-[rgba(255,255,255,0.15)] transition-all"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
+              title="Refresh local tournament manifests"
+            >
+              <RefreshCw size={12} className={isLoading ? 'animate-spin' : ''} />
+            </button>
+
           </div>
         </header>
 
@@ -343,71 +489,193 @@ export const App: React.FC = () => {
           {activeTab === 'live' && (
             <div className="space-y-6" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
               
-              {/* Task/Prompt Overview Card */}
-              <div className="glass-panel p-5 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', padding: '20px', borderRadius: '12px' }}>
-                <div className="space-y-2 max-w-[70%]" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '70%' }}>
-                  <div className="flex items-center gap-2 text-[10px] text-[var(--accent-cyan)] font-mono uppercase tracking-wider" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px', fontWeight: 600 }}>
-                    <Cpu size={12} />
-                    <span>ORCHESTRATION CONSOLE COMMAND</span>
+              {isDemoMode ? (
+                /* ---------------- DEMO MODE VIEW ---------------- */
+                <div className="space-y-6" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                  {/* Task/Prompt Overview Card */}
+                  <div className="glass-panel p-5 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', padding: '20px', borderRadius: '12px', border: '1px solid rgba(251, 191, 36, 0.2)' }}>
+                    <div className="space-y-2 max-w-[70%]" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '70%' }}>
+                      <div className="flex items-center gap-2 text-[10px] text-amber-400 font-mono uppercase tracking-wider" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px', fontWeight: 600 }}>
+                        <PlayCircle size={12} />
+                        <span>SIMULATED SANDBOX MONITOR ACTIVE</span>
+                      </div>
+                      <h2 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontSize: '14px', fontWeight: 600 }}>
+                        Sandbox Prompt: <span className="font-mono text-[var(--text-secondary)] font-normal">"{MOCK_PROMPT}"</span>
+                      </h2>
+                    </div>
+
+                    <div className="shrink-0" style={{ display: 'flex', gap: '12px' }}>
+                      <button
+                        onClick={handleStartSimulation}
+                        disabled={simulationStatus === 'running'}
+                        className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
+                          simulationStatus === 'running'
+                            ? 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] text-[var(--text-muted)] cursor-not-allowed'
+                            : 'bg-amber-400 text-black border-amber-400 hover:bg-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.2)]'
+                        }`}
+                        style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '11px', fontWeight: 700, color: simulationStatus === 'running' ? 'var(--text-muted)' : 'black', background: simulationStatus === 'running' ? 'rgba(255,255,255,0.02)' : 'var(--accent-gold)', borderStyle: 'solid' }}
+                      >
+                        <Play size={14} /> Run Simulation
+                      </button>
+                    </div>
                   </div>
-                  <h2 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontSize: '14px', fontWeight: 600 }}>
-                    Active Prompt: <span className="font-mono text-[var(--text-secondary)] font-normal">"{MOCK_PROMPT}"</span>
-                  </h2>
+
+                  {/* Parallel terminals grid */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                    {SIMULATION_CIVS.map((civ) => {
+                      const evs = simulationEvents[civ.id] || [];
+                      const civStatus = 
+                        simulationStatus === 'idle' ? 'idle' :
+                        simulationStatus === 'running' && evs.length === 0 ? 'idle' :
+                        simulationStatus === 'running' ? 'running' : 'completed';
+
+                      return (
+                        <TerminalPanel
+                          key={civ.id}
+                          regimeId={civ.id}
+                          displayName={civ.name}
+                          backend={civ.backend}
+                          events={evs}
+                          status={civStatus}
+                          sedimentStatus={civStatus === 'completed' ? 'success' : undefined}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  {/* Tournament scoreboard/Leaderboard (renders when completed) */}
+                  {simulationStatus === 'completed' && (
+                    <div className="animate-fade-in">
+                      <JudgeLeaderboard
+                        scores={MOCK_JUDGE_SCORES}
+                        verdicts={MOCK_JUDGE_VERDICTS}
+                        civNames={{
+                          'china/tang': 'Tang Dynasty',
+                          'global/roman-republic': 'Roman Republic',
+                          'global/soviet': 'Soviet Union',
+                          'global/prussia': 'Kingdom of Prussia',
+                        }}
+                      />
+                    </div>
+                  )}
                 </div>
+              ) : (
+                /* ---------------- REAL GOVERNANCE TOURNAMENT MONITOR ---------------- */
+                activeTournament ? (
+                  <div className="space-y-6 animate-fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+                    
+                    {/* Real Tournament Info Card */}
+                    <div className="glass-panel p-5 flex flex-col md:flex-row items-center justify-between gap-5 relative overflow-hidden" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', padding: '20px', borderRadius: '12px', border: '1px solid rgba(0, 240, 255, 0.2)' }}>
+                      <div className="space-y-2 max-w-[70%]" style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxWidth: '70%' }}>
+                        <div className="flex items-center gap-2 text-[10px] text-[var(--accent-cyan)] font-mono uppercase tracking-wider" style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '10px', fontWeight: 600 }}>
+                          <Cpu size={12} />
+                          <span>REAL-TIME GOVERNANCE MONITOR ACTIVE</span>
+                        </div>
+                        <h2 className="text-sm font-semibold text-[var(--text-primary)]" style={{ fontSize: '14px', fontWeight: 600 }}>
+                          Active Prompt: <span className="font-mono text-[var(--text-secondary)] font-normal">"{activeTournament.manifest.task}"</span>
+                        </h2>
+                        <span className="text-[10px] text-[var(--text-muted)] font-mono block">
+                          TOURNAMENT ID: {activeTournament.id} · STARTED: {new Date(activeTournament.manifest.createdAt).toLocaleString()}
+                        </span>
+                      </div>
 
-                <div className="shrink-0" style={{ display: 'flex', gap: '12px' }}>
-                  <button
-                    onClick={handleStartSimulation}
-                    disabled={simulationStatus === 'running'}
-                    className={`flex items-center gap-2 px-5 py-2.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all border ${
-                      simulationStatus === 'running'
-                        ? 'bg-[rgba(255,255,255,0.02)] border-[rgba(255,255,255,0.05)] text-[var(--text-muted)] cursor-not-allowed'
-                        : 'bg-[var(--accent-cyan)] text-black border-[var(--accent-cyan)] hover:bg-[#3bf5ff] shadow-[0_0_15px_rgba(0,240,255,0.2)]'
-                    }`}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '10px 20px', fontSize: '11px', fontWeight: 700, color: simulationStatus === 'running' ? 'var(--text-muted)' : 'black', background: simulationStatus === 'running' ? 'rgba(255,255,255,0.02)' : 'var(--accent-cyan)', borderStyle: 'solid' }}
-                  >
-                    <Play size={14} /> Run Simulation
-                  </button>
-                </div>
-              </div>
+                      {/* Tournament List Selector Dropdown */}
+                      <div className="shrink-0 flex items-center gap-2" style={{ display: 'flex', gap: '8px' }}>
+                        <span className="text-[10px] text-[var(--text-secondary)] font-mono">SELECT RUN:</span>
+                        <select
+                          value={activeTournament.id}
+                          onChange={(e) => {
+                            const found = tournaments.find(t => t.id === e.target.value);
+                            if (found) setActiveTournament(found);
+                          }}
+                          className="bg-[#121420] border border-[rgba(255,255,255,0.08)] rounded text-xs p-1.5 text-[var(--text-primary)] font-mono focus:outline-none"
+                          style={{ minWidth: '160px' }}
+                        >
+                          {tournaments.map(t => (
+                            <option key={t.id} value={t.id}>
+                              {t.id.substring(0, 16)}...
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
 
-              {/* Parallel terminals grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
-                {SIMULATION_CIVS.map((civ) => {
-                  const evs = simulationEvents[civ.id] || [];
-                  const civStatus = 
-                    simulationStatus === 'idle' ? 'idle' :
-                    simulationStatus === 'running' && evs.length === 0 ? 'idle' :
-                    simulationStatus === 'running' ? 'running' : 'completed';
+                    {/* Real Parallel Terminals Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(320px, 1fr))', gap: '24px' }}>
+                      {activeTournament.manifest.civs.map((civ: any) => {
+                        const evs = realMatchEvents[civ.matchId] || [];
+                        const civStatus = 
+                          civ.exitCode === null ? 'running' :
+                          civ.exitCode === 0 ? 'completed' : 'failed';
 
-                  return (
-                    <TerminalPanel
-                      key={civ.id}
-                      regimeId={civ.id}
-                      displayName={civ.name}
-                      backend={civ.backend}
-                      events={evs}
-                      status={civStatus}
-                      sedimentStatus={civStatus === 'completed' ? 'success' : undefined}
-                    />
-                  );
-                })}
-              </div>
+                        const parts = civ.regime.split('/');
+                        const name = parts[parts.length - 1];
+                        const displayName = name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c: string) => c.toUpperCase());
 
-              {/* Tournament scoreboard/Leaderboard (renders when completed) */}
-              {simulationStatus === 'completed' && (
-                <div className="animate-fade-in">
-                  <JudgeLeaderboard
-                    scores={MOCK_JUDGE_SCORES}
-                    verdicts={MOCK_JUDGE_VERDICTS}
-                    civNames={{
-                      'china/tang': 'Tang Dynasty',
-                      'global/roman-republic': 'Roman Republic',
-                      'global/soviet': 'Soviet Union',
-                      'global/prussia': 'Kingdom of Prussia',
-                    }}
-                  />
-                </div>
+                        const hasSediment = evs.some((e: any) => e.type === 'skill') || civ.exitCode === 0;
+
+                        return (
+                          <TerminalPanel
+                            key={civ.matchId}
+                            regimeId={civ.regime}
+                            displayName={displayName}
+                            backend={civ.backend}
+                            events={evs}
+                            status={civStatus}
+                            sedimentStatus={hasSediment ? 'success' : undefined}
+                          />
+                        );
+                      })}
+                    </div>
+
+                    {/* Real scoreboard/Leaderboard (renders when judge Result is loaded) */}
+                    {activeTournament.judgeResult && (
+                      <div className="animate-fade-in">
+                        <JudgeLeaderboard
+                          judgeResult={activeTournament.judgeResult}
+                        />
+                      </div>
+                    )}
+
+                  </div>
+                ) : (
+                  /* ---------------- REAL MODE EMPTY STATE fallback ---------------- */
+                  <div className="glass-panel p-10 text-center flex flex-col items-center justify-center gap-4 animate-fade-in" style={{ padding: '40px', minHeight: '380px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: '16px' }}>
+                    <div className="flex items-center justify-center w-14 h-14 rounded-full bg-[rgba(0,240,255,0.06)] border border-[rgba(0,240,255,0.2)] text-[var(--accent-cyan)] shadow-lg" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <AlertCircle size={28} />
+                    </div>
+                    <div className="max-w-md space-y-2" style={{ maxWidth: '448px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                      <h3 className="text-base font-bold text-[var(--text-primary)]" style={{ fontSize: '16px', fontWeight: 700 }}>No Real Tournaments Found</h3>
+                      <p className="text-xs text-[var(--text-secondary)] leading-relaxed" style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+                        No governance runs have been logged in <code className="font-mono text-[var(--accent-cyan)]">~/.civagent/tournaments/</code> yet.
+                      </p>
+                      <p className="text-[11px] text-[var(--text-muted)] font-mono leading-relaxed" style={{ fontSize: '11px', color: 'var(--text-muted)' }}>
+                        Launch a parallel tournament run using the CLI:
+                        <br />
+                        <code className="block bg-[rgba(0,0,0,0.3)] p-2 rounded mt-2 border border-[rgba(255,255,255,0.03)] text-[var(--accent-gold)]">
+                          node engine/v5/tournament.mjs --civs china/tang,global/roman-republic "Establish border defense policies"
+                        </code>
+                      </p>
+                    </div>
+
+                    <div className="flex gap-4 mt-4" style={{ display: 'flex', gap: '16px', marginTop: '16px' }}>
+                      <button
+                        onClick={() => fetchTournaments(true)}
+                        className="px-4 py-2 border border-[rgba(255,255,255,0.06)] bg-[rgba(255,255,255,0.02)] rounded text-xs font-semibold text-[var(--text-primary)] hover:border-[rgba(255,255,255,0.15)] transition-all"
+                        style={{ fontSize: '12px', padding: '8px 16px' }}
+                      >
+                        Scan Directory Again
+                      </button>
+                      <button
+                        onClick={() => setIsDemoMode(true)}
+                        className="px-4 py-2 bg-amber-400 hover:bg-amber-300 text-black font-bold rounded text-xs transition-all shadow-[0_0_12px_rgba(251,191,36,0.15)]"
+                        style={{ fontSize: '12px', padding: '8px 16px' }}
+                      >
+                        Activate Simulated Demo
+                      </button>
+                    </div>
+                  </div>
+                )
               )}
 
             </div>
