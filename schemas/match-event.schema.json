@@ -23,11 +23,19 @@
     "exitCode": { "type": ["integer", "null"], "description": "Process exit code. Present on match_end." },
     "provider": { "type": "string", "description": "Judge provider id. Present on judge events." },
     "error": { "type": "string", "description": "Failure reason, when a judge/skill step failed." },
-    "skill": { "type": "string", "description": "Saved skill file path. Present on skill events." }
+    "status": {
+      "type": "string",
+      "enum": ["saved", "rejected", "skipped", "error"],
+      "description": "Sedimentation outcome. Present on skill events."
+    },
+    "skillPath": { "type": "string", "description": "Absolute path of the saved skill file. Present on skill events when status=saved." },
+    "auditedBy": { "type": ["string", "null"], "description": "Provider that audited the skill. Present on skill events when an audit was attempted." },
+    "reason": { "type": "string", "description": "Human-readable reason for rejected/skipped/error status. Present on skill events." }
   },
   "examples": [
     { "matchId": "2026-05-28T10-00-00-ab12", "seq": 0, "ts": 1764326400000, "type": "match_start", "regime": "china/tang", "backend": "native", "command": "claude", "task": "famine on the eastern frontier" },
     { "matchId": "2026-05-28T10-00-00-ab12", "seq": 1, "ts": 1764326401000, "type": "turn", "text": "门下省 reviews the draft edict ..." },
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 8, "ts": 1764326459000, "type": "skill", "status": "saved", "skillPath": "/home/user/.civagent/envs/china-tang/regimes/china/tang/skills/learned-2026-05-28-famine-ab12.md", "auditedBy": "codex" },
     { "matchId": "2026-05-28T10-00-00-ab12", "seq": 9, "ts": 1764326460000, "type": "match_end", "exitCode": 0 }
   ]
 }

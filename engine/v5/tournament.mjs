@@ -23,6 +23,39 @@ const PROJECT_ROOT = path.resolve(__dirname, "..", "..");
 const RUN_V5 = path.join(__dirname, "run-v5.mjs");
 const TOURNAMENTS_DIR = path.join(os.homedir(), ".civagent", "tournaments");
 
+// Parse the judge's markdown output and extract per-regime scores.
+// Handles lines like: | 1 | china/tang | 8.5 | reason |
+// civRegimes is the full list of regime strings (e.g. ["china/tang", "china/qin"]).
+// Returns [{regime, score}] sorted descending, or [] if nothing parseable.
+export function parseJudgeScores(output, civRegimes) {
+  if (!output) return [];
+  const scores = [];
+  for (const line of String(output).split("\n")) {
+    const cells = line.split("|").map((s) => s.trim()).filter(Boolean);
+    if (cells.length < 3) continue;
+    // Skip header/separator rows
+    if (/^[-\s]+$/.test(cells[0]) || /rank/i.test(cells[0])) continue;
+    // cells[1] should contain the civilization name
+    const nameCell = cells[1] || "";
+    const scoreCell = cells[2] || "";
+    const scoreMatch = scoreCell.match(/^(\d+(?:\.\d+)?)/);
+    if (!scoreMatch) continue;
+    // Match against known regime ids: exact or partial (regime's slug part)
+    const regime = civRegimes.find((r) => {
+      const slug = r.split("/")[1] || r;
+      return nameCell === r || nameCell.includes(r) || nameCell.includes(slug);
+    });
+    if (regime) {
+      scores.push({ regime, score: parseFloat(scoreMatch[1]) });
+    }
+  }
+  // Remove duplicates (first occurrence wins after sort)
+  const seen = new Set();
+  return scores
+    .filter((s) => { if (seen.has(s.regime)) return false; seen.add(s.regime); return true; })
+    .sort((a, b) => b.score - a.score);
+}
+
 const JUDGE_PROMPT = `You are the judge of a CivAgent governance tournament.
 Each civilization received the same task and produced a transcript of how its
 governance system responded. Rank them on:
@@ -86,7 +119,9 @@ async function judge(task, civResults) {
       const text =
         readMatchText(r.matchId, 6000) ||
         (fs.existsSync(r.logFile) ? fs.readFileSync(r.logFile, "utf8").slice(-6000) : "(no output)");
-      return `### ${r.regime} (backend ${r.backend}, exit ${r.code})\n\n\`\`\`\n${text}\n\`\`\``;
+      // Omit backend from the section header — judges should rank on governance
+      // quality alone, not on which backend happened to run the civ.
+      return `### ${r.regime} (exit ${r.code})\n\n\`\`\`\n${text}\n\`\`\``;
     })
     .join("\n\n---\n\n");
 
@@ -95,11 +130,13 @@ async function judge(task, civResults) {
     const r = runJudge(prompt);
     return {
       provider: r.provider,
+      rawOutput: r.output,
       md: `# Tournament — ${new Date().toISOString()}\n\n**Task:** ${task}\n**Judge:** ${r.provider}\n\n${r.output}`,
     };
   } catch (e) {
     return {
       provider: null,
+      rawOutput: null,
       md:
         `# Tournament Result — judge unavailable\n\n${e.message}\n\n` +
         `Raw civ exit codes:\n${civResults.map((c) => `- ${c.regime} (${c.backend}): ${c.code}`).join("\n")}`,
@@ -122,6 +159,11 @@ export async function runTournament({ civs, task }) {
   const resultFile = path.join(outDir, "result.md");
   fs.writeFileSync(resultFile, verdict.md);
 
+  // Parse structured scores from the judge output for the frontend.
+  const civRegimes = results.map((r) => r.regime);
+  const scores = parseJudgeScores(verdict.rawOutput || "", civRegimes);
+  const topRegime = scores.length > 0 ? scores[0].regime : null;
+
   // Manifest is the frontend's entry point into a tournament.
   const manifest = {
     id,
@@ -134,7 +176,12 @@ export async function runTournament({ civs, task }) {
       exitCode: r.code,
       events: eventsPath(r.matchId),
     })),
-    judge: { provider: verdict.provider, resultPath: resultFile },
+    judge: {
+      provider: verdict.provider,      // which provider judged (or null if unavailable)
+      resultPath: resultFile,          // path to full markdown result
+      scores,                          // [{regime, score}] sorted desc; [] when judge unavailable
+      topRegime,                       // winning regime or null
+    },
   };
   fs.writeFileSync(path.join(outDir, "manifest.json"), JSON.stringify(manifest, null, 2));
 
