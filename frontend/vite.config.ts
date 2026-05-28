@@ -7,27 +7,90 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// Custom API middleware to serve ~/.civagent and ./regimes data
+function parsePathname(rawUrl: string): string {
+  try {
+    return new URL(rawUrl, 'http://local').pathname;
+  } catch {
+    return rawUrl || '/';
+  }
+}
+
+function decodePathSegments(pathname: string): string[] {
+  return pathname.split('/').filter(Boolean).map((s) => {
+    try {
+      return decodeURIComponent(s);
+    } catch {
+      return s;
+    }
+  });
+}
+
+const SAFE_ID = /^[a-zA-Z0-9._-]+$/;
+
+function safeResolve(
+  root: string,
+  ...segments: string[]
+): { ok: true; resolved: string } | { ok: false; error: string } {
+  for (const seg of segments) {
+    if (!SAFE_ID.test(seg)) {
+      return { ok: false, error: `invalid segment "${seg}"` };
+    }
+  }
+  const resolvedRoot = path.resolve(root);
+  const resolved = path.resolve(path.join(root, ...segments));
+  if (resolved !== resolvedRoot && !resolved.startsWith(resolvedRoot + path.sep)) {
+    return { ok: false, error: 'path traversal' };
+  }
+  return { ok: true, resolved };
+}
+
+function parseEventsJsonl(raw: string): unknown[] {
+  const events: unknown[] = [];
+  const lines = raw.split('\n');
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    try {
+      events.push(JSON.parse(trimmed));
+    } catch {
+      // skip bad/torn lines
+    }
+  }
+  return events;
+}
+
+function json(res: any, status: number, body: unknown) {
+  res.statusCode = status;
+  res.setHeader('Content-Type', 'application/json');
+  res.end(JSON.stringify(body));
+}
+
 function civagentApiPlugin() {
   return {
     name: 'civagent-api',
     configureServer(server: any) {
       server.middlewares.use('/api', async (req: any, res: any) => {
-        res.setHeader('Content-Type', 'application/json');
         res.setHeader('Access-Control-Allow-Origin', '*');
         res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-        
+
         if (req.method === 'OPTIONS') {
+          res.setHeader('Content-Type', 'application/json');
           res.end();
           return;
         }
 
+        if (req.method !== 'GET') {
+          json(res, 405, { error: 'method not allowed' });
+          return;
+        }
+
         const rootDir = path.join(os.homedir(), '.civagent');
-        const url = req.url || '';
+        const pathname = parsePathname(req.url || '');
+        const segs = decodePathSegments(pathname);
 
         try {
-          // Endpoint: /api/regimes
-          if (url === '/regimes' || url === '/regimes/') {
+          // /api/regimes
+          if (pathname === '/regimes' || pathname === '/regimes/') {
             const projectRoot = path.resolve(__dirname, '..');
             const regimesDir = path.join(projectRoot, 'regimes');
             const result: any[] = [];
@@ -36,16 +99,17 @@ function civagentApiPlugin() {
               if (!fs.existsSync(dir)) return;
               const files = fs.readdirSync(dir);
               for (const file of files) {
-                // Ignore templates or hidden directories/files starting with _ or .
                 if (file.startsWith('_') || file.startsWith('.')) continue;
 
                 const fullPath = path.join(dir, file);
                 if (fs.statSync(fullPath).isDirectory()) {
                   if (fs.existsSync(path.join(fullPath, 'metadata.json'))) {
                     try {
-                      const metadata = JSON.parse(fs.readFileSync(path.join(fullPath, 'metadata.json'), 'utf8'));
+                      const metadata = JSON.parse(
+                        fs.readFileSync(path.join(fullPath, 'metadata.json'), 'utf8')
+                      );
                       const id = path.relative(regimesDir, fullPath);
-                      
+
                       const identityPath = path.join(fullPath, 'IDENTITY.md');
                       let identity = '';
                       if (fs.existsSync(identityPath)) {
@@ -58,13 +122,17 @@ function civagentApiPlugin() {
                         soul = fs.readFileSync(soulPath, 'utf8');
                       }
 
-                      // Check for sedimented skills in regimes/<civ>/skills/
                       const skillsDir = path.join(fullPath, 'skills');
                       const skills = [];
                       if (fs.existsSync(skillsDir)) {
-                        const skillFiles = fs.readdirSync(skillsDir).filter(f => f.endsWith('.md'));
+                        const skillFiles = fs
+                          .readdirSync(skillsDir)
+                          .filter((f: string) => f.endsWith('.md'));
                         for (const sf of skillFiles) {
-                          const sContent = fs.readFileSync(path.join(skillsDir, sf), 'utf8');
+                          const sContent = fs.readFileSync(
+                            path.join(skillsDir, sf),
+                            'utf8'
+                          );
                           skills.push({ filename: sf, content: sContent });
                         }
                       }
@@ -81,55 +149,45 @@ function civagentApiPlugin() {
             };
 
             walk(regimesDir);
-            res.end(JSON.stringify(result));
+            json(res, 200, result);
             return;
           }
 
-          // Endpoint: /api/regimes/:region/:id/identity
-          if (url.startsWith('/regimes/') && url.endsWith('/identity')) {
-            const parts = url.split('/').filter(Boolean);
-            if (parts.length >= 4) {
-              const region = parts[1];
-              const id = parts[2];
+          // /api/regimes/:region/:id/identity
+          if (
+            segs.length === 4 &&
+            segs[0] === 'regimes' &&
+            segs[3] === 'identity'
+          ) {
+            const region = segs[1];
+            const id = segs[2];
 
-              // Validation to prevent path traversal
-              const nameRegex = /^[a-zA-Z0-9_-]+$/;
-              if (!nameRegex.test(region) || !nameRegex.test(id)) {
-                res.statusCode = 400;
-                res.end(JSON.stringify({ error: 'Invalid region or regime ID' }));
-                return;
-              }
+            const projectRoot = path.resolve(__dirname, '..');
+            const regimesDir = path.join(projectRoot, 'regimes');
 
-              const projectRoot = path.resolve(__dirname, '..');
-              const regimesDir = path.join(projectRoot, 'regimes');
-              const identityPath = path.join(regimesDir, region, id, 'IDENTITY.md');
-              
-              const resolvedRegimesDir = path.resolve(regimesDir);
-              const resolvedIdentityPath = path.resolve(identityPath);
-
-              if (!resolvedIdentityPath.startsWith(resolvedRegimesDir + path.sep)) {
-                res.statusCode = 403;
-                res.end(JSON.stringify({ error: 'Access denied: path traversal detected' }));
-                return;
-              }
-
-              if (fs.existsSync(identityPath)) {
-                try {
-                  const raw = fs.readFileSync(identityPath, 'utf8');
-                  res.end(JSON.stringify({ id, region, raw }));
-                } catch (err: any) {
-                  res.statusCode = 500;
-                  res.end(JSON.stringify({ error: err.message }));
-                }
-              } else {
-                res.end(JSON.stringify({ id, region, raw: null }));
-              }
+            const resolved = safeResolve(regimesDir, region, id);
+            if (!resolved.ok) {
+              json(res, 400, { error: resolved.error });
               return;
             }
+
+            const identityPath = path.join(resolved.resolved, 'IDENTITY.md');
+
+            if (fs.existsSync(identityPath)) {
+              try {
+                const raw = fs.readFileSync(identityPath, 'utf8');
+                json(res, 200, { id, region, raw });
+              } catch (err: any) {
+                json(res, 500, { error: err.message });
+              }
+            } else {
+              json(res, 200, { id, region, raw: null });
+            }
+            return;
           }
 
-          // Endpoint: /api/tournaments
-          if (url === '/tournaments' || url === '/tournaments/') {
+          // /api/tournaments
+          if (pathname === '/tournaments' || pathname === '/tournaments/') {
             const tournamentsDir = path.join(rootDir, 'tournaments');
             const list = [];
             if (fs.existsSync(tournamentsDir)) {
@@ -140,7 +198,7 @@ function civagentApiPlugin() {
                   try {
                     list.push({
                       id: dir,
-                      manifest: JSON.parse(fs.readFileSync(manifestPath, 'utf8'))
+                      manifest: JSON.parse(fs.readFileSync(manifestPath, 'utf8')),
                     });
                   } catch (err) {
                     console.error(`Error parsing tournament manifest: ${manifestPath}`, err);
@@ -148,30 +206,36 @@ function civagentApiPlugin() {
                 }
               }
             }
-            res.end(JSON.stringify(list));
+            json(res, 200, list);
             return;
           }
 
-          // Endpoint: /api/tournaments/:id
-          if (url.startsWith('/tournaments/')) {
-            const id = url.split('/').pop() || '';
-            const manifestPath = path.join(rootDir, 'tournaments', id, 'manifest.json');
+          // /api/tournaments/:id
+          if (segs.length === 2 && segs[0] === 'tournaments') {
+            const id = segs[1];
+
+            const resolved = safeResolve(rootDir, 'tournaments', id);
+            if (!resolved.ok) {
+              json(res, 400, { error: resolved.error });
+              return;
+            }
+
+            const manifestPath = path.join(resolved.resolved, 'manifest.json');
             if (fs.existsSync(manifestPath)) {
+              res.setHeader('Content-Type', 'application/json');
               res.end(fs.readFileSync(manifestPath, 'utf8'));
             } else {
-              res.statusCode = 404;
-              res.end(JSON.stringify({ error: `Tournament '${id}' not found` }));
+              json(res, 404, { error: `Tournament '${id}' not found` });
             }
             return;
           }
 
-          // Endpoint: /api/matches
-          if (url === '/matches' || url === '/matches/') {
+          // /api/matches
+          if (pathname === '/matches' || pathname === '/matches/') {
             const transcriptsDir = path.join(rootDir, 'transcripts');
             const matchesDir = path.join(rootDir, 'matches');
             const list = [];
 
-            // Read B4 structured matches
             if (fs.existsSync(matchesDir)) {
               const dirs = fs.readdirSync(matchesDir);
               for (const dir of dirs) {
@@ -193,13 +257,13 @@ function civagentApiPlugin() {
               }
             }
 
-            // Read legacy transcripts as fallback
             if (fs.existsSync(transcriptsDir)) {
-              const files = fs.readdirSync(transcriptsDir).filter(f => f.endsWith('.jsonl'));
+              const files = fs
+                .readdirSync(transcriptsDir)
+                .filter((f: string) => f.endsWith('.jsonl'));
               for (const file of files) {
                 const matchId = file.replace('.jsonl', '');
-                // Skip if already found in B4 structured matches
-                if (list.some(item => item.id === matchId)) continue;
+                if (list.some((item) => item.id === matchId)) continue;
 
                 const filePath = path.join(transcriptsDir, file);
                 const stats = fs.statSync(filePath);
@@ -212,73 +276,84 @@ function civagentApiPlugin() {
                     regime: 'legacy',
                     backend: 'legacy',
                     ts: stats.mtimeMs,
-                  }
+                  },
                 });
               }
             }
 
             list.sort((a, b) => b.mtime - a.mtime);
-            res.end(JSON.stringify(list));
+            json(res, 200, list);
             return;
           }
 
-          // Endpoint: /api/matches/:id
-          if (url.startsWith('/matches/')) {
-            const id = url.split('/').pop() || '';
-            const structuredDir = path.join(rootDir, 'matches', id);
-            const eventsPath = path.join(structuredDir, 'events.jsonl');
-            const metaPath = path.join(structuredDir, 'meta.json');
+          // /api/matches/:id
+          if (segs.length === 2 && segs[0] === 'matches') {
+            const id = segs[1];
 
-            // Try B4 structured matches
-            if (fs.existsSync(eventsPath)) {
-              const eventsRaw = fs.readFileSync(eventsPath, 'utf8');
-              const events = eventsRaw.split('\n').filter(Boolean).map(line => JSON.parse(line));
-              let meta = {};
-              if (fs.existsSync(metaPath)) {
-                meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
-              }
-              res.end(JSON.stringify({ format: 'structured', meta, events }));
+            const resolvedStructured = safeResolve(rootDir, 'matches', id);
+            if (!resolvedStructured.ok) {
+              json(res, 400, { error: resolvedStructured.error });
               return;
             }
 
-            // Try legacy transcript
+            const eventsPath = path.join(resolvedStructured.resolved, 'events.jsonl');
+            const metaPath = path.join(resolvedStructured.resolved, 'meta.json');
+
+            if (fs.existsSync(eventsPath)) {
+              try {
+                const eventsRaw = fs.readFileSync(eventsPath, 'utf8');
+                const events = parseEventsJsonl(eventsRaw);
+                let meta = {};
+                if (fs.existsSync(metaPath)) {
+                  try {
+                    meta = JSON.parse(fs.readFileSync(metaPath, 'utf8'));
+                  } catch {
+                    // continue with empty meta
+                  }
+                }
+                json(res, 200, { format: 'structured', meta, events });
+              } catch (err: any) {
+                json(res, 500, { error: err.message });
+              }
+              return;
+            }
+
             const legacyPath = path.join(rootDir, 'transcripts', `${id}.jsonl`);
             if (fs.existsSync(legacyPath)) {
-              const raw = fs.readFileSync(legacyPath, 'utf8');
-              const lines = raw.split('\n').filter(Boolean).map(line => JSON.parse(line));
-              
-              // Convert legacy formats to event chunks
-              const events = lines.map((l, index) => ({
-                matchId: id,
-                ts: l.t || Date.now(),
-                seq: index,
-                type: 'chunk',
-                text: l.chunk || '',
-              }));
+              try {
+                const raw = fs.readFileSync(legacyPath, 'utf8');
+                const lines = parseEventsJsonl(raw);
 
-              res.end(JSON.stringify({
-                format: 'legacy',
-                meta: { matchId: id, regime: 'legacy' },
-                events
-              }));
+                const events = lines.map((l: any, index: number) => ({
+                  matchId: id,
+                  ts: l.t || Date.now(),
+                  seq: index,
+                  type: 'chunk',
+                  text: l.chunk || '',
+                }));
+
+                json(res, 200, {
+                  format: 'legacy',
+                  meta: { matchId: id, regime: 'legacy' },
+                  events,
+                });
+              } catch (err: any) {
+                json(res, 500, { error: err.message });
+              }
               return;
             }
 
-            res.statusCode = 404;
-            res.end(JSON.stringify({ error: `Match '${id}' not found` }));
+            json(res, 404, { error: `Match '${id}' not found` });
             return;
           }
 
-          // Catch-all
-          res.statusCode = 404;
-          res.end(JSON.stringify({ error: `API route '${url}' not found` }));
+          json(res, 404, { error: `API route '${pathname}' not found` });
         } catch (e: any) {
           console.error('Error handling API request:', e);
-          res.statusCode = 500;
-          res.end(JSON.stringify({ error: e.message }));
+          json(res, 500, { error: e.message });
         }
       });
-    }
+    },
   };
 }
 
@@ -288,5 +363,5 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
-  }
+  },
 });
