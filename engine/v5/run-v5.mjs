@@ -40,6 +40,17 @@ export function parseArgs(argv, env = process.env) {
   return { backend, regimeRaw, prompt: promptParts.join(" ").trim() };
 }
 
+// Convert a sediment() result object to event fields for the skill event type.
+// Returns null if the result is empty or unrecognized.
+export function buildSkillEvent(result) {
+  if (!result) return null;
+  if (result.saved)    return { status: "saved",    skillPath: result.saved,    auditedBy: result.auditedBy ?? null };
+  if (result.rejected) return { status: "rejected", reason: String(result.rejected).slice(0, 200), auditedBy: result.auditedBy ?? null };
+  if (result.skipped)  return { status: "skipped",  reason: String(result.skipped).slice(0, 200) };
+  if (result.error)    return { status: "error",    reason: String(result.error).slice(0, 200) };
+  return null;
+}
+
 async function main() {
   const { backend, regimeRaw, prompt } = parseArgs(process.argv.slice(2));
   if (!regimeRaw) {
@@ -124,9 +135,8 @@ async function main() {
     writeMeta(matchId, { endedAt: Date.now(), exitCode: null, status: "failed", error: err.message });
     process.exit(2);
   }
-  log.emit("match_end", { exitCode });
-  await log.close();
-
+  // Run sedimentation BEFORE closing the log so we can emit the skill event
+  // inside the same JSONL stream (frontend watches for match_end to stop reading).
   console.error(`[v5] backend exited ${exitCode}, running skill sedimentation...`);
   const skillsDir = path.join(regimeDir, "skills");
   let sedimentResult;
@@ -143,6 +153,13 @@ async function main() {
     sedimentResult = { error: e.message };
     console.error(`[v5] sediment failed: ${e.message}`);
   }
+
+  // Emit a structured skill event so the frontend can reflect sedimentation status.
+  const skillEv = buildSkillEvent(sedimentResult);
+  if (skillEv) log.emit("skill", skillEv);
+
+  log.emit("match_end", { exitCode });
+  await log.close();
 
   writeMeta(matchId, { endedAt: Date.now(), exitCode, status: "done", sediment: sedimentResult });
   process.exit(exitCode ?? 0);

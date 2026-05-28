@@ -1,5 +1,23 @@
 # 📜 Changelog
 
+## v5.2.0 (unreleased) — R3 Engine Event Contract 📡
+
+Event contract hardening (Round 3). Focus: structured skill events in the match stream and structured judge fields in the tournament manifest, verified by fake-backend integration tests.
+
+### Changed
+- **Skill events now emitted inside the match stream** (`engine/v5/run-v5.mjs`) — sedimentation runs *before* `match_end` so the `skill` event lands in `events.jsonl` with `{ status: saved|rejected|skipped|error, skillPath?, auditedBy?, reason? }`. Frontend can read skill outcome without polling `meta.json`.
+- **`match_end` is guaranteed to be the final event** — the ordering contract (`match_start → turns → skill → match_end`) is now enforced and tested.
+- **Tournament manifest `judge` field is now structured** (`engine/v5/tournament.mjs`) — adds `scores: [{regime, score}]` sorted descending, and `topRegime: string|null`, extracted from the judge's markdown table. `provider` and `resultPath` are preserved. Frontend no longer has to re-parse `result.md` to show a leaderboard.
+- **Backend omitted from judge section header** — judge sees `### china/tang (exit 0)` not `(backend native, exit 0)`, preventing backend identity from leaking into a blind evaluation.
+
+### Added
+- **`parseJudgeScores(output, civRegimes)`** (exported from `tournament.mjs`) — lenient markdown-table parser; handles exact regime match, slug match, and returns `[]` gracefully on unparseable output.
+- **`buildSkillEvent(result)`** (exported from `run-v5.mjs`) — converts a `sediment()` result into the skill event payload; truncates `reason` at 200 chars.
+- **`schemas/match-event.schema.json`** — `skill` event now has defined properties: `status` (enum), `skillPath`, `auditedBy`, `reason`. Added a `skill` example event.
+- **`test/integration-event-contract.test.mjs`** — 13 new tests (32 → 45): fake-backend spawning of `run-v5` and `tournament`, concurrent-civ isolation proof, `parseJudgeScores` unit tests, `buildSkillEvent` unit tests.
+
+---
+
 ## v5.1.0 (unreleased) — R1 Engine Robustness 🔧
 
 Backend robustness pass (iteration plan: [ITERATION_PLAN.md](./ITERATION_PLAN.md), Round 1). Focus: correctness, concurrency safety, and removing the hard external dependency on Gemini.
