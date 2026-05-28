@@ -63,7 +63,7 @@ The Bayt al-Hikma (House of Wisdom) reached its zenith under Caliphs Harun al-Ra
 | Sahib al-Barid (邮政情报长) | `sahib-barid` | 驿站系统、情报网络、省报告 | Kimi K2.5 |
 | Sahib al-Shurta (治安长官) | `sahib-shurta` | 内部安全、执法、哈里发护卫 | GPT-5.4 |
 | Diwan al-Kharaj (财政司) | `diwan-kharaj` | 税收征管、国库、财政行政 | Qwen3-Coder |
-| Bayt al-Hikma (智慧宫) | `bayt-hikma` | 学术研究、翻译运动、知识保存 | Gemini 3.1 Pro |
+| Bayt al-Hikma (智慧宫) | `bayt-hikma` | 学术研究、翻译运动、知识保存 | MiMo v2 Pro |
 
 ---
 

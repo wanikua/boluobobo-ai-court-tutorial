@@ -164,7 +164,7 @@ Three independently sovereign Agent teams act collectively through alliance prot
 
 - **多团队联合开发 / Multi-Team Joint Development**：三个独立的开发团队（前端/后端/DevOps 或 iOS/Android/Web）各自保持技术栈独立性，但在共同项目上联合发布。Tlatoani 负责跨团队协调，每个"城邦"保持内部自治。
 - **微服务联邦架构 / Federated Microservices Architecture**：多个独立部署的微服务集群通过 API 网关（联盟协议）松耦合协作。每个集群由独立团队管理（城邦自治），共享资源按比例分配（贡赋 2:2:1）。
-- **多 AI 提供商编排 / Multi-AI Provider Orchestration**：同时使用多个 AI 提供商（如 OpenAI + Anthropic + Gemini 3.1 Pro）——每个提供商是一个"城邦"，各有专长和自治性，Tlatoani 协调跨提供商任务。
+- **多 AI 提供商编排 / Multi-AI Provider Orchestration**：同时使用多个 AI 提供商（如 OpenAI + Anthropic + MiMo v2 Pro）——每个提供商是一个"城邦"，各有专长和自治性，Tlatoani 协调跨提供商任务。
 - **产品+工程+设计三方协作 / Product+Engineering+Design Tripartite Collaboration**：产品（Tenochtitlan，战略方向）、工程（Texcoco，技术实现）、设计（Tlacopan，用户体验）三方联合交付，各自保持专业自主权。
 - **开源生态系统治理 / Open Source Ecosystem Governance**：核心项目（Tenochtitlan）+ 文档/教育（Texcoco）+ 工具链/基础设施（Tlacopan）三方联合维护开源生态。
 - **竞争情报驱动的产品开发 / Competitive Intelligence-Driven Product Development**：Pochteca Agent 持续收集市场情报和竞品信息，直接向 Tlatoani 汇报，驱动产品战略调整。

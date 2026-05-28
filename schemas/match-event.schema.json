@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://github.com/LeoLin990405/civagent/schemas/match-event.schema.json",
+  "title": "CivAgent match event",
+  "description": "One line of ~/.civagent/matches/<matchId>/events.jsonl. The stable contract the frontend consumes. Each line is an independent JSON object.",
+  "type": "object",
+  "required": ["matchId", "seq", "ts", "type"],
+  "additionalProperties": true,
+  "properties": {
+    "matchId": { "type": "string", "description": "Match this event belongs to." },
+    "seq": { "type": "integer", "minimum": 0, "description": "Monotonic per-match sequence number." },
+    "ts": { "type": "integer", "description": "Unix epoch milliseconds." },
+    "type": {
+      "type": "string",
+      "enum": ["match_start", "turn", "tool", "judge", "skill", "match_end"],
+      "description": "Event kind."
+    },
+    "regime": { "type": "string", "description": "region/regime-id, e.g. china/tang. Present on match_start." },
+    "backend": { "type": "string", "description": "Backend id, e.g. native, cn:doubao. Present on match_start." },
+    "command": { "type": "string", "description": "Resolved binary the backend mapped to. Present on match_start." },
+    "task": { "type": "string", "description": "The governance task. Present on match_start." },
+    "text": { "type": "string", "description": "Streamed output chunk. Present on turn events." },
+    "exitCode": { "type": ["integer", "null"], "description": "Process exit code. Present on match_end." },
+    "provider": { "type": "string", "description": "Judge provider id. Present on judge events." },
+    "error": { "type": "string", "description": "Failure reason, when a judge/skill step failed." },
+    "skill": { "type": "string", "description": "Saved skill file path. Present on skill events." }
+  },
+  "examples": [
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 0, "ts": 1764326400000, "type": "match_start", "regime": "china/tang", "backend": "native", "command": "claude", "task": "famine on the eastern frontier" },
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 1, "ts": 1764326401000, "type": "turn", "text": "门下省 reviews the draft edict ..." },
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 9, "ts": 1764326460000, "type": "match_end", "exitCode": 0 }
+  ]
+}

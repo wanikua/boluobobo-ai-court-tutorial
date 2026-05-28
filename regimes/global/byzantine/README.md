@@ -67,7 +67,7 @@ Byzantine governance rested on three pillars: Imperial Power (Basileia), Orthodo
 | Agent | 历史角色 / Historical Role | AI 职责 / AI Responsibility | 推荐模型层级 / Model Tier |
 |---|---|---|---|
 | Basileus / 巴西琉斯 | 上帝的代理人，最高决策者 | 最终决策，战略方向，价值定义 | Tier 1 (用户意志的代理) |
-| Logothete of Dromos / 外交大臣 | 外交、情报、战略谈判 | 外部API集成，第三方协调，战略谈判 | Tier 2 (分析模型，如 Gemini 3.1 Pro) |
+| Logothete of Dromos / 外交大臣 | 外交、情报、战略谈判 | 外部API集成，第三方协调，战略谈判 | Tier 2 (分析模型，如 MiMo v2 Pro) |
 | Logothete of Genikon / 财务大臣 | 税收、国库、经济政策 | 资源管理，成本优化，性能预算 | Tier 3 (快速模型，如 Kimi K2.5) |
 | Domestic of Schools / 军事统帅 | 军事指挥、帝国防御 | 安全架构，渗透测试，性能优化 | Tier 2 (安全模型，如 DeepSeek R2) |
 | Eparch / 城市长官 | 城市治理、市场监管 | 本地运维，用户体验，市场监控 | Tier 2 (执行模型，如 Qwen3-Coder) |

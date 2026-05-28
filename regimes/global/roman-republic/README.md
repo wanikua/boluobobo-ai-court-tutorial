@@ -72,7 +72,7 @@ The Roman Republic was an intricate multi-layered system of checks and balances.
 |---|---|---|---|
 | Consul A / 执政官A | 共和执政官，最高军事行政权 | 主执行者，领导技术实施 | Tier 1 (主模型，如 Claude Opus 4.6) |
 | Consul B / 执政官B | 同僚执政官，制衡 Consul A | 对等审查，提供替代视角 | Tier 1 (对等模型，如 GPT-5.4 Pro) |
-| Senate / 元老院 | 300名前官员，战略顾问 | 战略规划，集体经验，架构指导 | Tier 1 (推理模型，如 Gemini 3.1 Pro) |
+| Senate / 元老院 | 300名前官员，战略顾问 | 战略规划，集体经验，架构指导 | Tier 1 (推理模型，如 MiMo v2 Pro) |
 | Tribune / 护民官 | 平民代表，神圣否决权 | 用户利益代言，可访问性审查，否决有害决策 | Tier 2 (安全模型，如 DeepSeek R2) |
 | Praetor / 裁判官 | 首席法官，法律解释 | 合规检查，争议仲裁，法律审查 | Tier 2 (审查模型) |
 | Censor / 监察官 | 道德与标准审查，五年一次 | 代码质量审计，最佳实践执行 | Tier 2 (审查模型) |

@@ -7,7 +7,7 @@
   },
   "scripts": {
     "test": "node --test test/*.test.mjs",
-    "lint:syntax": "node -c engine/v5/civ-memory.mjs && node -c engine/v5/skill-sediment.mjs && node -c engine/v5/run-v5.mjs && node -c engine/regime-to-cc.mjs && bash -n bin/civagent",
+    "lint:syntax": "node -c engine/v5/civ-memory.mjs && node -c engine/v5/skill-sediment.mjs && node -c engine/v5/run-v5.mjs && node -c engine/v5/backends.mjs && node -c engine/v5/judge.mjs && node -c engine/v5/events.mjs && node -c engine/v5/tournament.mjs && node -c engine/regime-to-cc.mjs && bash -n bin/civagent",
     "validate:regimes": "node test/regime-validator.mjs"
   },
   "type": "module",

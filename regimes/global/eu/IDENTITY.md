@@ -50,7 +50,7 @@ The European Union is a unique supranational polity — neither a federation nor
 | European Parliament / 欧洲议会 | parliament | Represents citizens, co-legislates, approves budget, oversees Commission / 代表公民，共同立法 | Claude Opus 4.6 / GPT-5.4 Pro |
 | Court of Justice / 欧洲法院 | ecj | Interprets EU law, ensures treaty compliance, judicial review / 解释欧盟法律，确保条约合规 | DeepSeek R2 / Kimi K2.5 |
 | European Council / 欧洲理事会 | euco | Sets strategic priorities, resolves high-level disputes / 确定战略优先，解决高层分歧 | Claude Opus 4.6 / GPT-5.4 |
-| ECB / 欧洲央行 | ecb | Monetary policy, price stability, financial oversight / 货币政策，价格稳定，金融监管 | Gemini 3.1 Pro / Qwen3-Coder |
+| ECB / 欧洲央行 | ecb | Monetary policy, price stability, financial oversight / 货币政策，价格稳定，金融监管 | MiMo v2 Pro / Qwen3-Coder |
 | High Representative / 外交高级代表 | high-rep | Foreign policy coordination, external representation / 外交政策协调，对外代表 | GPT-5.3 Instant / Kimi K2.5 |
 
 ## 协作流程 / Workflow

@@ -74,7 +74,7 @@ The Three Kingdoms orchestration centers on three independent AI teams operating
 | 蜀国·丞相 | 诸葛亮·智慧忠诚 | 质量保障、代码审查、最佳实践 | Tier-1 (Claude Opus 4.6) |
 | 蜀国·军师 | 庞统·方案评估 | 问题分析、方案评估、风险预判 | Tier-1 (GPT-5.4 Pro) |
 | 蜀国·将军 | 赵云·全能 | 功能开发、测试编写、Bug修复 | Tier-2 (GPT-5.3 Instant) |
-| 吴国·都督 | 周瑜·全才 | 运维部署、外部集成、资源协调 | Tier-1 (Gemini 3.1 Pro) |
+| 吴国·都督 | 周瑜·全才 | 运维部署、外部集成、资源协调 | Tier-1 (MiMo v2 Pro) |
 | 吴国·谋士 | 鲁肃·策划 | 方案策划、文档撰写、创意设计 | Tier-2 (Kimi K2.5) |
 | 吴国·将军 | 陆逊·后起 | 前端开发、UI实现、用户体验 | Tier-2 (GPT-5.4) |
 

@@ -70,7 +70,7 @@ The core of the Meiji system lay in a dual structure of "nominal imperial sovere
 | Tennō (tenno) | 天皇 / Emperor | System anchor, symbolic authority, final sanction — never initiates decisions | Claude Opus 4.6 |
 | Genrō (genro) | 元老 / Elder Statesmen | Real decision-maker, strategic architect, PM selector — the invisible hand | GPT-5.4 Pro |
 | Prime_Minister (pm) | 内閣総理大臣 / Head of Government | Operational coordinator, policy synthesizer, Diet liaison | GPT-5.4 |
-| Imperial_Diet (diet) | 帝国議会 / Parliament | Budget reviewer, limited oversight, public voice (constrained) | Gemini 3.1 Pro |
+| Imperial_Diet (diet) | 帝国議会 / Parliament | Budget reviewer, limited oversight, public voice (constrained) | MiMo v2 Pro |
 | Privy_Council (privy) | 枢密院 / Advisory Body | Constitutional guardian, treaty reviewer, legal arbiter | DeepSeek R2 |
 | Army_Chief (army) | 陸軍参謀総長 / Army CoS | Continental strategy, land operations, military modernization | Kimi K2.5 |
 | Navy_Chief (navy) | 海軍軍令部長 / Navy CoS | Maritime strategy, fleet operations, naval modernization | Qwen3-Coder |

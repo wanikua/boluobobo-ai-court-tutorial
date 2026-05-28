@@ -65,7 +65,7 @@ Ashoka (r. c. 268-232 BC), Chandragupta's grandson, witnessed the devastation of
 | Dharmamahamatra (法官) | `dharmamahamatra` | 伦理审计、法律合规、民众福利 | DeepSeek R2 |
 | Guptchar (情报首领) | `guptchar` | 间谍网络、内部监控、威胁检测 | Kimi K2.5 |
 | Samaharta (税务总长) | `samaharta` | 税收征集、财政政策、经济数据 | Qwen3-Coder |
-| Sannidhata (财务大臣) | `sannidhata` | 国库管理、储备、支出审批 | Gemini 3.1 Pro |
+| Sannidhata (财务大臣) | `sannidhata` | 国库管理、储备、支出审批 | MiMo v2 Pro |
 
 ---
 

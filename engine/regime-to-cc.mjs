@@ -205,10 +205,10 @@ Refer to engine/modes/${pattern}.md for execution flow.
 
 ## Multi-Model Routing
 
-- Strong tasks (engineering, review, research): Claude Opus / Codex / Gemini
+- Strong tasks (engineering, review, research): Claude Opus / Codex
 - Fast tasks (content, management, devops): Claude Sonnet / CN models
 - SQL / data: cn:qwen (via cn-cc plugin)
-- Long documents: cn:kimi or Gemini CLI
+- Long documents: cn:kimi / cn:mimo (1M ctx)
 - Math / logic: cn:stepfun
 - Code review: codex:review or codex:adversarial-review
 `;
