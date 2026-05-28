@@ -25,13 +25,19 @@ function decodePathSegments(pathname: string): string[] {
   });
 }
 
-const SAFE_ID = /^[a-zA-Z0-9._-]+$/;
+const SAFE_ID = /^[a-zA-Z0-9][a-zA-Z0-9_-]*$/;
 
 function safeResolve(
   root: string,
   ...segments: string[]
 ): { ok: true; resolved: string } | { ok: false; error: string } {
   for (const seg of segments) {
+    if (seg === '.' || seg === '..') {
+      return { ok: false, error: `invalid segment "${seg}"` };
+    }
+    if (seg.includes('/') || seg.includes('\\')) {
+      return { ok: false, error: `invalid segment "${seg}"` };
+    }
     if (!SAFE_ID.test(seg)) {
       return { ok: false, error: `invalid segment "${seg}"` };
     }
