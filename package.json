@@ -14,7 +14,8 @@
   },
   "bin": {
     "task-store": "./scripts/task-store.js",
-    "context-compressor": "./scripts/context-compressor.js"
+    "context-compressor": "./scripts/context-compressor.js",
+    "provider-advisor": "./scripts/provider-advisor.js"
   },
   "keywords": [
     "ai",
