@@ -33,6 +33,7 @@ ${BOLD}Usage:${NC}
   civagent agents                       Show generated CC agents for active regime
   civagent modes                        List 6 orchestration modes
   civagent setup                        Check tool availability (CC, Codex, opencode, cn-cc)
+  civagent doctor                       Verify cn-cc-workflow backends (cn:*) are installed
 
 ${BOLD}Examples:${NC}
   civagent switch china/tang
@@ -302,6 +303,19 @@ cmd_tournament() {
   exec node "$ENGINE_DIR/v5/tournament.mjs" --civs "$civs" "${rest[@]}"
 }
 
+# Verify the cn-cc-workflow launchers the cn:* backends depend on (engine/cn-cc.mjs).
+cmd_doctor() {
+  echo -e "${BOLD}CivAgent — cn-cc-workflow 依赖自检 / dependency check${NC}"
+  CIVAGENT_ENGINE="$ENGINE_DIR" node --input-type=module -e '
+const { checkCnCc } = await import(`${process.env.CIVAGENT_ENGINE}/cn-cc.mjs`);
+const r = checkCnCc();
+for (const b of r.present) console.log("  ✓ " + b.id + " → " + b.cmd);
+for (const b of r.missing) console.log("  ✗ " + b.id + " → " + b.cmd + " (missing)");
+if (!r.ok) { console.error("\nMissing cn-cc-workflow launchers. Install:\n  " + r.install + "\n  see " + r.repo); process.exit(1); }
+console.log("\n✓ cn-cc execution engine ready (" + r.present.length + " backends)");
+'
+}
+
 # ── main ─────────────────────────────────────────────────────────────────────
 
 case "${1:-}" in
@@ -312,6 +326,7 @@ case "${1:-}" in
   agents)    cmd_agents ;;
   modes)     cmd_modes ;;
   setup)     cmd_setup ;;
+  doctor)    cmd_doctor ;;
   skills)    cmd_skills "${2:-}" ;;
   match-log) cmd_match_log ;;
   tournament) shift; cmd_tournament "$@" ;;
