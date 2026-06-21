@@ -21,6 +21,12 @@ and 37 global empires, creating a universal multi-regime governance platform.
 - Fork maintained by [@LeoLin990405](https://github.com/LeoLin990405) — a data professional & online part-time history undergraduate & AI programming enthusiast
 - Original concept and Tang Dynasty implementation: [@wanikua](https://github.com/wanikua)
 
+## Runtime Dependency / 运行时依赖
+
+CivAgent uses **[cn-cc-workflow](https://github.com/LeoLin990405/cn-cc-workflow)** (Apache-2.0) as its multi-agent **execution engine**: the `cn:*` civ backends (`cn:doubao`, `cn:glm`, …) are the `cc-*` launchers that project provides. CivAgent stays the orchestration / regime / dashboard layer on top; cn-cc-workflow runs the implementers. See `engine/cn-cc.mjs` (dependency check) and the contract at [cn-cc-workflow/docs/INTEGRATIONS.md](https://github.com/LeoLin990405/cn-cc-workflow/blob/main/docs/INTEGRATIONS.md).
+
+> Two clean repos (not merged): licenses differ (CivAgent MIT, cn-cc-workflow Apache-2.0). Install the engine: `git clone https://github.com/LeoLin990405/cn-cc-workflow && cd cn-cc-workflow && ./backends/install.sh`.
+
 ## Inspirations & Key References / 灵感来源 & 主要参考
 
 - **[@wanikua](https://github.com/wanikua)** — The original [AI 朝廷](https://github.com/wanikua/boluobobo-ai-court-tutorial) project that started it all

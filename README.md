@@ -18,6 +18,10 @@
   <img src="https://img.shields.io/badge/License-MIT-yellowgreen?style=for-the-badge" />
 </p>
 
+<p align="center">
+  🔧 <b>执行引擎 / Execution engine</b>：<code>cn:*</code> 后端跑在 <a href="https://github.com/LeoLin990405/cn-cc-workflow">cn-cc-workflow</a> 上 — civagent 管编排，cn-cc 管执行（见 <a href="./CREDITS.md">CREDITS</a> / <code>engine/cn-cc.mjs</code>）
+</p>
+
 > **一种假说**：人类在五千年间反复实验的政治制度（中央集权、三权分立、民主议会、联邦自治、神权统治、双轨制衡），本质上是对**多实体协作问题**的历史解答。如果把每个 AI agent 类比为一个"臣子"、把问题求解过程类比为"治理过程"，那么 57 种历史政体就是 57 套**可复用的多智能体编排模式**——各自在真实历史中经受过数十年乃至千年的压力测试。
 >
 > *"The present is history's laboratory; the past, its ruined library."*
