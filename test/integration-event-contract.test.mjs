@@ -266,6 +266,27 @@ test(
         assert.equal(ev.matchId, matchId,          "all events must reference the right matchId");
       }
 
+      // ── OTel-style envelope (schema v2) ──
+      for (const ev of events) {
+        assert.match(ev.event_id, /^[0-9a-f-]{36}$/, `event_id must be a UUID in: ${JSON.stringify(ev)}`);
+        assert.equal(ev.schema_version, "2.0",       "schema_version must be 2.0");
+        assert.equal(ev.trace_id, matchId,           "trace_id must equal the match id for every event");
+        assert.match(ev.span_id, /^[0-9a-f]{16}$/,   "span_id must be 16 hex chars");
+        assert.match(ev.payload_hash, /^[0-9a-f]{16}$/, "payload_hash must be 16 hex chars");
+        assert.equal(typeof ev.kind, "string",       "kind must be present");
+        assert.equal(typeof ev.actor, "string",      "actor must be present");
+      }
+      const startForTrace = events.find((e) => e.type === "match_start");
+      assert.equal(startForTrace.parent_span_id, null, "match_start is the trace root");
+      for (const ev of events.filter((e) => e.type !== "match_start")) {
+        assert.equal(ev.parent_span_id, startForTrace.span_id,
+          `${ev.type} must be a child span of match_start`);
+      }
+      assert.equal(events.find((e) => e.type === "turn").kind, "turn");
+      assert.equal(events.find((e) => e.type === "turn").actor, "china/tang");
+      assert.equal(events.find((e) => e.type === "skill").actor, "skill-learner");
+      assert.equal(events.find((e) => e.type === "match_end").actor, "system");
+
       // match_start with regime/backend fields.
       const startEv = events.find((e) => e.type === "match_start");
       assert.ok(startEv,                        "must have match_start");
@@ -466,6 +487,31 @@ test(
         `expected qin score 7.0, got ${j.scores[1].score}`);
       assert.equal(j.topRegime, "china/tang",
         `expected topRegime=china/tang, got ${j.topRegime}`);
+
+      // ── blind double evaluation: swap pass + audit trail ──
+      assert.equal(j.swap, true, "order swap must be on by default");
+      assert.equal(j.passes, 2, "two judge passes (original + swapped) must have run");
+      assert.deepEqual(j.rubric?.dimensions, ["legality", "feasibility", "resilience"]);
+
+      // The tournament-level trace holds one judge_score event per pass.
+      assert.equal(typeof j.events, "string", "judge.events must point at the audit event stream");
+      const judgeEvents = readJsonl(j.events).filter((e) => e.type === "judge");
+      assert.equal(judgeEvents.length, 2, "one judge_score event per pass");
+      assert.equal(judgeEvents[0].kind, "judge_score");
+      assert.equal(judgeEvents[0].swapped, false, "pass 1 keeps original order");
+      assert.equal(judgeEvents[1].swapped, true, "pass 2 swaps presentation order");
+      assert.deepEqual(judgeEvents[0].order, ["china/tang", "china/qin"]);
+      assert.deepEqual(judgeEvents[1].order, ["china/qin", "china/tang"]);
+      for (const ev of judgeEvents) {
+        assert.match(ev.prompt_hash, /^[0-9a-f]{16}$/, "judge event must carry the rubric prompt hash");
+        assert.equal(ev.provider, "codex");
+        assert.equal(ev.model, "codex");
+        assert.equal(ev.actor, "judge");
+        assert.equal(ev.trace_id, tournamentId, "judge events share the tournament trace");
+        assert.ok(ev.parent_span_id, "judge_score must be a child span");
+      }
+      assert.notEqual(judgeEvents[0].prompt_hash, judgeEvents[1].prompt_hash,
+        "swapped order must produce a different prompt hash");
 
       // result.md must exist alongside manifest.
       assert.ok(

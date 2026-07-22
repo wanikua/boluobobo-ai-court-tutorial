@@ -30,6 +30,7 @@ export interface JudgeScore {
   regime: string;
   score: number;
   reason?: string;
+  dims?: { legality?: number; feasibility?: number; resilience?: number };
 }
 
 export interface MatchEvent {
@@ -105,6 +106,10 @@ export interface TournamentManifest {
     resultPath: string; // absolute path to result.md
     scores?: JudgeScore[];
     topRegime?: string | null;
+    swap?: boolean;     // whether the order-swapped second judge pass ran
+    passes?: number;    // judge passes actually completed
+    rubric?: { scale: string; dimensions: string[] };
+    events?: string;    // absolute path to the tournament-level judge_score events.jsonl
   };
 }
 
