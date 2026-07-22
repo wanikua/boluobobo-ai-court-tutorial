@@ -7,10 +7,46 @@
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
+import crypto from "node:crypto";
 
 export const ROOT = path.join(os.homedir(), ".civagent");
 
 export const EVENT_TYPES = ["match_start", "turn", "tool", "judge", "skill", "match_end"];
+
+// ── OTel-style envelope (schema v2) ─────────────────────────────────────────
+// Added back-compatibly: every event keeps its legacy fields (matchId, seq, ts,
+// type, ...) and additionally carries a trace/span envelope so event streams can
+// be correlated across matches, judges, and skill sedimentation.
+export const SCHEMA_VERSION = "2.0";
+
+// Fine-grained kind per legacy coarse type. Coexists with `type`; consumers that
+// only know `type` are unaffected.
+export const KIND_BY_TYPE = {
+  match_start: "match_start",
+  turn: "turn",
+  tool: "tool_call",
+  judge: "judge_score",
+  skill: "skill_commit",
+  match_end: "match_end",
+};
+
+// Default producer per type when the emitter doesn't pass an explicit actor.
+const DEFAULT_ACTOR_BY_TYPE = {
+  judge: "judge",
+  skill: "skill-learner",
+  match_end: "system",
+};
+
+// sha256 of `input`, truncated to 16 hex chars (64 bits) — enough to detect
+// prompt/payload drift without storing the full digest.
+export function hashShort(input) {
+  return crypto.createHash("sha256").update(String(input)).digest("hex").slice(0, 16);
+}
+
+// 16 hex chars, mirroring OTel span-id width.
+export function newSpanId() {
+  return crypto.randomBytes(8).toString("hex");
+}
 
 export function matchDir(matchId) {
   const dir = path.join(ROOT, "matches", String(matchId));
@@ -33,11 +69,36 @@ export class EventLog {
     this.path = eventsPath(this.matchId);
     this.stream = fs.createWriteStream(this.path, { flags: "a" });
     this.seq = 0;
+    // Root span of this trace; match_start adopts it, all other events default
+    // to being its children unless the caller passes an explicit parent.
+    this.rootSpanId = newSpanId();
   }
 
   emit(type, fields = {}) {
     if (!EVENT_TYPES.includes(type)) throw new Error(`unknown event type: ${type}`);
-    const ev = { matchId: this.matchId, seq: this.seq++, ts: Date.now(), type, ...fields };
+    const isRoot = type === "match_start";
+    // Hash only the caller-supplied payload (the type-specific fields), not the
+    // envelope itself.
+    const payload_hash = hashShort(JSON.stringify(fields));
+    const ev = {
+      // legacy fields — untouched contract
+      matchId: this.matchId,
+      seq: this.seq++,
+      ts: Date.now(),
+      type,
+      // OTel-style envelope (schema v2, all additive)
+      event_id: crypto.randomUUID(),
+      schema_version: SCHEMA_VERSION,
+      trace_id: this.matchId,
+      span_id: fields.span_id || (isRoot ? this.rootSpanId : newSpanId()),
+      parent_span_id: fields.parent_span_id ?? (isRoot ? null : this.rootSpanId),
+      actor: fields.actor || DEFAULT_ACTOR_BY_TYPE[type] || "system",
+      kind: fields.kind || KIND_BY_TYPE[type] || type,
+      payload_hash,
+      // Optional observability fields, passed through when the caller has them:
+      // model, model_version, prompt_hash, tokens, cost — spread below.
+      ...fields,
+    };
     this.stream.write(JSON.stringify(ev) + "\n");
     return ev;
   }

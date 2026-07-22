@@ -86,7 +86,7 @@ async function main() {
   console.error(`[v5] events=${eventsPath(matchId)}`);
 
   writeMeta(matchId, { regime, backend, command, task: prompt, startedAt, status: "running" });
-  log.emit("match_start", { regime, backend, command, task: prompt });
+  log.emit("match_start", { regime, backend, command, task: prompt, actor: regime });
 
   // Generate agent definitions via v4's converter, piped to CC's --agents.
   const agentsJson = await new Promise((resolve, reject) => {
@@ -118,7 +118,7 @@ async function main() {
   const cc = spawn(command, ccArgs, { env, stdio: ["inherit", "pipe", "inherit"] });
   cc.stdout.on("data", (chunk) => {
     process.stdout.write(chunk);
-    log.emit("turn", { text: chunk.toString() });
+    log.emit("turn", { text: chunk.toString(), actor: regime });
   });
 
   let exitCode;
@@ -156,9 +156,9 @@ async function main() {
 
   // Emit a structured skill event so the frontend can reflect sedimentation status.
   const skillEv = buildSkillEvent(sedimentResult);
-  if (skillEv) log.emit("skill", skillEv);
+  if (skillEv) log.emit("skill", skillEv); // actor defaults to "skill-learner"
 
-  log.emit("match_end", { exitCode });
+  log.emit("match_end", { exitCode }); // actor defaults to "system"
   await log.close();
 
   writeMeta(matchId, { endedAt: Date.now(), exitCode, status: "done", sediment: sedimentResult });

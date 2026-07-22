@@ -13,8 +13,25 @@
     "type": {
       "type": "string",
       "enum": ["match_start", "turn", "tool", "judge", "skill", "match_end"],
-      "description": "Event kind."
+      "description": "Coarse event kind (legacy contract)."
     },
+    "event_id": { "type": "string", "description": "UUID uniquely identifying this event (schema v2 envelope)." },
+    "schema_version": { "type": "string", "description": "Envelope schema version, e.g. \"2.0\". Absent on pre-v2 events." },
+    "trace_id": { "type": "string", "description": "Trace this event belongs to; equals the match/tournament id." },
+    "span_id": { "type": "string", "description": "16-hex span id of this event (OTel-style)." },
+    "parent_span_id": { "type": ["string", "null"], "description": "Span id of the parent event; null on match_start (trace root)." },
+    "actor": { "type": "string", "description": "Producer identity: regime id, \"judge\", \"skill-learner\", or \"system\"." },
+    "kind": {
+      "type": "string",
+      "enum": ["llm_call", "tool_call", "judge_score", "skill_propose", "skill_commit", "turn", "match_start", "match_end"],
+      "description": "Fine-grained event kind; coexists with the legacy coarse `type` field."
+    },
+    "model": { "type": "string", "description": "Model/provider id that produced this event, when known (e.g. judge provider)." },
+    "model_version": { "type": "string", "description": "Version string of the model, when known." },
+    "prompt_hash": { "type": "string", "description": "sha256 (first 16 hex chars) of the prompt sent to a judge/learner." },
+    "tokens": { "type": "integer", "description": "Token count for the LLM call, when reported by the provider." },
+    "cost": { "type": "number", "description": "Monetary cost of the LLM call, when reported by the provider." },
+    "payload_hash": { "type": "string", "description": "sha256 (first 16 hex chars) of the event's type-specific payload fields." },
     "regime": { "type": "string", "description": "region/regime-id, e.g. china/tang. Present on match_start." },
     "backend": { "type": "string", "description": "Backend id, e.g. native, cn:doubao. Present on match_start." },
     "command": { "type": "string", "description": "Resolved binary the backend mapped to. Present on match_start." },
@@ -33,9 +50,9 @@
     "reason": { "type": "string", "description": "Human-readable reason for rejected/skipped/error status. Present on skill events." }
   },
   "examples": [
-    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 0, "ts": 1764326400000, "type": "match_start", "regime": "china/tang", "backend": "native", "command": "claude", "task": "famine on the eastern frontier" },
-    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 1, "ts": 1764326401000, "type": "turn", "text": "门下省 reviews the draft edict ..." },
-    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 8, "ts": 1764326459000, "type": "skill", "status": "saved", "skillPath": "/home/user/.civagent/envs/china-tang/regimes/china/tang/skills/learned-2026-05-28-famine-ab12.md", "auditedBy": "codex" },
-    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 9, "ts": 1764326460000, "type": "match_end", "exitCode": 0 }
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 0, "ts": 1764326400000, "type": "match_start", "regime": "china/tang", "backend": "native", "command": "claude", "task": "famine on the eastern frontier", "event_id": "3f6b2a10-7c4e-4f1a-9d2e-5b8c1a0e2f44", "schema_version": "2.0", "trace_id": "2026-05-28T10-00-00-ab12", "span_id": "aa10bb20cc30dd40", "parent_span_id": null, "actor": "china/tang", "kind": "match_start", "payload_hash": "0f1e2d3c4b5a6978" },
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 1, "ts": 1764326401000, "type": "turn", "text": "门下省 reviews the draft edict ...", "event_id": "4a7c3b21-8d5f-402b-8e3f-6c9d2b1f3055", "schema_version": "2.0", "trace_id": "2026-05-28T10-00-00-ab12", "span_id": "bb21cc32dd43ee54", "parent_span_id": "aa10bb20cc30dd40", "actor": "china/tang", "kind": "turn", "payload_hash": "1a2b3c4d5e6f7081" },
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 8, "ts": 1764326459000, "type": "skill", "status": "saved", "skillPath": "/home/user/.civagent/envs/china-tang/regimes/china/tang/skills/learned-2026-05-28-famine-ab12.md", "auditedBy": "codex", "event_id": "5b8d4c32-9e60-513c-9f40-7d0e3c204166", "schema_version": "2.0", "trace_id": "2026-05-28T10-00-00-ab12", "span_id": "cc32dd43ee54ff65", "parent_span_id": "aa10bb20cc30dd40", "actor": "skill-learner", "kind": "skill_commit", "payload_hash": "2b3c4d5e6f708192" },
+    { "matchId": "2026-05-28T10-00-00-ab12", "seq": 9, "ts": 1764326460000, "type": "match_end", "exitCode": 0, "event_id": "6c9e5d43-af71-624d-a051-8e1f4d315277", "schema_version": "2.0", "trace_id": "2026-05-28T10-00-00-ab12", "span_id": "dd43ee54ff65aa76", "parent_span_id": "aa10bb20cc30dd40", "actor": "system", "kind": "match_end", "payload_hash": "3c4d5e6f708192a3" }
   ]
 }
